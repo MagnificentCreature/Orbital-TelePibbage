@@ -77,6 +77,7 @@ sendPhoto("C:/Users/seanw/Downloads/sapl8o4hr4ca1.webp")
 sendMessage("Vote for the prompt you think generated Photo 1!")
 sendPoll("Which prompt generated Photo 1?", options)
 sendMessage("Vote for the prompt you think generated Photo 1!")
+sendMessage("new branch")
 
 # sendMessage('"Baroque Obama"')
 # sendMessage("Picked By: @HoXuWen")
