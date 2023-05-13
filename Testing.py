@@ -1,7 +1,7 @@
 import requests
 import json
 
-BOT_TOKEN = '1646052721:AAH6IJRzcM1s6Cbv2WQlTaqNYMlPVEuhAHs'
+BOT_TOKEN = '6222391384:AAEoLLtl8DDzbjiXy4NwpndASWrhDH9Krk0'
 CHAT_ID = "-511576030"
 # file = "C:/Users/seanw/Downloads/sapl8o4hr4ca1.webp"
 
