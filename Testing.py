@@ -26,7 +26,13 @@ def sendPoll(question, options) :
     print(request)
     send = requests.get(request)
 
-options = json.dumps(['Baroque Obama', 'Obama dressing up as George Washington', 'Option 3', 'Use a hint LOL'])
+def readMessage() :
+    request = ('https://api.telegram.org/bot'+ BOT_TOKEN + '/getUpdates')
+    print(request)
+    send = requests.get(request)
+    print(send.json())
+
+# options = json.dumps(['Baroque Obama', 'Obama dressing up as George Washington', 'Option 3', 'Use a hint LOL'])
 
 # sendMessage("Welcome to Pibbage! Type /create_game to create a game lobby or /join <RoomCode> to join a game!")
 # sendMessage("If you're new here, check <Insert youtube video/website> for the rules!")
@@ -65,11 +71,11 @@ options = json.dumps(['Baroque Obama', 'Obama dressing up as George Washington',
 # sendMessage("Enter your lie for this photo, or click 'Use a Hint' if you can't decide")
 # sendMessage("10 seconds left! Time to click send!")
 
-sendMessage("Voting Round!")
-sendMessage("Photo 1:")
-sendPhoto("C:/Users/seanw/Downloads/sapl8o4hr4ca1.webp")
-sendMessage("Vote for the prompt you think generated Photo 1!")
-sendPoll("Which prompt generated Photo 1?", options)
+# sendMessage("Voting Round!")
+# sendMessage("Photo 1:")
+# sendPhoto("C:/Users/seanw/Downloads/sapl8o4hr4ca1.webp")
+# sendMessage("Vote for the prompt you think generated Photo 1!")
+# sendPoll("Which prompt generated Photo 1?", options)
 
 # sendMessage('"Baroque Obama"')
 # sendMessage("Picked By: @HoXuWen")
