@@ -26,7 +26,13 @@ def sendPoll(question, options) :
     print(request)
     send = requests.get(request)
 
-options = json.dumps(['Baroque Obama', 'Obama dressing up as George Washington', 'Option 3', 'Use a hint LOL'])
+def readMessage() :
+    request = ('https://api.telegram.org/bot'+ BOT_TOKEN + '/getUpdates')
+    print(request)
+    send = requests.get(request)
+    print(send.json())
+
+# options = json.dumps(['Baroque Obama', 'Obama dressing up as George Washington', 'Option 3', 'Use a hint LOL'])
 
 # sendMessage("Welcome to Pibbage! Type /create_game to create a game lobby or /join <RoomCode> to join a game!")
 # sendMessage("If you're new here, check <Insert youtube video/website> for the rules!")
