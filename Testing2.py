@@ -8,10 +8,12 @@ CHAT_ID = "-511576030"
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Sends a message with three inline buttons attached."""
     keyboard = [
-        [InlineKeyboardButton("Baroque Obama", callback_data="1")],
-        [InlineKeyboardButton("Obama dressing up as washington", callback_data="2")],
-        [InlineKeyboardButton("Option 3", callback_data="3")],
-        [InlineKeyboardButton("Use a hint LOL", callback_data="4")]
+        # [InlineKeyboardButton("Baroque Obama", callback_data="1")],
+        # [InlineKeyboardButton("Obama dressing up as washington", callback_data="2")],
+        # [InlineKeyboardButton("Option 3", callback_data="3")],
+        # [InlineKeyboardButton("Use a hint LOL", callback_data="4")]
+        [InlineKeyboardButton("start", callback_data="start")],
+        [InlineKeyboardButton("help", callback_data="help")]
     ]
 
     reply_markup = InlineKeyboardMarkup(keyboard)
