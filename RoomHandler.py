@@ -14,7 +14,8 @@ class RoomHandler:
     def __init__(self):
         self.rooms = {}
 
-    #Static method that generates a random room code
+    #Static method that generates a random four alphabet room code
+    @staticmethod
     def generateRoomCode():
         code = ""
         for i in range(4):

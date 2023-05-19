@@ -1,0 +1,3 @@
+# Each line is an entry stored in the form of key, text 
+Welcome1, Welcome to Pibbage! If you're new here, check <Insert youtube video/website> for the rules!
+Welcome2, When you're ready, type /create_game to create a game lobby or /join <RoomCode> to join a game!
