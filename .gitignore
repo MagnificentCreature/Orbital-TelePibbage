@@ -1,3 +1,6 @@
+#Testing files
+Testing*.py
+
 #Bot API tokens
 /Controller/conf.py
 
