@@ -10,6 +10,7 @@ from pathlib import Path
 sys.path.insert(1, str(Path(__file__).parent.parent.absolute()))
 from Chat.DialogueReader import DialogueReader
 from Room.RoomHandler import RoomHandler
+from Player.PlayersManager import PlayersManager
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await DialogueReader.sendMessage(context.bot, update, "Welcome1")
@@ -17,4 +18,4 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def create_room(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await DialogueReader.sendMessage(context.bot, update, "Creating Room")
-    room = RoomHandler().generateRoom(update.effective_user)
+    await RoomHandler().generateRoom(PlayersManager.)
