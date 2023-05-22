@@ -3,5 +3,5 @@ Welcome1, Welcome to Pibbage! If you're new here, check <Insert youtube video/we
 Welcome2, When you're ready, type /create_room to create a game lobby or /join <RoomCode> to join a game!
 CreateRoom1, Creating game room...
 CreateRoom2, Your room code is {roomCode}
-CreateRoom3, Invite your friends to the room by sending them this link: https://t.me/PibbageBot?start={roomCode} \nOR \ngetting them to send /join_room {roomCode} to me, @TelePibbageBot
+CreateRoom3, Invite your friends to the room by sending them this link: https://t.me/TelePibbageBot?start={roomCode} \nOR \ngetting them to send /join_room {roomCode} to me, @TelePibbageBot
 RoomError, Error when creating room
