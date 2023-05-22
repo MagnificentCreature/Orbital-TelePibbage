@@ -1,5 +1,5 @@
-import conf
-import BotCommands
+from Controller import conf
+from Controller import BotCommands
 import logging
 from telegram.ext import ApplicationBuilder, CommandHandler
 
@@ -10,10 +10,12 @@ logging.basicConfig(
     level=logging.INFO
 )
 
-if __name__ == '__main__':
+def main():
     application = ApplicationBuilder().token(BOT_TOKEN).build()
     
     start_handler = CommandHandler('start', BotCommands.start)
+    create_room_handler = CommandHandler('create_room', BotCommands.create_room)
     application.add_handler(start_handler)
+    application.add_handler(create_room_handler)
     
     application.run_polling()

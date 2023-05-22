@@ -1,43 +1,65 @@
 '''
-Controller class that manages things to do with players
+Singleton controller class that manages things to do with players in the global context
 Can be later replaced with the interace that interacts with a player database
 For now it will interact with a text file
 '''
 
+from os import path
+# import player class
+from Player.Player import Player #This import does not work when running this script directly, but works when running from main.py
+
 class PlayersManager:
-    playerList = []
+    playerRecord = {}
 
-    def __init__(self):
-        # initlaise player list from players.txt in name, score
-        self.playerList = []
-        with open("Players/players.txt", "r") as f:
-            for line in f:
-                self.playerList.append(line.strip().split(","))
-        f.close()
+    file_path = path.realpath(__file__)
+    dir_path = path.dirname(file_path)
+    players_path = path.join(dir_path, "Players.txt")
 
-    # method that adds a player to the player list
-    def addPlayer(self, username):
+    with open(players_path, "r") as f:
+        for line in f:
+            playerRecord[line.strip().split(",")[0]] = Player(
+                line.strip().split(",")[0], line.strip().split(",")[1]
+            )
+    f.close()
+
+    # method that adds a player to the playerRecord
+    def recordNewPlayer(username):
         # check if player is already in the list
-        for player in self.playerList:
-            if player[0] == username:
-                return False
-        # add player to list
-        self.playerList.append([username, 0])
+        if username in PlayersManager.playerRecord.keys():
+            return PlayersManager.playerRecord[username]
+        
+        print("Adding new player " + username + " to player list")
 
-        # write to file
-        with open("Players/players.txt", "a") as f:
-            f.write(username + ",0\n")
+        # add player to list
+        PlayersManager.playerRecord[username] = Player(username)
+
+        # # write to file
+        with open(PlayersManager.players_path, "a") as f: # is this secure?
+            f.write(str(username) + ",0\n")
         f.close()
 
-        return True
+        return PlayersManager.playerRecord[username]
     
     # method that removes a player from the player list
 
 
-    # method that returns the player if he is in the list, else creates a new one
-    def getPlayer(self, username):
-        for player in self.playerList:
-            if player[0] == username:
-                return player
-        self.addPlayer(username)
-        return self.getPlayer(username)
+    # method that returns the player if he is in the dictionary, else creates a new one
+    def getPlayer(player):
+        # check if player is already in the dicitonary
+        if player in PlayersManager.playerRecord.keys():
+            return PlayersManager.playerRecord[player]
+        return PlayersManager.recordNewPlayer(player)
+
+    # # returns the room code a player is in if he is in one, else return -1
+    # def getRoom(username):
+    #     return username.getRoomCode()
+
+'''
+    def __init__(self):
+        # initlaise player dictionary from players.txt by username : player object
+        playerList = {}
+        with open("Players/players.txt", "r") as f:
+            for line in f:
+                self.playerList.appen(line.strip().split(","))
+        f.close()
+'''

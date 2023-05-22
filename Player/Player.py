@@ -8,11 +8,11 @@ class Player:
     username = ""
     score = 0
     inGame = False
-    isHost = False
+    roomCode = -1
 
-    def __init__(self, username):
+    def __init__(self, username, score=0):
         self.username = username
-        self.score = 0
+        self.score = score
         self.inGame = False
         self.isHost = False
 
@@ -20,4 +20,14 @@ class Player:
         return self.inGame
     
     def isHost(self):
-        return self.isHost
+        return False
+    
+    def getScore(self):
+        return self.score
+    
+class Host(Player):
+    def __init__(self, username, score=0):
+        super().__init__(username, score)
+    
+    def isHost(self):
+        return True

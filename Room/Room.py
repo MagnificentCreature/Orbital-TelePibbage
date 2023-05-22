@@ -33,5 +33,5 @@ class Room:
         self.players.remove(player)
         return True
 
-    def getPlayers(self):
-        return self.players
+    def hasPlayer(self, username):
+        return username in self.players

@@ -27,17 +27,32 @@ class DialogueReader:
             # Split the line into key-value pairs by the first comma
             key, value = line.strip().split(',', 1)
             # Store the key-value pairs in the dictionary 
-            data[key] = value 
+            data[key] = value
         dialogues = data
     
+    @staticmethod
+    def additionalProcessing(inputString):
+        # Replace \n with newline
+        inputString = inputString.replace("\\n", "\n")
+        return inputString
+
     @staticmethod
     async def sendMessage(bot, update, message):
         #Use telegram api to send a message
         if (message not in DialogueReader.dialogues):
             print("Message " + message + " not found in dialogues.txt")
-        await bot.send_message(chat_id=update.effective_chat.id, text=DialogueReader.dialogues[message])
+        formattedText = DialogueReader.additionalProcessing(DialogueReader.dialogues[message])
+        await bot.send_message(chat_id=update.effective_chat.id, text=formattedText)
         
+    @staticmethod
+    async def sendMessage(bot, update, message, **kwargs):
+        #Use telegram api to send a message
+        if (message not in DialogueReader.dialogues):
+            print("Message " + message + " not found in dialogues.txt")
+        formattedText = DialogueReader.additionalProcessing(DialogueReader.dialogues[message].format(**kwargs))
+        await bot.send_message(chat_id=update.effective_chat.id, text=formattedText)
 
+    
 
     # def readDialogues():
     #     with open('Dialogues.txt', 'r') as f: 
