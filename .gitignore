@@ -5,9 +5,8 @@ Testing*.py
 /Controller/conf.py
 
 #Player Data
-Player/Players.txt
+/Player/Players.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
-Player/Players.txt
