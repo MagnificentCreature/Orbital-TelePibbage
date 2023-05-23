@@ -20,9 +20,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def create_room(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await DialogueReader.sendMessage(context.bot, update, "CreateRoom1")
-    room = RoomHandler.generateRoom(update.message.from_user.username)
-    if room is None:
-        await DialogueReader.sendMessage(context.bot, update, "CreateRoomFail")
-        return
-    await DialogueReader.sendMessage(context.bot, update, "CreateRoom2", **{'roomCode':room.getCode()})
-    await DialogueReader.sendMessage(context.bot, update, "CreateRoom3", **{'roomCode':room.getCode()})
+    await RoomHandler.generateRoom(update.message.from_user.username, context.bot, update)
+
+async def join_room(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await DialogueReader.sendMessage(context.bot, update, "JoinRoom1")
+    # check if join room is successful
+
+    # send messsage to all other players that a new player has joined
+    

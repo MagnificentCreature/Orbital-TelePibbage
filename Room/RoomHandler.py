@@ -27,11 +27,12 @@ class RoomHandler:
             code += chr(random.randint(65, 90))
         return code
 
-    def generateRoom(username):
+    async def generateRoom(username, bot, update):
         host = PlayersManager.getPlayer(username)
 
         # first check if host player is already in a room
         if host.isInRoom():
+            await DialogueReader.sendMessage(bot, update, "CreateRoomError")
             return None #TODO return error code for bot to print if it failed (with reason)
         # By right the code should not even reach this point because the bot would 
         # not have even register the /create_game command if the player is already in a game
@@ -42,9 +43,24 @@ class RoomHandler:
             code = RoomHandler.generateRoomCode()
 
         #create room and add to rooms
-        RoomHandler.rooms[code] = Room(code, host)
+        room = Room(code, host)
+        #add host to room
+        room.addPlayer(host)
+        
+        #send join room message
+        await RoomHandler.sendRoomMessages(room, bot, update)
+            
+        RoomHandler.rooms[code] = room
         return Room(code, host)
     
+    async def joinRoom(username, roomCode, bot, update):
+        return
+
+    async def sendRoomMessages(room, bot, update):
+        await DialogueReader.sendMessage(bot, update, "RoomCode", **{'roomCode':room.getCode()})
+        await DialogueReader.sendMessage(bot, update, "Invite", **{'roomCode':room.getCode()})
+        await DialogueReader.sendMessage(bot, update, "WaitingToStart")
+
     #method that deletes a room
     def deleteRoom(room):
         del RoomHandler.rooms[room.getCode()]
