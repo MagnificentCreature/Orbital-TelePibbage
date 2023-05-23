@@ -28,20 +28,18 @@ class RoomHandler:
         return code
 
     async def generateRoom(username, bot):
-        host = PlayersManager.getPlayer(username)
-
         #keep generating room codes while making sure there is no duplicate room codes
         code = RoomHandler.generateRoomCode()
         while code in RoomHandler.rooms:
             code = RoomHandler.generateRoomCode()
 
         #create room and add to rooms list
-        room = Room(code, host)
+        room = Room(code, username)
         RoomHandler.rooms[code] = room
 
         #add host to room
-        if not room.addPlayer(host, "create", bot):
-            await DialogueReader.sendMessage(bot, host, "RoomCreationFailed")
+        if not await room.addPlayer(username, "create", bot):
+            await DialogueReader.sendMessage(bot, username, "RoomCreationFailed")
             return False
         
         return True
@@ -52,7 +50,7 @@ class RoomHandler:
             await DialogueReader.sendMessage(bot, username, "RoomNotFound")
             return False
         room = RoomHandler.rooms[roomCode]
-        room.addPlayer(username, "join", bot)
+        await room.addPlayer(username, "join", bot)
         return True
 
     #method that deletes a room

@@ -23,7 +23,8 @@ class PlayersManager:
     f.close()
 
     # method that adds a player to the playerRecord
-    def recordNewPlayer(username, id):
+    @staticmethod
+    async def recordNewPlayer(username, id):
         # check if player is already in the list
         if username in PlayersManager.playerRecord.keys():
             return PlayersManager.playerRecord[username]
@@ -44,15 +45,18 @@ class PlayersManager:
 
 
     # method that returns the player if he is in the dictionary, else creates a new one
+    @staticmethod
     def getPlayer(player):
         # check if player is already in the dicitonary
         if player in PlayersManager.playerRecord.keys():
             return PlayersManager.playerRecord[player]
         return PlayersManager.recordNewPlayer(player)
     
+    #Method is only used in DialogueReader
     def getChatID(username):
         return PlayersManager.playerRecord[username].getChatID()
     
+    @staticmethod
     def isPlayerFree(username):
         return PlayersManager.playerRecord[username].isInGame()
 

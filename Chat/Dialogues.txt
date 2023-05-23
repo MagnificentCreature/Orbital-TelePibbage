@@ -9,7 +9,8 @@ WaitingToStart, Waiting for players to join... Type "/start_game" to start the g
 JoinRoom1, Joining game lobby {roomCode}...
 PlayerJoined, @{player} has joined the lobby ({playerCount}/{maxPlayerCount})
 # Error Messages 
-AlreadyInRoom, Error to {action} room, perhaps you are already in a room
+InGame, Error to {action} room, perhaps you are already in another game
+AlreadyInRoom, You are already in this room!
 RoomNotFound, Invalid Room Code! Room code is a sequence of four Uppercase letters
 RoomFull, Error when {action} room, room is full!
 GameInProgress, Game is in progress, do "/join_audience {roomCode}" to join as audience

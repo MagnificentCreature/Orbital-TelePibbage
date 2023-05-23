@@ -40,11 +40,19 @@ class DialogueReader:
         return inputString
 
     @staticmethod
-    async def sendMessage(bot, chat_id, message):
+    async def sendMessageByID(bot, chat_id, message):
         #Use telegram api to send a message
         if (message not in DialogueReader.dialogues):
             print("Message " + message + " not found in dialogues.txt")
         formattedText = DialogueReader.additionalProcessing(DialogueReader.dialogues[message])
+        await bot.send_message(chat_id=chat_id, text=formattedText)
+
+    @staticmethod
+    async def sendMessageByID(bot, chat_id, message, **kwargs):
+        #Use telegram api to send a message, additional arguments are given in the form of **{{key}=value}
+        if (message not in DialogueReader.dialogues):
+            print("Message " + message + " not found in dialogues.txt")
+        formattedText = DialogueReader.additionalProcessing(DialogueReader.dialogues[message].format(**kwargs))
         await bot.send_message(chat_id=chat_id, text=formattedText)
         
     @staticmethod
@@ -54,14 +62,6 @@ class DialogueReader:
             print("Message " + message + " not found in dialogues.txt")
         formattedText = DialogueReader.additionalProcessing(DialogueReader.dialogues[message])
         await bot.send_message(chat_id=PlayersManager.getChatID(username), text=formattedText)
-        
-    @staticmethod
-    async def sendMessage(bot, chat_id, message, **kwargs):
-        #Use telegram api to send a message, additional arguments are given in the form of **{{key}=value}
-        if (message not in DialogueReader.dialogues):
-            print("Message " + message + " not found in dialogues.txt")
-        formattedText = DialogueReader.additionalProcessing(DialogueReader.dialogues[message].format(**kwargs))
-        await bot.send_message(chat_id=chat_id, text=formattedText)
 
     @staticmethod
     async def sendMessage(bot, username, message, **kwargs):

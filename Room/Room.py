@@ -2,6 +2,7 @@
 Class that holds data about rooms
 """
 
+import asyncio
 from Chat.DialogueReader import DialogueReader
 from Player.PlayersManager import PlayersManager
 
@@ -15,7 +16,6 @@ class Room:
     def __init__(self, room, host):
         self.code = room
         self.host = host
-        self.players.append(host)
 
     def getCode(self):
         return self.code
@@ -25,29 +25,29 @@ class Room:
         await DialogueReader.sendMessage(bot, username, "RoomCode", **{'roomCode':self.getCode()})
         await DialogueReader.sendMessage(bot, username, "Invite", **{'roomCode':self.getCode()})
         await DialogueReader.sendMessage(bot, username, "WaitingToStart")
-        for player in self.players:
-            if player == username:
-                continue
-            await DialogueReader.sendMessage(bot, player, "PlayerJoined", **{'player':username})
+        await asyncio.gather(
+            DialogueReader.sendMessage(bot, player, "PlayerJoined", **{'player':username}) for player in self.players if player != username
+        )
 
     # Add player to room
     # Fails if is already in or if room is full
     async def addPlayer(self, username, action, bot):
         # do nothing if the player is already in the room
         if (username in self.players):
+            await DialogueReader.sendMessage(bot, username, "AlreadyInRoom", **{'action':action})
             return False
         if len(self.players) == Room.MAX_PLAYERS:
-            await DialogueReader.sendMessage(bot, username, "RoomFull", **{'action':action}) 
+            await DialogueReader.sendMessage(bot, username, "RoomFull", **{'action':action})
             return False
-        if (PlayersManager.isInRoom(username)):
-            await DialogueReader.sendMessage(bot, username, "AlreadyInRoom", **{'action':action})
+        if (PlayersManager.isPlayerFree(username)):
+            await DialogueReader.sendMessage(bot, username, "InGame", **{'action':action})
             return False
         if (self.state == 1):
             await DialogueReader.sendMessage(bot, username, "GameInProgress")
             return False
 
         # What remains is when state is 0 and room has space to join
-        await self.sendRoomMessages(bot, username)    
+        await self.sendRoomMessages(bot, username)
 
         self.players.append(username)
         return True
