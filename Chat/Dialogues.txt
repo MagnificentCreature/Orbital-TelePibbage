@@ -1,10 +1,16 @@
 # Each line is an entry stored in the form of key, text 
 Welcome1, Welcome to Pibbage! If you're new here, check <Insert youtube video/website> for the rules!
-Welcome2, When you're ready, type /create_room to create a game lobby or /join <RoomCode> to join a game!
+Welcome2, When you're ready, type "/create_room" to create a game lobby or /join <RoomCode> to join a game!
+# Room related dialogues
 CreateRoom1, Creating game room...
 RoomCode, Your room code is {roomCode}
-Invite, Invite your friends to the room by sending them this link: https://t.me/TelePibbageBot?start={roomCode} \nOR \ngetting them to send /join_room {roomCode} to me, @TelePibbageBot
-RoomCreateError, Error when creating room
-WaitingToStart, Waiting for players to join... Type /start_game to start the game
+Invite, Invite your friends to the room by sending them this link: https://t.me/TelePibbageBot?start={roomCode} \nOR \ngetting them to send "/join_room {roomCode}" to me, @TelePibbageBot
+WaitingToStart, Waiting for players to join... Type "/start_game" to start the game
 JoinRoom1, Joining game lobby {roomCode}...
-JoinRoomNotif, @{player} has joined the lobby ({playerCount}/{maxPlayerCount})
+PlayerJoined, @{player} has joined the lobby ({playerCount}/{maxPlayerCount})
+# Error Messages 
+AlreadyInRoom, Error to {action} room, perhaps you are already in a room
+RoomNotFound, Invalid Room Code! Room code is a sequence of four Uppercase letters
+RoomFull, Error when {action} room, room is full!
+GameInProgress, Game is in progress, do "/join_audience {roomCode}" to join as audience
+RoomCreationFailed, Failed to create room

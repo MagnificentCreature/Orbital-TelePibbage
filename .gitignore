@@ -4,6 +4,9 @@ Testing*.py
 #Bot API tokens
 /Controller/conf.py
 
+#Player Data
+Player/Players.txt
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

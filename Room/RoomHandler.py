@@ -27,39 +27,33 @@ class RoomHandler:
             code += chr(random.randint(65, 90))
         return code
 
-    async def generateRoom(username, bot, update):
+    async def generateRoom(username, bot):
         host = PlayersManager.getPlayer(username)
-
-        # first check if host player is already in a room
-        if host.isInRoom():
-            await DialogueReader.sendMessage(bot, update, "CreateRoomError")
-            return None #TODO return error code for bot to print if it failed (with reason)
-        # By right the code should not even reach this point because the bot would 
-        # not have even register the /create_game command if the player is already in a game
 
         #keep generating room codes while making sure there is no duplicate room codes
         code = RoomHandler.generateRoomCode()
         while code in RoomHandler.rooms:
             code = RoomHandler.generateRoomCode()
 
-        #create room and add to rooms
+        #create room and add to rooms list
         room = Room(code, host)
-        #add host to room
-        room.addPlayer(host)
-        
-        #send join room message
-        await RoomHandler.sendRoomMessages(room, bot, update)
-            
         RoomHandler.rooms[code] = room
-        return Room(code, host)
-    
-    async def joinRoom(username, roomCode, bot, update):
-        return
 
-    async def sendRoomMessages(room, bot, update):
-        await DialogueReader.sendMessage(bot, update, "RoomCode", **{'roomCode':room.getCode()})
-        await DialogueReader.sendMessage(bot, update, "Invite", **{'roomCode':room.getCode()})
-        await DialogueReader.sendMessage(bot, update, "WaitingToStart")
+        #add host to room
+        if not room.addPlayer(host, "create", bot):
+            await DialogueReader.sendMessage(bot, host, "RoomCreationFailed")
+            return False
+        
+        return True
+    
+    async def joinRoom(username, roomCode, bot):
+        #check if room exists
+        if roomCode not in RoomHandler.rooms:
+            await DialogueReader.sendMessage(bot, username, "RoomNotFound")
+            return False
+        room = RoomHandler.rooms[roomCode]
+        room.addPlayer(username, "join", bot)
+        return True
 
     #method that deletes a room
     def deleteRoom(room):

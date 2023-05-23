@@ -15,7 +15,8 @@ def main():
     
     start_handler = CommandHandler('start', BotCommands.start)
     create_room_handler = CommandHandler('create_room', BotCommands.create_room)
+    pm_handler = CommandHandler('pm', BotCommands.sendPM)
     application.add_handler(start_handler)
     application.add_handler(create_room_handler)
-    
+    application.add_handler(pm_handler)
     application.run_polling()

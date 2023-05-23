@@ -6,17 +6,19 @@ Can later be linked to a database to keep track of (leaderboard/overall scores)
 
 class Player:
     username = ""
+    chatID = 0
     score = 0
     inGame = False
-    roomCode = -1
+    
+    #roomCode = -1
 
-    def __init__(self, username, score=0):
+    def __init__(self, username, chatID=0, score=0):
         self.username = username
+        self.chatID = chatID
         self.score = score
         self.inGame = False
-        self.isHost = False
-
-    def isInRoom(self):
+        
+    def isInGame(self):
         return self.inGame
     
     def isHost(self):
@@ -25,9 +27,5 @@ class Player:
     def getScore(self):
         return self.score
     
-class Host(Player):
-    def __init__(self, username, score=0):
-        super().__init__(username, score)
-    
-    def isHost(self):
-        return True
+    def getChatID(self):
+        return self.chatID

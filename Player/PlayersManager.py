@@ -23,7 +23,7 @@ class PlayersManager:
     f.close()
 
     # method that adds a player to the playerRecord
-    def recordNewPlayer(username):
+    def recordNewPlayer(username, id):
         # check if player is already in the list
         if username in PlayersManager.playerRecord.keys():
             return PlayersManager.playerRecord[username]
@@ -31,11 +31,11 @@ class PlayersManager:
         print("Adding new player " + username + " to player list")
 
         # add player to list
-        PlayersManager.playerRecord[username] = Player(username)
+        PlayersManager.playerRecord[username] = Player(username, id)
 
         # # write to file
         with open(PlayersManager.players_path, "a") as f: # is this secure?
-            f.write(str(username) + ",0\n")
+            f.write(username + "," + str(id) + ",0\n")
         f.close()
 
         return PlayersManager.playerRecord[username]
@@ -49,17 +49,13 @@ class PlayersManager:
         if player in PlayersManager.playerRecord.keys():
             return PlayersManager.playerRecord[player]
         return PlayersManager.recordNewPlayer(player)
+    
+    def getChatID(username):
+        return PlayersManager.playerRecord[username].getChatID()
+    
+    def isPlayerFree(username):
+        return PlayersManager.playerRecord[username].isInGame()
 
     # # returns the room code a player is in if he is in one, else return -1
     # def getRoom(username):
     #     return username.getRoomCode()
-
-'''
-    def __init__(self):
-        # initlaise player dictionary from players.txt by username : player object
-        playerList = {}
-        with open("Players/players.txt", "r") as f:
-            for line in f:
-                self.playerList.appen(line.strip().split(","))
-        f.close()
-'''
