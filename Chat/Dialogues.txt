@@ -3,10 +3,11 @@ Welcome1, Welcome to Pibbage! If you're new here, check <Insert youtube video/we
 Welcome2, When you're ready, type "/create_room" to create a game lobby or /join <RoomCode> to join a game!
 # Room related dialogues
 CreateRoom1, Creating game room...
-RoomCode, Your room code is {roomCode}
-Invite, Invite your friends to the room by sending them this link: https://t.me/TelePibbageBot?start={roomCode} \nOR \ngetting them to send "/join_room {roomCode}" to me, @TelePibbageBot
+RoomCode, You have entered the game lobby.\nYour room code is {roomCode}
+Invite, Invite your friends to the room by getting them to send "/join_room {roomCode}" to me, @TelePibbageBot
 WaitingToStart, Waiting for players to join... Type "/start_game" to start the game
-JoinRoom1, Joining game lobby {roomCode}...
+JoinRoom1, Joining game room {roomCode}...
+JoinRoom2, There are currently ({playerCount}/{maxPlayerCount}) players
 PlayerJoined, @{player} has joined the lobby ({playerCount}/{maxPlayerCount})
 # Error Messages 
 InGame, Error to {action} room, perhaps you are already in another game

@@ -23,10 +23,11 @@ class Room:
     # Dialogue messages to send when adding player
     async def sendRoomMessages(self, bot, username):
         await DialogueReader.sendMessage(bot, username, "RoomCode", **{'roomCode':self.getCode()})
+        await DialogueReader.sendMessage(bot, username, "JoinRoom2", **{'playerCount':len(self.players), 'maxPlayerCount':str(self.MAX_PLAYERS)})
         await DialogueReader.sendMessage(bot, username, "Invite", **{'roomCode':self.getCode()})
         await DialogueReader.sendMessage(bot, username, "WaitingToStart")
         await asyncio.gather(
-            DialogueReader.sendMessage(bot, player, "PlayerJoined", **{'player':username}) for player in self.players if player != username
+            *[DialogueReader.sendMessage(bot, player, "PlayerJoined", **{'player':username, 'playerCount':len(self.players), 'maxPlayerCount':str(self.MAX_PLAYERS)}) for player in self.players if player != username]
         )
 
     # Add player to room
