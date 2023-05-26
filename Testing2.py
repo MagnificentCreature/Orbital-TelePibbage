@@ -2,9 +2,6 @@ import logging
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import Application, CallbackQueryHandler, CommandHandler, ContextTypes
 
-BOT_TOKEN = '6222391384:AAEoLLtl8DDzbjiXy4NwpndASWrhDH9Krk0'
-CHAT_ID = "-511576030"
-
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Sends a message with three inline buttons attached."""
     keyboard = [
