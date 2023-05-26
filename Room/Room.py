@@ -48,9 +48,8 @@ class Room:
             return False
 
         # What remains is when state is 0 and room has space to join
-        await self.sendRoomMessages(bot, username)
-
         self.players.append(username)
+        await self.sendRoomMessages(bot, username)
         return True
 
     # Remove player from room

@@ -4,7 +4,7 @@ Welcome2, When you're ready, type "/create_room" to create a game lobby or /join
 # Room related dialogues
 CreateRoom1, Creating game room...
 RoomCode, You have entered the game lobby.\nYour room code is {roomCode}
-Invite, Invite your friends to the room by getting them to send "/join_room {roomCode}" to me, @TelePibbageBot
+Invite, Invite your friends to the room by sharing them this link: https://t.me/TelePibbageBot?start={roomCode}
 WaitingToStart, Waiting for players to join... Type "/start_game" to start the game
 JoinRoom1, Joining game room {roomCode}...
 JoinRoom2, There are currently ({playerCount}/{maxPlayerCount}) players
@@ -12,7 +12,7 @@ PlayerJoined, @{player} has joined the lobby ({playerCount}/{maxPlayerCount})
 # Error Messages 
 InGame, Error to {action} room, perhaps you are already in another game
 AlreadyInRoom, You are already in this room!
-RoomNotFound, Invalid Room Code! Room code is a sequence of four Uppercase letters
+RoomNotFound, Invalid Room Code! Room code either doesn't exist or is entered wrongly.\nRoom code is a sequence of four Uppercase letters
 RoomFull, Error when {action} room, room is full!
 GameInProgress, Game is in progress, do "/join_audience {roomCode}" to join as audience
 RoomCreationFailed, Failed to create room
