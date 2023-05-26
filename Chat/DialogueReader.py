@@ -32,7 +32,7 @@ class DialogueReader:
             # Store the key-value pairs in the dictionary 
             data[key] = value
         dialogues = data
-    
+
     @staticmethod
     def additionalProcessing(inputString):
         # Replace \n with newline
@@ -56,7 +56,7 @@ class DialogueReader:
         await bot.send_message(chat_id=chat_id, text=formattedText)
     
     @staticmethod
-    async def sendImageByID(bot, chat_id, imageURL):
+    async def sendImageURLByID(bot, chat_id, imageURL):
         await bot.send_photo(chat_id=chat_id, photo=imageURL)
         
     @staticmethod
@@ -76,11 +76,11 @@ class DialogueReader:
         await bot.send_message(chat_id=PlayersManager.getChatID(username), text=formattedText)
 
     @staticmethod
-    async def sendImage(bot, username, imageURL):
+    async def sendImageURL(bot, username, imageURL):
         await bot.send_photo(chat_id=PlayersManager.getChatID(username), photo_url=imageURL)
 
-    # def readDialogues():
-    #     with open('Dialogues.txt', 'r') as f: 
+    # def readDialogues(filepath):
+    #     with open(filepath, 'r') as f: 
     #         # Read the contents of the file into a list 
     #         lines = f.readlines() 
     #         # Create an empty dictionary 

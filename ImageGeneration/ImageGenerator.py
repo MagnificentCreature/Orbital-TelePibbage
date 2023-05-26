@@ -6,9 +6,9 @@ AI_API_TOKEN = SDconf.key
 
 url = "https://stablediffusionapi.com/api/v3/text2img"
 
-PAYLOAD_TEMPLATE = json.dumps({
+PAYLOAD_DATA_TEMPLATE = {
   "key": AI_API_TOKEN,
-  "prompt": "ultra realistic close up portrait ((beautiful pale cyberpunk female with heavy black eyeliner))",
+  "prompt": "",
   "negative_prompt": None,
   "width": "512",
   "height": "512",
@@ -24,7 +24,7 @@ PAYLOAD_TEMPLATE = json.dumps({
   "embeddings_model": "embeddings_model_id",
   "webhook": None,
   "track_id": None
-})
+}
 
 headers = {
   'Content-Type': 'application/json'
@@ -32,22 +32,11 @@ headers = {
 
 @staticmethod
 async def imageQuery(prompt):
-    payload = PAYLOAD_TEMPLATE
-    payload.prompt = prompt
-    response = requests.request("POST", url, headers=headers, data=payload)
+    payload_data = PAYLOAD_DATA_TEMPLATE.copy()
+    payload_data["prompt"] = prompt
+    payload = json.dumps(payload_data)
 
+    response = requests.request("POST", url, headers=headers, data=payload)
     myDict = json.loads(response.text)
 
-    return myDict["output"]
-    
-
-
-# if __name__ == '__main__':
-
-
-#     response = requests.request("POST", url, headers=headers, data=payload)
-
-#     print(response.text)
-#     myDict = json.loads(response.text)
-#     print(myDict["output"])
-#     return
+    return myDict["output"][0]

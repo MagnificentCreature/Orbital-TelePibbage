@@ -13,7 +13,7 @@ sys.path.insert(1, str(Path(__file__).parent.parent.absolute()))
 from Chat.DialogueReader import DialogueReader
 from Room.RoomHandler import RoomHandler
 from Player.PlayersManager import PlayersManager
-from ImageGeneration import AITesting
+from ImageGeneration import ImageGenerator
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await PlayersManager.recordNewPlayer(update.message.from_user.username, update.message.from_user.id)
@@ -34,6 +34,7 @@ async def join_room(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await RoomHandler.joinRoom(update.message.from_user.username, roomCode, context.bot)
 
 async def generate(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    prompt = update.message.text.split(" ")[1:]
-    imageurl = AITesting.imageQuery(prompt)
-    await DialogueReader.sendImageByID(context.bot, update.message.from_user.id, imageurl)
+    prompt = (" ").join(update.message.text.split(" ")[1:])
+    imageurl = await ImageGenerator.imageQuery(prompt)
+    print(update.message.from_user.username + "Generated Image: " + str(imageurl))
+    await DialogueReader.sendImageURLByID(context.bot, update.message.from_user.id, imageurl)
