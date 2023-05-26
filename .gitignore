@@ -10,3 +10,7 @@ Testing*.py
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
+
+#Image Generation API Key
+/ImageGeneration/SDconf.py
+
