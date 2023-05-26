@@ -57,7 +57,7 @@ class DialogueReader:
     
     @staticmethod
     async def sendImageByID(bot, chat_id, imageURL):
-        await bot.send_photo(chat_id=chat_id, url=imageURL)
+        await bot.send_photo(chat_id=chat_id, photo=imageURL)
         
     @staticmethod
     async def sendMessage(bot, username, message):
