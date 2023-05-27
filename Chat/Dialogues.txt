@@ -16,3 +16,4 @@ RoomNotFound, Invalid Room Code! Room code either doesn't exist or is entered wr
 RoomFull, Error when {action} room, room is full!
 GameInProgress, Game is in progress, do "/join_audience {roomCode}" to join as audience
 RoomCreationFailed, Failed to create room
+UnknownCommand, Sorry, I did not understand that command.

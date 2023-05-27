@@ -42,3 +42,6 @@ async def generate(update: Update, context: ContextTypes.DEFAULT_TYPE):
     imageurl = await ImageGenerator.imageQuery(prompt)
     print(update.message.from_user.username + "Generated Image: " + str(imageurl))
     await DialogueReader.sendImageURLByID(context.bot, update.message.from_user.id, imageurl)
+
+async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "UnknownCommand")
