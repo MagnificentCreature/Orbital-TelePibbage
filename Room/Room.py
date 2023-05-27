@@ -8,8 +8,8 @@ from Player.PlayersManager import PlayersManager
 
 class Room:
     code = ""
-    host = ""
-    players = [] #contains list of usernames
+    host = None #player object
+    players = [] #contains list of player objects
     MAX_PLAYERS = 8
     state = 0 # 0 = join state, 1 = game state
 
@@ -21,35 +21,36 @@ class Room:
         return self.code
     
     # Dialogue messages to send when adding player
-    async def sendRoomMessages(self, bot, username):
-        await DialogueReader.sendMessage(bot, username, "RoomCode", **{'roomCode':self.getCode()})
-        await DialogueReader.sendMessage(bot, username, "JoinRoom2", **{'playerCount':len(self.players), 'maxPlayerCount':str(self.MAX_PLAYERS)})
-        await DialogueReader.sendMessage(bot, username, "Invite", **{'roomCode':self.getCode()})
-        await DialogueReader.sendMessage(bot, username, "WaitingToStart")
+    async def sendRoomMessages(self, bot, player):
+        await player.sendMessage(bot, "RoomCode", **{'roomCode':self.getCode()})
+        await player.sendMessage(bot, "JoinRoom2", **{'playerCount':len(self.players), 'maxPlayerCount':str(self.MAX_PLAYERS)})
+        await player.sendMessage(bot, "Invite", **{'roomCode':self.getCode()})
+        await player.sendMessage(bot, "WaitingToStart")
         await asyncio.gather(
-            *[DialogueReader.sendMessage(bot, player, "PlayerJoined", **{'player':username, 'playerCount':len(self.players), 'maxPlayerCount':str(self.MAX_PLAYERS)}) for player in self.players if player != username]
+            *[playerElem.sendMessage(bot, player, "PlayerJoined", **{'player':playerElem.getUsername(), 'playerCount':len(self.players), 'maxPlayerCount':str(self.MAX_PLAYERS)}) for playerElem in self.players if playerElem != player]
         )
 
     # Add player to room
     # Fails if is already in or if room is full
     async def addPlayer(self, username, action, bot):
+        player = PlayersManager.queryPlayer(username)
         # do nothing if the player is already in the room
-        if (username in self.players):
-            await DialogueReader.sendMessage(bot, username, "AlreadyInRoom", **{'action':action})
+        if (player in self.players):
+            await player.sendMessage(bot, "AlreadyInRoom", **{'action':action})
             return False
         if len(self.players) == Room.MAX_PLAYERS:
-            await DialogueReader.sendMessage(bot, username, "RoomFull", **{'action':action})
+            await player.sendMessage(bot, "RoomFull", **{'action':action})
             return False
-        if (PlayersManager.isPlayerFree(username)):
-            await DialogueReader.sendMessage(bot, username, "InGame", **{'action':action})
+        if (not player.isFree()):
+            await player.sendMessage(bot, "InGame", **{'action':action})
             return False
         if (self.state == 1):
-            await DialogueReader.sendMessage(bot, username, "GameInProgress")
+            await player.sendMessage(bot, "GameInProgress")
             return False
 
         # What remains is when state is 0 and room has space to join
-        self.players.append(username)
-        await self.sendRoomMessages(bot, username)
+        self.players.append(player)
+        await self.sendRoomMessages(bot, player)
         return True
 
     # Remove player from room
@@ -64,14 +65,14 @@ class Room:
         self.players.remove(player)
         return True
 
-    def hasPlayer(self, username):
-        return username in self.players
+    def hasPlayer(self, player):
+        return player in self.players
     
     def joinState(self):
         return self.state == 0
     
     # WIP this this will enable the features for audience to join
-    def audienceState(self):
+    def acceptingAudience(self):
         return self.state == 1 
     
     def startGame(self):

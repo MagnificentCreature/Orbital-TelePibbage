@@ -49,20 +49,10 @@ class PlayersManager:
 
     # method that returns the player if he is in the dictionary, else creates a new one
     @staticmethod
-    def getPlayer(player):
+    def queryPlayer(username):
         # check if player is already in the dicitonary
-        if player in PlayersManager.playerRecord.keys():
-            return PlayersManager.playerRecord[player]
-        return PlayersManager.recordNewPlayer(player)
+        return PlayersManager.playerRecord[username]
     
-    #Method is only used in DialogueReader
-    def getChatID(username):
-        return PlayersManager.playerRecord[username].getChatID()
-    
-    @staticmethod
-    def isPlayerFree(username):
-        return PlayersManager.playerRecord[username].isInGame()
-
     # # returns the room code a player is in if he is in one, else return -1
     # def getRoom(username):
     #     return username.getRoomCode()

@@ -4,6 +4,9 @@ Stores information about his username, scores etc
 Can later be linked to a database to keep track of (leaderboard/overall scores)
 '''
 
+from Chat.DialogueReader import DialogueReader
+
+
 class Player:
     username = ""
     chatID = 0
@@ -18,8 +21,8 @@ class Player:
         self.score = score
         self.inGame = False
         
-    def isInGame(self):
-        return self.inGame
+    def isFree(self):
+        return not self.inGame
     
     def isHost(self):
         return False
@@ -27,5 +30,14 @@ class Player:
     def getScore(self):
         return self.score
     
-    def getChatID(self):
-        return self.chatID
+    def getUsername(self):
+        return self.username
+    
+    async def sendMessage(self, bot, message):
+        await DialogueReader.sendMessageByID(bot, self.chatID, message)
+
+    async def sendMessage(self, bot, message, **kwargs):
+        await DialogueReader.sendMessageByID(bot, self.chatID, message, **kwargs)
+        
+    async def sendImageURL(self, bot, imageURL):
+        await DialogueReader.sendImageURLByID(bot, self.chatID, imageURL)
