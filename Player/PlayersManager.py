@@ -11,16 +11,19 @@ from Player.Player import Player #This import does not work when running this sc
 class PlayersManager:
     playerRecord = {}
 
-    file_path = path.realpath(__file__)
-    dir_path = path.dirname(file_path)
+    def readPlayers(filepath):
+        data = {}
+        with open(filepath, "r") as f:
+            for line in f:
+                data[line.strip().split(",")[0]] = Player(
+                    line.strip().split(",")[0], line.strip().split(",")[1]
+                )
+        return data
+
+    dir_path = path.dirname(path.realpath(__file__))
     players_path = path.join(dir_path, "Players.txt")
 
-    with open(players_path, "r") as f:
-        for line in f:
-            playerRecord[line.strip().split(",")[0]] = Player(
-                line.strip().split(",")[0], line.strip().split(",")[1]
-            )
-    f.close()
+    playerRecord = readPlayers(players_path)
 
     # method that adds a player to the playerRecord
     @staticmethod

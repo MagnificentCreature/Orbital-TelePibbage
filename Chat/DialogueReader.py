@@ -13,25 +13,29 @@ class DialogueReader:
     # Create a static variable to store the dialogues
     dialogues = {}
 
-    file_path = path.realpath(__file__)
-    dir_path = path.dirname(file_path)
+    def readDialogues(filepath):
+        with open(filepath, 'r') as f: 
+            # Read the contents of the file into a list 
+            lines = f.readlines() 
+            # Create an empty dictionary 
+            data = {} 
+            # Loop through the list of lines 
+            for line in lines: 
+                if (line[0] == "#"):
+                    continue
+                # Split the line into key-value pairs by the first comma
+                key, value = line.strip().split(',', 1)
+                # Store the key-value pairs in the dictionary 
+                data[key] = value
+            # Return the dictionary
+            return data
+
+    dir_path = path.dirname(path.realpath(__file__))
     dialogues_path = path.join(dir_path, "Dialogues.txt")
 
     # Read the dialogues from the file
-    with open(dialogues_path, 'r') as f: 
-        # Read the contents of the file into a list 
-        lines = f.readlines() 
-        # Create an empty dictionary 
-        data = {} 
-        # Loop through the list of lines 
-        for line in lines: 
-            if (line[0] == "#"):
-                continue
-            # Split the line into key-value pairs by the first comma
-            key, value = line.strip().split(',', 1)
-            # Store the key-value pairs in the dictionary 
-            data[key] = value
-        dialogues = data
+
+    dialogues = readDialogues(dialogues_path)
 
     @staticmethod
     def additionalProcessing(inputString):
