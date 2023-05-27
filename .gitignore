@@ -1,5 +1,7 @@
 #Testing files
 Testing*.py
+Testing.py
+Testing2.py
 
 #Bot API tokens
 conf.py
