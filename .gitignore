@@ -2,7 +2,7 @@
 Testing*.py
 
 #Bot API tokens
-/Controller/conf.py
+conf.py
 
 #Player Data
 /Player/Players.txt
@@ -11,6 +11,7 @@ Testing*.py
 __pycache__/
 *.py[cod]
 
-#Image Generation API Key
-/ImageGeneration/SDconf.py
-
+# Pyreverse things
+classes.png
+packages.png
+*.dot

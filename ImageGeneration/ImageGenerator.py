@@ -1,8 +1,8 @@
 import requests
 import json
-from ImageGeneration import SDconf
+import conf
 
-AI_API_TOKEN = SDconf.key
+AI_API_TOKEN = conf.SD_API_TOKEN
 
 url = "https://stablediffusionapi.com/api/v3/text2img"
 

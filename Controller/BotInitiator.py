@@ -1,9 +1,9 @@
-from Controller import conf
+import conf
 from Controller import BotCommands
 import logging
 from telegram.ext import ApplicationBuilder, CommandHandler
 
-BOT_TOKEN = conf.BOT_TOKEN
+BOT_TOKEN = conf.TELE_BOT_TOKEN
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
