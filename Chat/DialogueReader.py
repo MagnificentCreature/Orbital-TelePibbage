@@ -37,11 +37,14 @@ class DialogueReader:
 
     dialogues = readDialogues(dialogues_path)
 
-    @staticmethod
     def additionalProcessing(inputString):
         # Replace \n with newline
         inputString = inputString.replace("\\n", "\n")
         return inputString
+    
+    @staticmethod
+    def getMesssage(key):
+        return DialogueReader.additionalProcessing(DialogueReader.dialogues[key])
 
     @staticmethod
     async def sendMessageByID(bot, chat_id, message):
