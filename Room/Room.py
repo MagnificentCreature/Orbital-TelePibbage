@@ -27,7 +27,7 @@ class Room:
         await player.sendMessage(bot, "Invite", **{'roomCode':self.getCode()})
         await player.sendMessage(bot, "WaitingToStart")
         await asyncio.gather(
-            *[playerElem.sendMessage(bot, player, "PlayerJoined", **{'player':playerElem.getUsername(), 'playerCount':len(self.players), 'maxPlayerCount':str(self.MAX_PLAYERS)}) for playerElem in self.players if playerElem != player]
+            *[playerElem.sendMessage(bot, "PlayerJoined", **{'player':player.getUsername(), 'playerCount':len(self.players), 'maxPlayerCount':str(self.MAX_PLAYERS)}) for playerElem in self.players if playerElem != player]
         )
 
     # Add player to room
