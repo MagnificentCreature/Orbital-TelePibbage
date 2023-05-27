@@ -29,12 +29,16 @@ async def create_room(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await RoomHandler.generateRoom(update.message.from_user.username, context.bot)
 
 async def join_room(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    roomCode = update.message.text.split(" ")[1]
+    try:
+        roomCode = update.message.text.split(" ")[1]
+    except IndexError:
+        await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "RoomNotFound")
+        return
     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "JoinRoom1", **{"roomCode": roomCode})
     await RoomHandler.joinRoom(update.message.from_user.username, roomCode, context.bot)
 
 async def generate(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    prompt = (" ").join(update.message.text.split(" ")[1:])
+    prompt = (" ").join(update.message.text.split(" ")[1:]) #TODO logic flow if invalid prompt or no prompt
     imageurl = await ImageGenerator.imageQuery(prompt)
     print(update.message.from_user.username + "Generated Image: " + str(imageurl))
     await DialogueReader.sendImageURLByID(context.bot, update.message.from_user.id, imageurl)

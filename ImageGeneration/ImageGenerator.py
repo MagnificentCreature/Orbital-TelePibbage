@@ -1,6 +1,6 @@
 import requests
 import json
-from . import conf
+import conf
 
 AI_API_TOKEN = conf.SD_API_TOKEN
 

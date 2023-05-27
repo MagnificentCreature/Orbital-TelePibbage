@@ -1,4 +1,4 @@
-from . import conf
+import conf
 from Controller import BotCommands
 import logging
 from telegram.ext import ApplicationBuilder, CommandHandler
