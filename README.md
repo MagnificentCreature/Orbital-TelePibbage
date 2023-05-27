@@ -1,7 +1,7 @@
 How to play:
 
-1) Download the code, then run main.py \
-2) Get a telegram bot API token and a Stable Diffusion API token \
+1) Download the code, then run main.py   
+2) Get a telegram bot API token and a Stable Diffusion API token  
 3) Create a file inside Controller called conf.py, and fill it with these two lines \
 TELE_BOT_TOKEN = '<Your telegram bot token>' \
 SD_API_TOKEN = '<Your Stable Diffusion API token>' \
