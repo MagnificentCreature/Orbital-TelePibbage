@@ -5,8 +5,6 @@ Calls to this class can be made from the public function sendMessage(bot, chat, 
 """
 
 from os import path
-from Player.PlayersManager import PlayersManager
-# from telegram import Bot, Update
 
 class DialogueReader:
 
@@ -61,26 +59,6 @@ class DialogueReader:
     @staticmethod
     async def sendImageURLByID(bot, chat_id, imageURL):
         await bot.send_photo(chat_id=chat_id, photo=imageURL)
-        
-    @staticmethod
-    async def sendMessage(bot, username, message):
-        #Use telegram api to send a message
-        if (message not in DialogueReader.dialogues):
-            print("Message " + message + " not found in dialogues.txt")
-        formattedText = DialogueReader.additionalProcessing(DialogueReader.dialogues[message])
-        await bot.send_message(chat_id=PlayersManager.getChatID(username), text=formattedText)
-
-    @staticmethod
-    async def sendMessage(bot, username, message, **kwargs):
-        #Use telegram api to send a message, additional arguments are given in the form of **{{key}=value}
-        if (message not in DialogueReader.dialogues):
-            print("Message " + message + " not found in dialogues.txt")
-        formattedText = DialogueReader.additionalProcessing(DialogueReader.dialogues[message].format(**kwargs))
-        await bot.send_message(chat_id=PlayersManager.getChatID(username), text=formattedText)
-
-    @staticmethod
-    async def sendImageURL(bot, username, imageURL):
-        await bot.send_photo(chat_id=PlayersManager.getChatID(username), photo_url=imageURL)
 
     # def readDialogues(filepath):
     #     with open(filepath, 'r') as f: 
