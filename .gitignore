@@ -11,3 +11,7 @@ conf.py
 __pycache__/
 *.py[cod]
 
+# Pyreverse things
+classes.png
+packages.png
+*.dot
