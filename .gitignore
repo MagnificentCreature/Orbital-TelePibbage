@@ -3,6 +3,7 @@ Testing*.py
 
 #Bot API tokens
 conf.py
+SDconf.py
 
 #Player Data
 /Player/Players.txt
