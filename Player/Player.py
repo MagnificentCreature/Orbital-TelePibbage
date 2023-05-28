@@ -9,14 +9,14 @@ from Chat.DialogueReader import DialogueReader
 
 class Player:
     username = ""
-    chatID = 0
+    _chatID = 0
     score = 0
     inGame = False
     roomCode = ""
     
     def __init__(self, username, chatID=0, score=0):
         self.username = username
-        self.chatID = chatID
+        self._chatID = chatID
         self.score = score
         self.inGame = False
         self.roomCode = ""
@@ -46,10 +46,10 @@ class Player:
         return tempRoomCode
     
     async def sendMessage(self, bot, message):
-        await DialogueReader.sendMessageByID(bot, self.chatID, message)
+        await DialogueReader.sendMessageByID(bot, self._chatID, message)
 
     async def sendMessage(self, bot, message, **kwargs):
-        await DialogueReader.sendMessageByID(bot, self.chatID, message, **kwargs)
+        await DialogueReader.sendMessageByID(bot, self._chatID, message, **kwargs)
         
     async def sendImageURL(self, bot, imageURL):
-        await DialogueReader.sendImageURLByID(bot, self.chatID, imageURL)
+        await DialogueReader.sendImageURLByID(bot, self._chatID, imageURL)
