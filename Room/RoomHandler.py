@@ -26,6 +26,29 @@ class RoomHandler:
             #randomly choose between Capital letters A-Z
             code += chr(random.randint(65, 90))
         return code
+    
+    #method that deletes a room
+    @classmethod
+    def deleteRoom(room):
+        del RoomHandler.rooms[room.getCode()]
+
+    async def joinRoom(username, roomCode, bot):
+        player = PlayersManager.queryPlayer(username)
+        #check if room exists
+        if roomCode not in RoomHandler.rooms:
+            await player.sendMessage(bot, "RoomNotFound")
+            return False
+        room = RoomHandler.rooms[roomCode]
+        await room.addPlayer(username, "join", bot)
+        return True
+        
+    async def leaveRoom(username, bot):
+        player = PlayersManager.queryPlayer(username)
+        room = player.getRoom()
+        if room:
+            await room.removePlayer(username, bot)
+        else:
+            await player.sendMessage(bot, "NotInRoom")
 
     async def generateRoom(username, bot):
         player = PlayersManager.queryPlayer(username)
@@ -40,24 +63,11 @@ class RoomHandler:
         RoomHandler.rooms[code] = room
 
         #add host to room
-        if not await room.addPlayer(username, "create", bot):
-            await player.sendMessage(bot, "RoomCreationFailed")
-            return False
+        await RoomHandler.joinRoom(username, code, bot)
+        # if not await room.addPlayer(username, "create", bot):
+        #     await player.sendMessage(bot, "RoomCreationFailed")
+        #     return False
         
         return True
-    
-    async def joinRoom(username, roomCode, bot):
-        player = PlayersManager.queryPlayer(username)
-        #check if room exists
-        if roomCode not in RoomHandler.rooms:
-            await player.sendMessage(bot, "RoomNotFound")
-            return False
-        room = RoomHandler.rooms[roomCode]
-        await room.addPlayer(username, "join", bot)
-        return True
-
-    #method that deletes a room
-    def deleteRoom(room):
-        del RoomHandler.rooms[room.getCode()]
 
     

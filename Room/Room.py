@@ -3,7 +3,6 @@ Class that holds data about rooms
 """
 
 import asyncio
-from Chat.DialogueReader import DialogueReader
 from Player.PlayersManager import PlayersManager
 
 class Room:
