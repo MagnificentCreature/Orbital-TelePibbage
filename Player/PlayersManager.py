@@ -13,11 +13,16 @@ class PlayersManager:
 
     def readPlayers(filepath):
         data = {}
-        with open(filepath, "r") as f:
-            for line in f:
-                data[line.strip().split(",")[0]] = Player(
-                    line.strip().split(",")[0], line.strip().split(",")[1]
-                )
+        try:
+            with open(filepath, "r") as f:
+                for line in f:
+                    data[line.strip().split(",")[0]] = Player(
+                        line.strip().split(",")[0], line.strip().split(",")[1]
+                    )
+        except FileNotFoundError:
+            ("Players.txt not found, creating new file")
+            with open(filepath, "w") as f:
+                f.write("")
         return data
 
     dir_path = path.dirname(path.realpath(__file__))
