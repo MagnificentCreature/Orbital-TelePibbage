@@ -20,7 +20,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "Welcome1")
     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "Welcome2")
     if (context.args):
-        print("WTF")
         roomCode = context.args[0]
         await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "JoinRoom1", **{"roomCode": roomCode})
         await RoomHandler.joinRoom(update.message.from_user.username, roomCode, context.bot)    
