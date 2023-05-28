@@ -13,9 +13,11 @@ class Room:
     MAX_PLAYERS = 8
     state = 0 # 0 = join state, 1 = game state
 
-    def __init__(self, room, host):
-        self.code = room
+    def __init__(self, code, host):
+        self.code = code
         self.host = host
+        self.players = []
+        self.state = 0
 
     def getCode(self):
         return self.code
@@ -26,6 +28,7 @@ class Room:
         await player.sendMessage(bot, "JoinRoom2", **{'playerCount':len(self.players), 'maxPlayerCount':str(self.MAX_PLAYERS)})
         await player.sendMessage(bot, "Invite", **{'roomCode':self.getCode()})
         await player.sendMessage(bot, "WaitingToStart")
+        await player.sendMessage(bot, "WaitingToStart2")
         await asyncio.gather(
             *[playerElem.sendMessage(bot, "PlayerJoined", **{'player':player.getUsername(), 'playerCount':len(self.players), 'maxPlayerCount':str(self.MAX_PLAYERS)}) for playerElem in self.players if playerElem != player]
         )
@@ -35,6 +38,7 @@ class Room:
     async def addPlayer(self, username, action, bot):
         player = PlayersManager.queryPlayer(username)
         # do nothing if the player is already in the room
+        print(str(self.players) + self.code)
         if (player in self.players):
             await player.sendMessage(bot, "AlreadyInRoom", **{'action':action})
             return False

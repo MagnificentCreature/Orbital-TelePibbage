@@ -36,6 +36,7 @@ class RoomHandler:
 
         #create room and add to rooms list
         room = Room(code, player)
+        print(room)
         RoomHandler.rooms[code] = room
 
         #add host to room
