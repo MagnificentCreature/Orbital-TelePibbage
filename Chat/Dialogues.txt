@@ -9,6 +9,7 @@ WaitingToStart, Waiting for players to join... Type "/start_game" to start the g
 WaitingToStart2, Meanwhile, try /generate <prompt> to try your hands at generating some fun images! 
 JoinRoom1, Joining game room {roomCode}...
 JoinRoom2, There are currently ({playerCount}/{maxPlayerCount}) players
+LeavingRoom, Leaving game room {roomCode}...
 PlayerJoined, @{player} has joined the lobby ({playerCount}/{maxPlayerCount})
 # Error Messages 
 InGame, Error to {action} room, perhaps you are already in another game

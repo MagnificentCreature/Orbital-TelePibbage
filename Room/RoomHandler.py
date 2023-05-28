@@ -16,7 +16,7 @@ from Player.PlayersManager import PlayersManager
 
 class RoomHandler:
     #hashset of rooms by their room code
-    rooms = {}
+    _rooms = {}
 
    #Static method that generates a random four alphabet room code
     @staticmethod
@@ -29,41 +29,46 @@ class RoomHandler:
     
     #method that deletes a room
     @classmethod
-    def deleteRoom(room):
-        del RoomHandler.rooms[room.getCode()]
+    def deleteRoom(cls, room):
+        del cls._rooms[room.getCode()]
 
-    async def joinRoom(username, roomCode, bot):
+    async def leaveRoom(player, bot):
+        roomCode = await player.leaveRoom(bot)
+        room = RoomHandler._rooms[roomCode]
+        result = await room.removePlayer(player)
+        if result is None:
+            RoomHandler.deleteRoom(room)
+
+    async def joinRoom(username, roomCode, bot, action="join"):
         player = PlayersManager.queryPlayer(username)
         #check if room exists
-        if roomCode not in RoomHandler.rooms:
+        if roomCode not in RoomHandler._rooms:
             await player.sendMessage(bot, "RoomNotFound")
             return False
-        room = RoomHandler.rooms[roomCode]
-        await room.addPlayer(username, "join", bot)
+        room = RoomHandler._rooms[roomCode]
+
+        #check if player is already in a room
+        if player.inRoom():
+            await RoomHandler.leaveRoom(player, bot)
+        await room.addPlayer(username, action, bot)
         return True
-        
-    async def leaveRoom(username, bot):
-        player = PlayersManager.queryPlayer(username)
-        room = player.getRoom()
-        if room:
-            await room.removePlayer(username, bot)
-        else:
-            await player.sendMessage(bot, "NotInRoom")
 
     async def generateRoom(username, bot):
         player = PlayersManager.queryPlayer(username)
         #keep generating room codes while making sure there is no duplicate room codes
         code = RoomHandler.generateRoomCode()
-        while code in RoomHandler.rooms:
+        while code in RoomHandler._rooms:
             code = RoomHandler.generateRoomCode()
 
         #create room and add to rooms list
         room = Room(code, player)
-        print(room)
-        RoomHandler.rooms[code] = room
+        RoomHandler._rooms[code] = room
 
         #add host to room
-        await RoomHandler.joinRoom(username, code, bot)
+        if not await RoomHandler.joinRoom(username, code, bot, "create"):
+            await player.sendMessage(bot, "RoomCreationFailed")
+            return False
+        
         # if not await room.addPlayer(username, "create", bot):
         #     await player.sendMessage(bot, "RoomCreationFailed")
         #     return False

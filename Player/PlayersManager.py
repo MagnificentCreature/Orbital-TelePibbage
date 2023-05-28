@@ -49,8 +49,7 @@ class PlayersManager:
 
         return PlayersManager.playerRecord[username]
     
-    # method that removes a player from the player list
-
+    # TODO: method that removes a player from the player list
 
     # method that returns the player if he is in the dictionary, else creates a new one
     @staticmethod

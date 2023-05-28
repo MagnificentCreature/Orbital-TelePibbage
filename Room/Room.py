@@ -26,7 +26,7 @@ class Room:
         await player.sendMessage(bot, "RoomCode", **{'roomCode':self.getCode()})
         await player.sendMessage(bot, "JoinRoom2", **{'playerCount':len(self.players), 'maxPlayerCount':str(self.MAX_PLAYERS)})
         await player.sendMessage(bot, "Invite", **{'roomCode':self.getCode()})
-        await player.sendMessage(bot, "WaitingToStart")
+        # await player.sendMessage(bot, "WaitingToStart")
         await player.sendMessage(bot, "WaitingToStart2")
         await asyncio.gather(
             *[playerElem.sendMessage(bot, "PlayerJoined", **{'player':player.getUsername(), 'playerCount':len(self.players), 'maxPlayerCount':str(self.MAX_PLAYERS)}) for playerElem in self.players if playerElem != player]
@@ -37,7 +37,6 @@ class Room:
     async def addPlayer(self, username, action, bot):
         player = PlayersManager.queryPlayer(username)
         # do nothing if the player is already in the room
-        print(str(self.players) + self.code)
         if (player in self.players):
             await player.sendMessage(bot, "AlreadyInRoom", **{'action':action})
             return False
@@ -51,19 +50,24 @@ class Room:
             await player.sendMessage(bot, "GameInProgress")
             return False
 
-        # What remains is when state is 0 and room has space to join
+        # Add player to room
         self.players.append(player)
+        player.joinRoom(self.code)
         await self.sendRoomMessages(bot, player)
         return True
 
     # Remove player from room
     # Fails if not in room 
-    def removePlayer(self, player):
+    async def removePlayer(self, player):
         if player not in self.players:
             return False
+        
+        # if last player, delete the room
+        if len(self.players) == 1:
+            return None
         if player == self.host:
-            # if player is the host, delete the room
-            del self #TODO: Make delete room code
+            # if player is the host, make the next player the host
+            self.host = self.players[1]
             return True
         self.players.remove(player)
         return True
