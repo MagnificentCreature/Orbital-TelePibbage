@@ -37,11 +37,9 @@ class Player:
         return self.roomCode != ""
     
     def joinRoom(self, roomCode):
-        print("Joining room " + roomCode)
         self.roomCode = roomCode
 
     async def leaveRoom(self, bot):
-        print("Leaving room " + self.roomCode)
         await self.sendMessage(bot, "LeavingRoom", **{'roomCode':self.roomCode})
         tempRoomCode = self.roomCode
         self.roomCode = None
