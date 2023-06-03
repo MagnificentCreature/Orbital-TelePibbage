@@ -8,41 +8,41 @@ from Chat.DialogueReader import DialogueReader
 
 
 class Player:
-    username = ""
+    _username = ""
     _chatID = 0
-    score = 0
-    inGame = False
-    roomCode = ""
+    _score = 0
+    _inGame = False
+    _roomCode = ""
     
     def __init__(self, username, chatID=0, score=0):
-        self.username = username
+        self._username = username
         self._chatID = chatID
-        self.score = score
-        self.inGame = False
-        self.roomCode = ""
+        self._score = score
+        self._inGame = False
+        self._roomCode = ""
         
     def isFree(self):
-        return not self.inGame
+        return not self._inGame
     
     def isHost(self):
         return False
     
     def getScore(self):
-        return self.score
+        return self._score
     
     def getUsername(self):
-        return self.username
+        return self._username
     
     def inRoom(self):
-        return self.roomCode != ""
+        return self._roomCode != ""
     
     def joinRoom(self, roomCode):
-        self.roomCode = roomCode
+        self._roomCode = roomCode
 
     async def leaveRoom(self, bot):
-        await self.sendMessage(bot, "LeavingRoom", **{'roomCode':self.roomCode})
-        tempRoomCode = self.roomCode
-        self.roomCode = None
+        await self.sendMessage(bot, "LeavingRoom", **{'roomCode':self._roomCode})
+        tempRoomCode = self._roomCode
+        self._roomCode = None
         return tempRoomCode
     
     async def sendMessage(self, bot, message):

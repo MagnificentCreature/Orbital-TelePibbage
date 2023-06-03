@@ -1,5 +1,5 @@
 """
-This class reads dialogues from dialogues.txt and stores them in a dictionary
+This class reads _dialogues from _dialogues.txt and stores them in a dictionary
 This class is responsible for sending chat messages
 Calls to this class can be made from the public function sendMessage(bot, chat, message)
 """
@@ -9,9 +9,9 @@ from os import path
 class DialogueReader:
 
     # Create a static variable to store the dialogues
-    dialogues = {}
+    _dialogues = {}
 
-    def readDialogues(filepath):
+    def __read_dialogues(filepath):
         with open(filepath, 'r') as f: 
             # Read the contents of the file into a list 
             lines = f.readlines() 
@@ -29,38 +29,38 @@ class DialogueReader:
             return data
 
     dir_path = path.dirname(path.realpath(__file__))
-    dialogues_path = path.join(dir_path, "Dialogues.txt")
+    dialogues_path = path.join(dir_path, "dialogues.txt")
 
     # Read the dialogues from the file
 
-    dialogues = readDialogues(dialogues_path)
+    _dialogues = __read_dialogues(dialogues_path)
 
     def additionalProcessing(inputString):
         # Replace \n with newline
         inputString = inputString.replace("\\n", "\n")
         return inputString
 
-    @staticmethod
-    async def sendMessageByID(bot, chat_id, message):
+    @classmethod
+    async def sendMessageByID(cls, bot, chat_id, message):
         #Use telegram api to send a message
-        if (message not in DialogueReader.dialogues):
+        if (message not in cls._dialogues):
             print("Message " + message + " not found in dialogues.txt")
-        formattedText = DialogueReader.additionalProcessing(DialogueReader.dialogues[message])
+        formattedText = cls.additionalProcessing(cls.dialogues[message])
         await bot.send_message(chat_id=chat_id, text=formattedText)
 
-    @staticmethod
-    async def sendMessageByID(bot, chat_id, message, **kwargs):
+    @classmethod
+    async def sendMessageByID(cls, bot, chat_id, message, **kwargs):
         #Use telegram api to send a message, additional arguments are given in the form of **{{key}=value}
-        if (message not in DialogueReader.dialogues):
+        if (message not in cls._dialogues):
             print("Message " + message + " not found in dialogues.txt")
-        formattedText = DialogueReader.additionalProcessing(DialogueReader.dialogues[message].format(**kwargs))
+        formattedText = cls.additionalProcessing(cls._dialogues[message].format(**kwargs))
         await bot.send_message(chat_id=chat_id, text=formattedText)
     
     @staticmethod
     async def sendImageURLByID(bot, chat_id, imageURL):
         await bot.send_photo(chat_id=chat_id, photo=imageURL)
 
-    # def readDialogues(filepath):
+    # def read_dialogues(filepath):
     #     with open(filepath, 'r') as f: 
     #         # Read the contents of the file into a list 
     #         lines = f.readlines() 

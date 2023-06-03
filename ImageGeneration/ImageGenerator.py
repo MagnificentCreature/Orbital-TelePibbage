@@ -4,7 +4,7 @@ import conf
 
 AI_API_TOKEN = conf.SD_API_TOKEN
 
-url = "https://stablediffusionapi.com/api/v3/text2img"
+URL = "https://stablediffusionapi.com/api/v3/text2img"
 
 PAYLOAD_DATA_TEMPLATE = {
   "key": AI_API_TOKEN,
@@ -36,7 +36,7 @@ async def imageQuery(prompt):
     payload_data["prompt"] = prompt
     payload = json.dumps(payload_data)
 
-    response = requests.request("POST", url, headers=headers, data=payload)
+    response = requests.request("POST", URL, headers=headers, data=payload)
     myDict = json.loads(response.text)
 
     return myDict["output"][0]

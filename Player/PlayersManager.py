@@ -9,9 +9,10 @@ from os import path
 from Player.Player import Player #This import does not work when running this script directly, but works when running from main.py
 
 class PlayersManager:
-    playerRecord = {}
+    #Private Class variable
+    _playerRecord = {}
 
-    def readPlayers(filepath):
+    def __readPlayers(filepath):
         data = {}
         try:
             with open(filepath, "r") as f:
@@ -25,37 +26,37 @@ class PlayersManager:
                 f.write("")
         return data
 
-    dir_path = path.dirname(path.realpath(__file__))
-    players_path = path.join(dir_path, "Players.txt")
+    _dir_path = path.dirname(path.realpath(__file__))
+    _players_path = path.join(_dir_path, "Players.txt")
 
-    playerRecord = readPlayers(players_path)
+    _playerRecord = __readPlayers(_players_path)
 
     # method that adds a player to the playerRecord
-    @staticmethod
-    async def recordNewPlayer(username, id):
+    @classmethod
+    async def recordNewPlayer(cls, username, id):
         # check if player is already in the list
-        if username in PlayersManager.playerRecord.keys():
-            return PlayersManager.playerRecord[username]
+        if username in cls._playerRecord.keys():
+            return cls._playerRecord[username]
         
         print("Adding new player " + username + " to player list")
 
         # add player to list
-        PlayersManager.playerRecord[username] = Player(username, id)
+        cls._playerRecord[username] = Player(username, id)
 
         # # write to file
-        with open(PlayersManager.players_path, "a") as f: # is this secure?
+        with open(cls._players_path, "a") as f: # is this secure?
             f.write(username + "," + str(id) + ",0\n")
         f.close()
 
-        return PlayersManager.playerRecord[username]
+        return cls._playerRecord[username]
     
     # TODO: method that removes a player from the player list
 
     # method that returns the player if he is in the dictionary, else creates a new one
-    @staticmethod
-    def queryPlayer(username):
+    @classmethod
+    def queryPlayer(cls, username):
         # check if player is already in the dicitonary
-        return PlayersManager.playerRecord[username]
+        return cls._playerRecord[username]
     
     # # returns the room code a player is in if he is in one, else return -1
     # def getRoom(username):
