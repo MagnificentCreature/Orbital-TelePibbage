@@ -1,4 +1,4 @@
-from Controller import BotInitiator
+from BotController import BotInitiator
 
 def main():
     BotInitiator.main()

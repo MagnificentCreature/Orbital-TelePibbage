@@ -1,5 +1,5 @@
 import conf
-from Controller import BotCommands
+from BotController import BotCommands
 import logging
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters
 
