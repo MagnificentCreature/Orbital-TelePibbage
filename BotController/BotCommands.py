@@ -4,8 +4,17 @@ Handles user commands
 
 import asyncio
 
-from telegram import Update
-from telegram.ext import ContextTypes
+from telegram import InlineKeyboardMarkup, InlineKeyboardButton, Update
+from BotController import BotCommands
+from telegram.ext import (
+    # Application,
+    CallbackQueryHandler,
+    # CommandHandler,
+    ContextTypes,
+    # ConversationHandler,
+    # MessageHandler,
+    # filters,
+)
 
 import sys
 from pathlib import Path
@@ -19,7 +28,7 @@ from BotController import BotInitiator
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await PlayersManager.recordNewPlayer(update.message.from_user.username, update.message.from_user.id, context.user_data)
     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "Welcome1")
-    await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "Welcome2")
+    await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "Welcome2", reply_markup=BotInitiator.WelcomeKeyboard)
     
     if (context.args):
         roomCode = context.args[0]
@@ -31,8 +40,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return BotInitiator.FRESH
 
 async def create_room(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "CreateRoom1")
-    await RoomHandler.generateRoom(update.message.from_user.username, context.bot)
+    #await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "CreateRoom1")
+    #await RoomHandler.generateRoom(update.message.from_user.username, context.bot)
+    await DialogueReader.sendMessageByID(context.bot, update.callback_query.from_user.id, "CreateRoom1")
+    await RoomHandler.generateRoom(update.callback_query.from_user.username, context.bot)
 
     return BotInitiator.INROOM
 

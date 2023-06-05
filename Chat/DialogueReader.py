@@ -5,6 +5,7 @@ Calls to this class can be made from the public function sendMessage(bot, chat, 
 """
 
 from os import path
+from BotController import BotInitiator
 import logging
 
 class DialogueReader:
@@ -42,20 +43,20 @@ class DialogueReader:
         return inputString
 
     @classmethod
-    async def sendMessageByID(cls, bot, chat_id, message):
+    async def sendMessageByID(cls, bot, chat_id, message, reply_markup=None):
         #Use telegram api to send a message
         if (message not in cls._dialogues):
             print("Message " + message + " not found in dialogues.txt")
-        formattedText = cls.additionalProcessing(cls.dialogues[message])
-        await bot.send_message(chat_id=chat_id, text=formattedText)
+        formattedText = cls.additionalProcessing(cls._dialogues[message])
+        await bot.send_message(chat_id=chat_id, text=formattedText, reply_markup=reply_markup)
 
     @classmethod
-    async def sendMessageByID(cls, bot, chat_id, message, **kwargs):
+    async def sendMessageByID(cls, bot, chat_id, message, reply_markup=None, **kwargs):
         #Use telegram api to send a message, additional arguments are given in the form of **{{key}=value}
         if (message not in cls._dialogues):
             print("Message " + message + " not found in dialogues.txt")
         formattedText = cls.additionalProcessing(cls._dialogues[message].format(**kwargs))
-        await bot.send_message(chat_id=chat_id, text=formattedText)
+        await bot.send_message(chat_id=chat_id, text=formattedText, reply_markup=reply_markup)
     
     @staticmethod
     async def sendImageURLByID(bot, chat_id, imageURL):

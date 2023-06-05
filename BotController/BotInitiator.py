@@ -1,6 +1,8 @@
 import conf
 from BotController import BotCommands
+
 import logging
+from telegram import InlineKeyboardMarkup, InlineKeyboardButton, Update
 from telegram.ext import (
     ApplicationBuilder,
     Application,
@@ -9,9 +11,21 @@ from telegram.ext import (
     ConversationHandler,
     MessageHandler,
     filters,
+    CallbackQueryHandler,
 )
 
 BOT_TOKEN = conf.TELE_BOT_TOKEN
+
+CREATE_ROOM, JOIN_ROOM = map(chr, range(2))
+
+# State definitions for fresh level commands
+
+WelcomeKeyboard = InlineKeyboardMarkup([
+    [
+        InlineKeyboardButton(text="Create Room", callback_data=str(CREATE_ROOM)),
+        InlineKeyboardButton(text="Join Room", callback_data=str(JOIN_ROOM)),
+    ],
+])
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -27,9 +41,12 @@ def main() -> None:
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler("start", BotCommands.start, block=False)],
         states={
-            FRESH: [CommandHandler('create_room', BotCommands.create_room),
-                    CommandHandler('join_room', BotCommands.join_room),
+            FRESH: [CallbackQueryHandler(BotCommands.create_room, pattern="^" + str(CREATE_ROOM) + "$"),
+                    CallbackQueryHandler(BotCommands.join_room, pattern="^" + str(JOIN_ROOM) + "$"),
             ],
+            # [CallbackQueryHandler('create_room', BotCommands.create_room),
+            #         CallbackQueryHandler('join_room', BotCommands.join_room),
+            # ],
             INROOM: [
                 CommandHandler('generate', BotCommands.generate)
             ],
