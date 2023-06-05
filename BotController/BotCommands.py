@@ -16,7 +16,7 @@ from Player.PlayersManager import PlayersManager
 from ImageGeneration import ImageGenerator
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await PlayersManager.recordNewPlayer(update.message.from_user.username, update.message.from_user.id)
+    await PlayersManager.recordNewPlayer(update.message.from_user.username, update.message.from_user.id, context.user_data)
     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "Welcome1")
     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "Welcome2")
     if (context.args):

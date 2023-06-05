@@ -13,13 +13,15 @@ class Player:
     _score = 0
     _inGame = False
     _roomCode = ""
+    _ctx = None
     
-    def __init__(self, username, chatID=0, score=0):
+    def __init__(self, username, ctx, chatID=0, score=0):
         self._username = username
         self._chatID = chatID
         self._score = score
         self._inGame = False
         self._roomCode = ""
+        self._ctx = ctx
         
     def isFree(self):
         return not self._inGame
