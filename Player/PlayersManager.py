@@ -8,6 +8,8 @@ from os import path
 # import player class
 from Player.Player import Player #This import does not work when running this script directly, but works when running from main.py
 
+CONTEXT_TEMPLATE = []
+
 class PlayersManager:
     #Private Class variable
     _playerRecord = {}
@@ -33,7 +35,7 @@ class PlayersManager:
 
     # method that adds a player to the playerRecord
     @classmethod
-    async def recordNewPlayer(cls, username, id):
+    async def recordNewPlayer(cls, username, id, userCtx):
         # check if player is already in the list
         if username in cls._playerRecord.keys():
             return cls._playerRecord[username]
@@ -41,7 +43,7 @@ class PlayersManager:
         print("Adding new player " + username + " to player list")
 
         # add player to list
-        cls._playerRecord[username] = Player(username, id)
+        cls._playerRecord[username] = Player(username, id, userCtx)
 
         # # write to file
         with open(cls._players_path, "a") as f: # is this secure?

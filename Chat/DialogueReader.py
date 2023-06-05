@@ -5,6 +5,7 @@ Calls to this class can be made from the public function sendMessage(bot, chat, 
 """
 
 from os import path
+import logging
 
 class DialogueReader:
 
