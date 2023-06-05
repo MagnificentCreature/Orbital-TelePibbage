@@ -31,8 +31,11 @@ def main() -> None:
                     CommandHandler('join_room', BotCommands.join_room),
             ],
             INROOM: [
-                CommandHandler('generate', BotCommands.generate)
+                CommandHandler('start_game', BotCommands.start_game)
             ],
+            INGAME: [
+                CommandHandler('generate', BotCommands.generate)
+            ]
         },
         fallbacks=[MessageHandler(filters.COMMAND, BotCommands.unknown)],
     )

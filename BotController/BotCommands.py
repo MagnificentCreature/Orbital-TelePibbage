@@ -45,13 +45,19 @@ async def join_room(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "JoinRoom1", **{"roomCode": roomCode})
     await RoomHandler.joinRoom(update.message.from_user.username, roomCode, context.bot)
 
-    return BotInitiator.INROOM
+    await asyncio.Event()
+
+    return BotInitiator.INGAME
 
 async def generate(update: Update, context: ContextTypes.DEFAULT_TYPE):
     prompt = (" ").join(update.message.text.split(" ")[1:]) #TODO logic flow if invalid prompt or no prompt
     imageurl = await ImageGenerator.imageQuery(prompt)
     print(update.message.from_user.username + "Generated Image: " + str(imageurl))
     await DialogueReader.sendImageURLByID(context.bot, update.message.from_user.id, imageurl)
+
+async def start_game(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    
+    return BotInitiator.INGAME
 
 async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "UnknownCommand")
