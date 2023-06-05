@@ -13,7 +13,7 @@ logging.basicConfig(
 def main():
     application = ApplicationBuilder().token(BOT_TOKEN).build()
     
-    start_handler = CommandHandler('start', BotCommands.start)
+    start_handler = CommandHandler('start', BotCommands.start, block=False)
     create_room_handler = CommandHandler('create_room', BotCommands.create_room)
     join_room_handler = CommandHandler('join_room', BotCommands.join_room)
     generate_handler = CommandHandler('generate', BotCommands.generate)

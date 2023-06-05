@@ -43,7 +43,7 @@ class PlayersManager:
         print("Adding new player " + username + " to player list")
 
         # add player to list
-        cls._playerRecord[username] = Player(username, id)
+        cls._playerRecord[username] = Player(username, id, userCtx)
 
         # # write to file
         with open(cls._players_path, "a") as f: # is this secure?
