@@ -29,8 +29,8 @@ class DialogueReader:
             # Return the dictionary
             return data
 
-    dir_path = path.dirname(path.realpath(__file__))
-    dialogues_path = path.join(dir_path, "dialogues.txt")
+    _dir_path = path.dirname(path.realpath(__file__))
+    _dialogues_path = path.join(_dir_path, "dialogues.txt")
 
     # Read the dialogues from the file
 
