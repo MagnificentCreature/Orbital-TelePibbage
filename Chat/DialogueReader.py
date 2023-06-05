@@ -34,7 +34,7 @@ class DialogueReader:
 
     # Read the dialogues from the file
 
-    _dialogues = __read_dialogues(dialogues_path)
+    _dialogues = __read_dialogues(_dialogues_path)
 
     def additionalProcessing(inputString):
         # Replace \n with newline
