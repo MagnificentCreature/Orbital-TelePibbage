@@ -15,7 +15,7 @@ class Player:
     _roomCode = ""
     _userCtx = None
     
-    def __init__(self, username, _userCtx, chatID=0, score=0):
+    def __init__(self, username, chatID=0, _userCtx=None, score=0):
         self._username = username
         self._chatID = chatID
         self._score = score
