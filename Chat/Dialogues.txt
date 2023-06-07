@@ -13,7 +13,9 @@ LeavingRoom, Leaving game room {roomCode}...
 PlayerJoined, @{player} has joined the lobby ({playerCount}/{maxPlayerCount})
 StartingGame, Host @{host} has started the game! Get Ready!
 HostStartingGame, You are starting the game! Get Ready!
+# Game related dialogues
 GameStarted, Game has started! Send in your prompts!
+Phase1, Send in your prompts!
 # Error Messages 
 InGame, Error to {action} room, perhaps you are already in another game
 AlreadyInRoom, You are already in this room!

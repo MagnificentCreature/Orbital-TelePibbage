@@ -4,7 +4,9 @@ Information passed into rooms are given only as the usernames
 So keeping track of who is in which room is important, and each player can only be in one room at a time
 '''
 
+import asyncio
 import random
+from GameController import Prompting
 
 from Room.Room import Room
 
@@ -95,6 +97,4 @@ class RoomHandler:
             return
         
         await room.startGame(bot)
-        await player.sendMessage(bot, "GameStarted")
-
-    
+        asyncio.create_task(Prompting.startGamePhase1(room, bot))

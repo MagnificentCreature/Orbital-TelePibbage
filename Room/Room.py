@@ -33,6 +33,11 @@ class Room:
     def hasMinPlayers(self):
         return len(self._players) >= Room.MIN_PLAYERS
     
+    async def broadcast(self, bot, message, **kwargs):
+        asyncio.gather(
+            *[player.sendMessage(bot, message, **kwargs) for player in self._players]
+        )
+
     # Dialogue messages to send when adding player
     async def __joinRoomMessages(self, bot, player):
         await player.sendMessage(bot, "RoomCode", **{'roomCode':self.getCode()})
