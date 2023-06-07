@@ -49,10 +49,8 @@ async def join_room(update: Update, context: ContextTypes.DEFAULT_TYPE, roomCode
 
     waiting_to_start = asyncio.Event()
     context.user_data["waiting_to_start"] = waiting_to_start
-    print(PlayersManager.queryPlayer(update.message.from_user.username)._user_data)
     await waiting_to_start.wait()
     context.user_data['waiting_to_start'].clear()
-    print("GGDELETED")
 
     return BotInitiator.INGAME
 
