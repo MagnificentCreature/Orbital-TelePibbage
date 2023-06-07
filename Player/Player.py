@@ -26,6 +26,9 @@ class Player:
         _user_data['in_game'] = False
         _user_data['roomCode'] = ""
 
+    def getRoomCode(self):
+        return self._user_data['roomCode']
+
     def isFree(self):
         return not self._user_data['in_game']
     
