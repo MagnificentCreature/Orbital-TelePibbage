@@ -49,6 +49,7 @@ async def join_room(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data["waiting_to_start"] = waiting_to_start
     await waiting_to_start.wait()
     context.user_data['waiting_to_start'].clear()
+
     return BotInitiator.INGAME
 
 async def leave_room(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -63,7 +64,7 @@ async def generate(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await DialogueReader.sendImageURLByID(context.bot, update.message.from_user.id, imageurl)
 
 async def start_game(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    
+    await RoomHandler.startGame(update.message.from_user.username, context.bot)
     return BotInitiator.INGAME
 
 async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):

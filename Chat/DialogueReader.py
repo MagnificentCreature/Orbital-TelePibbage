@@ -7,6 +7,8 @@ Calls to this class can be made from the public function sendMessage(bot, chat, 
 from os import path
 import logging
 
+from telegram import error
+
 class DialogueReader:
 
     # Create a static variable to store the dialogues
@@ -47,7 +49,10 @@ class DialogueReader:
         if (message not in cls._dialogues):
             print("Message " + message + " not found in dialogues.txt")
         formattedText = cls.additionalProcessing(cls.dialogues[message])
-        await bot.send_message(chat_id=chat_id, text=formattedText)
+        try:
+            await bot.send_message(chat_id=chat_id, text=formattedText)
+        except error.Forbidden as e:
+            logging.error("Error sending message to chat_id " + str(chat_id) + ": " + str(e))
 
     @classmethod
     async def sendMessageByID(cls, bot, chat_id, message, **kwargs):
@@ -55,11 +60,17 @@ class DialogueReader:
         if (message not in cls._dialogues):
             print("Message " + message + " not found in dialogues.txt")
         formattedText = cls.additionalProcessing(cls._dialogues[message].format(**kwargs))
-        await bot.send_message(chat_id=chat_id, text=formattedText)
+        try:
+            await bot.send_message(chat_id=chat_id, text=formattedText)
+        except error.Forbidden as e:
+            logging.error("Error sending message to chat_id " + str(chat_id) + ": " + str(e))
     
     @staticmethod
     async def sendImageURLByID(bot, chat_id, imageURL):
-        await bot.send_photo(chat_id=chat_id, photo=imageURL)
+        try:
+            await bot.send_photo(chat_id=chat_id, photo=imageURL)
+        except error.Forbidden as e:
+            logging.error("Error sending message to chat_id " + str(chat_id) + ": " + str(e))
 
     # def read_dialogues(filepath):
     #     with open(filepath, 'r') as f: 

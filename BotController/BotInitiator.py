@@ -31,7 +31,8 @@ def main() -> None:
                     CommandHandler('join_room', BotCommands.join_room),
             ],
             INROOM: [
-                CommandHandler('start_game', BotCommands.start_game)
+                CommandHandler('start_game', BotCommands.start_game),
+                CommandHandler('leave_room', BotCommands.leave_room),
             ],
             INGAME: [
                 CommandHandler('generate', BotCommands.generate)

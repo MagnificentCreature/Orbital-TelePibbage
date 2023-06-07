@@ -9,6 +9,7 @@ class Room:
     _host = None #player object
     _players = [] #contains list of player objects
     MAX_PLAYERS = 8
+    MIN_PLAYERS = 2
     _state = 0 # 0 = join state, 1 = game state
 
     def __init__(self, code, host):
@@ -20,8 +21,20 @@ class Room:
     def getCode(self):
         return self._code
     
+    def hasPlayer(self, player):
+        return player in self._players
+    
+    def joinState(self):
+        return self._state == 0
+    
+    def isHost(self, player):
+        return player == self._host
+    
+    def hasMinPlayers(self):
+        return len(self._players) >= Room.MIN_PLAYERS
+    
     # Dialogue messages to send when adding player
-    async def __sendRoomMessages(self, bot, player):
+    async def __joinRoomMessages(self, bot, player):
         await player.sendMessage(bot, "RoomCode", **{'roomCode':self.getCode()})
         await player.sendMessage(bot, "JoinRoom2", **{'playerCount':len(self._players), 'maxPlayerCount':str(self.MAX_PLAYERS)})
         await player.sendMessage(bot, "Invite", **{'roomCode':self.getCode()})
@@ -51,7 +64,7 @@ class Room:
         # Add player to room
         self._players.append(player)
         player.joinRoom(self._code)
-        await self.__sendRoomMessages(bot, player)
+        await self.__joinRoomMessages(bot, player)
         return True
 
     # Remove player from room
@@ -69,16 +82,18 @@ class Room:
             return True
         self._players.remove(player)
         return True
+    
+    async def startGame(self, bot):
+        for eachPlayer in self._players:
+            if eachPlayer == self._host:
+                eachPlayer.sendMessage(bot, "StartingGame", **{'host': "(you)"})
+                eachPlayer.setInGame()
+                continue
+            eachPlayer.sendMessage(bot, "StartingGame", **{'host':self._host.getUsername()})
+            eachPlayer.startGame()
+        self._state = 1
 
-    def hasPlayer(self, player):
-        return player in self._players
-    
-    def joinState(self):
-        return self._state == 0
-    
+
     # WIP this this will enable the features for audience to join
     def acceptingAudience(self):
         return self._state == 1 
-    
-    def startGame(self):
-        self._state = 1

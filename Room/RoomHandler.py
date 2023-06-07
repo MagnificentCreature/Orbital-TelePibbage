@@ -11,7 +11,6 @@ from Room.Room import Room
 # import sys
 # from pathlib import Path
 # sys.path.insert(1, str(Path(__file__).parent.parent.absolute()))
-from Chat.DialogueReader import DialogueReader
 from Player.PlayersManager import PlayersManager
 
 class RoomHandler:
@@ -71,7 +70,31 @@ class RoomHandler:
         if not await cls.joinRoom(username, code, bot, "create"):
             await player.sendMessage(bot, "RoomCreationFailed")
             return False
-        
+
         return True
+    
+    @classmethod
+    async def startGame(cls, username, bot):
+        player = PlayersManager.queryPlayer(username)
+        roomCode = player.getRoomCode()
+
+        #check if player is in a room
+        if roomCode is "":
+            print("Player is not in a room, this could be a bug")
+            return
+        
+        room = cls._rooms[roomCode]
+        #check if player is host
+        if not room.isHost(player):
+            await player.sendMessage(bot, "NotHost")
+            return
+        
+        #check if room has min players
+        if not room.hasMinPlayers():
+            await player.sendMessage(bot, "NotEnoughPlayers")
+            return
+        
+        await room.startGame(bot)
+
 
     
