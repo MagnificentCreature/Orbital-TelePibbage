@@ -21,8 +21,10 @@ class Player:
         _user_data['in_game'] = False
         _user_data['roomCode'] = ""
         
-    def getRoomCode(self):
-        return self._user_data['roomCode']
+    def updateUserData(self, _user_data):
+        self._user_data = _user_data
+        _user_data['in_game'] = False
+        _user_data['roomCode'] = ""
 
     def isFree(self):
         return not self._user_data['in_game']
@@ -40,7 +42,7 @@ class Player:
         self._user_data['roomCode'] = roomCode
 
     async def leaveRoom(self, bot):
-        await self.sendMessage(bot, "LeavingRoom", **{'roomCode':self._roomCode})
+        await self.sendMessage(bot, "LeavingRoom", **{'roomCode':self.getRoomCode()})
         tempRoomCode = self.getRoomCode()
         self._user_data['roomCode'] = ""
         return tempRoomCode

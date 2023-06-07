@@ -79,15 +79,15 @@ class RoomHandler:
         roomCode = player.getRoomCode()
 
         #check if player is in a room
-        if roomCode is "":
+        if roomCode == "":
             print("Player is not in a room, this could be a bug")
-            return
+            return 
         
         room = cls._rooms[roomCode]
         #check if player is host
         if not room.isHost(player):
             await player.sendMessage(bot, "NotHost")
-            return
+            return 
         
         #check if room has min players
         if not room.hasMinPlayers():
@@ -95,7 +95,6 @@ class RoomHandler:
             return
         
         await room.startGame(bot)
-        player.sendMessage(bot, "GameStarted")
-
+        await player.sendMessage(bot, "GameStarted")
 
     

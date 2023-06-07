@@ -23,10 +23,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     if (context.args):
         roomCode = context.args[0]
-        await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "JoinRoom1", **{"roomCode": roomCode})
-        await RoomHandler.joinRoom(update.message.from_user.username, roomCode, context.bot)
+        # await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "JoinRoom1", **{"roomCode": roomCode})
+        # await RoomHandler.joinRoom(update.message.from_user.username, roomCode, context.bot)
+        await join_room(update, context, roomCode)
 
-        return BotInitiator.INROOM
+        return BotInitiator.INGAME
     
     return BotInitiator.FRESH
 
@@ -36,9 +37,10 @@ async def create_room(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     return BotInitiator.INROOM
 
-async def join_room(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def join_room(update: Update, context: ContextTypes.DEFAULT_TYPE, roomCode=None):
     try:
-        roomCode = update.message.text.split(" ")[1]
+        if roomCode is None:
+            roomCode = update.message.text.split(" ")[1]
     except IndexError:
         await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "RoomNotFound")
         return
@@ -47,8 +49,10 @@ async def join_room(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     waiting_to_start = asyncio.Event()
     context.user_data["waiting_to_start"] = waiting_to_start
+    print(PlayersManager.queryPlayer(update.message.from_user.username)._user_data)
     await waiting_to_start.wait()
     context.user_data['waiting_to_start'].clear()
+    print("GGDELETED")
 
     return BotInitiator.INGAME
 
@@ -64,7 +68,6 @@ async def generate(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await DialogueReader.sendImageURLByID(context.bot, update.message.from_user.id, imageurl)
 
 async def start_game(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "HostStartingGame")
     await RoomHandler.startGame(update.message.from_user.username, context.bot)
     return BotInitiator.INGAME
 

@@ -38,10 +38,10 @@ class PlayersManager:
     async def recordNewPlayer(cls, username, id, user_data):
         # check if player is already in the list
         if username in cls._playerRecord.keys():
-            return cls._playerRecord[username]
+            player = cls._playerRecord[username]
+            player.updateUserData(user_data)
+            return player
         
-        print("Adding new player " + username + " to player list")
-
         # add player to list
         cls._playerRecord[username] = Player(username, id, user_data)
 

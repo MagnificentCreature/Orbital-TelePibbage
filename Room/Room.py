@@ -88,8 +88,8 @@ class Room:
             if eachPlayer == self._host:
                 eachPlayer.setInGame()
                 continue
-            eachPlayer.sendMessage(bot, "StartingGame", **{'host':self._host.getUsername()})
-            eachPlayer.startGame()
+            await eachPlayer.sendMessage(bot, "StartingGame", **{'host':self._host.getUsername()})
+            await eachPlayer.startGame()
         self._state = 1
 
 
