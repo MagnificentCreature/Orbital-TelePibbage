@@ -86,7 +86,6 @@ class Room:
     async def startGame(self, bot):
         for eachPlayer in self._players:
             if eachPlayer == self._host:
-                eachPlayer.sendMessage(bot, "StartingGame", **{'host': "(you)"})
                 eachPlayer.setInGame()
                 continue
             eachPlayer.sendMessage(bot, "StartingGame", **{'host':self._host.getUsername()})

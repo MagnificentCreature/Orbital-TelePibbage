@@ -12,6 +12,8 @@ JoinRoom2, There are currently ({playerCount}/{maxPlayerCount}) players
 LeavingRoom, Leaving game room {roomCode}...
 PlayerJoined, @{player} has joined the lobby ({playerCount}/{maxPlayerCount})
 StartingGame, Host @{host} has started the game! Get Ready!
+HostStartingGame, You are starting the game! Get Ready!
+GameStarted, Game has started! Send in your prompts!
 # Error Messages 
 InGame, Error to {action} room, perhaps you are already in another game
 AlreadyInRoom, You are already in this room!

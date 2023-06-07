@@ -48,7 +48,6 @@ class Player:
     def setInGame(self):
         self._user_data['in_game'] = True
 
-
     async def startGame(self):
         self._user_data['waiting_to_start'].set()
         self.setInGame()

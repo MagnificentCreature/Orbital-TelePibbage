@@ -64,6 +64,7 @@ async def generate(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await DialogueReader.sendImageURLByID(context.bot, update.message.from_user.id, imageurl)
 
 async def start_game(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "HostStartingGame")
     await RoomHandler.startGame(update.message.from_user.username, context.bot)
     return BotInitiator.INGAME
 

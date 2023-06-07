@@ -95,6 +95,7 @@ class RoomHandler:
             return
         
         await room.startGame(bot)
+        player.sendMessage(bot, "GameStarted")
 
 
     
