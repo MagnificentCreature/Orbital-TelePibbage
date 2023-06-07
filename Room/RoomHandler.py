@@ -52,7 +52,7 @@ class RoomHandler:
         #check if player is already in a room
         if player.inRoom():
             await cls.leaveRoom(player, bot)
-        await room.addPlayer(username, action, bot)
+        await room.addPlayer(player, action, bot)
         return True
 
     @classmethod
@@ -71,10 +71,6 @@ class RoomHandler:
         if not await cls.joinRoom(username, code, bot, "create"):
             await player.sendMessage(bot, "RoomCreationFailed")
             return False
-        
-        # if not await room.addPlayer(username, "create", bot):
-        #     await player.sendMessage(bot, "RoomCreationFailed")
-        #     return False
         
         return True
 

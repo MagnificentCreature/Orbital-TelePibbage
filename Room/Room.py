@@ -3,7 +3,6 @@ Class that holds data about rooms
 """
 
 import asyncio
-from Player.PlayersManager import PlayersManager
 
 class Room:
     _code = ""
@@ -34,8 +33,7 @@ class Room:
 
     # Add player to room
     # Fails if is already in or if room is full
-    async def addPlayer(self, username, action, bot):
-        player = PlayersManager.queryPlayer(username)
+    async def addPlayer(self, player, action, bot):
         # do nothing if the player is already in the room
         if (player in self._players):
             await player.sendMessage(bot, "AlreadyInRoom", **{'action':action})
