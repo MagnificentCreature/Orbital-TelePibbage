@@ -11,20 +11,21 @@ class Player:
     _username = ""
     _chatID = 0
     _score = 0
-    _inGame = False
-    _roomCode = ""
-    #_userCtx = None
+    _userCtx = None
     
-    def __init__(self, username, chatID=0, score=0): # _userCtx=None,
+    def __init__(self, username, chatID=0, _userCtx=None, score=0):
         self._username = username
         self._chatID = chatID
         self._score = score
-        self._inGame = False
-        self._roomCode = ""
-        #self._userCtx = _userCtx
+        self._userCtx = _userCtx
+        _userCtx.user_data['in_game'] = False
+        _userCtx.user_data['roomCode'] = ""
         
+    def __getRoomCode(self):
+        return self._userCtx.user_data['roomCode']
+
     def isFree(self):
-        return not self._inGame
+        return not self.user_data['in_game']
     
     def isHost(self):
         return False
@@ -36,16 +37,21 @@ class Player:
         return self._username
     
     def inRoom(self):
-        return self._roomCode != ""
+        return self._userCtx.user_data['roomCode'] != ""
     
     def joinRoom(self, roomCode):
-        self._roomCode = roomCode
+        self._userCtx.user_data['roomCode'] = roomCode
 
     async def leaveRoom(self, bot):
         await self.sendMessage(bot, "LeavingRoom", **{'roomCode':self._roomCode})
-        tempRoomCode = self._roomCode
-        self._roomCode = None
+        tempRoomCode = self.__getRoomCode()
+        self._userCtx.user_data['roomCode'] = ""
         return tempRoomCode
+    
+    async def startGame(self, bot):
+        await self.sendMessage(bot, "StartingGame")
+        self._userCtx.user_data['waiting_to_start'].set()
+        self._userCtx.user_data['in_game'] = True
     
     async def sendMessage(self, bot, message):
         await DialogueReader.sendMessageByID(bot, self._chatID, message)
