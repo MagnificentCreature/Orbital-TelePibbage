@@ -45,9 +45,16 @@ async def join_room(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "JoinRoom1", **{"roomCode": roomCode})
     await RoomHandler.joinRoom(update.message.from_user.username, roomCode, context.bot)
 
-    await asyncio.Event()
-
+    waiting_to_start = asyncio.Event()
+    context.user_data["waiting_to_start"] = waiting_to_start
+    await waiting_to_start.wait()
+    context.user_data['waiting_to_start'].clear()
     return BotInitiator.INGAME
+
+async def leave_room(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await RoomHandler.leaveRoom(update.message.from_user.username, context.bot)
+
+    return BotInitiator.FRESH
 
 async def generate(update: Update, context: ContextTypes.DEFAULT_TYPE):
     prompt = (" ").join(update.message.text.split(" ")[1:]) #TODO logic flow if invalid prompt or no prompt
