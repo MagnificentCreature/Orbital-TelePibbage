@@ -5,12 +5,15 @@ Welcome2, When you're ready, type "/create_room" to create a game lobby or /join
 CreateRoom1, Creating game room...
 RoomCode, You have entered the game lobby.\nYour room code is {roomCode}
 Invite, Invite your friends to the room by sharing them this link: https://t.me/TelePibbageBot?start={roomCode}
-WaitingToStart, Waiting for players to join... Type "/start_game" to start the game when everyone is ready!
+#WaitingToStart, Waiting for players to join... Type "/start_game" to start the game when everyone is ready!
 WaitingToStart2, Meanwhile, try /generate <prompt> to try your hands at generating some fun images! 
 JoinRoom1, Joining game room {roomCode}...
 JoinRoom2, There are currently ({playerCount}/{maxPlayerCount}) players
 LeavingRoom, Leaving game room {roomCode}...
 PlayerJoined, @{player} has joined the lobby ({playerCount}/{maxPlayerCount})
+StartGameOption, When all players have joined, start the game!
+#Start Game dialogue
+StartGameWelcome, Ladies and gentlemen, boys and girls, welcome to the most exhilarating game show in town, TelePibbage! I am honored to be your host for today's thrilling competition.
 # Error Messages 
 InGame, Error to {action} room, perhaps you are already in another game
 AlreadyInRoom, You are already in this room!

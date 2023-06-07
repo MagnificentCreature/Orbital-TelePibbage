@@ -16,10 +16,11 @@ from telegram.ext import (
 
 BOT_TOKEN = conf.TELE_BOT_TOKEN
 
-CREATE_ROOM, JOIN_ROOM = map(chr, range(2))
+CREATE_ROOM, JOIN_ROOM, START_GAME = map(chr, range(3))
 
 # State definitions for fresh level commands
 
+# for FRESH
 WelcomeKeyboard = InlineKeyboardMarkup([
     [
         InlineKeyboardButton(text="Create Room", callback_data=str(CREATE_ROOM)),
@@ -27,12 +28,26 @@ WelcomeKeyboard = InlineKeyboardMarkup([
     ],
 ])
 
+# for INROOM
+StartGameKeyboard = InlineKeyboardMarkup([
+    [
+        InlineKeyboardButton(text="Start Game", callback_data=str(START_GAME)),
+    ],
+])
+
+# for PROMPTING_PHASE
+# StartGameKeyboard = InlineKeyboardMarkup([
+#     [
+#         InlineKeyboardButton(text="Enter Prompt", callback_data=str(ENTER_PROMPT)),
+#     ],
+# ])
+
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
 
-FRESH, INROOM, INGAME, PROMPTING_PHASE, LYING_PHASE, VOTING_PHASE = range(6)
+FRESH, ENTERCODE, INROOM, INGAME, PROMPTING_PHASE, LYING_PHASE, VOTING_PHASE = range(7)
 
 def main() -> None:
     application = ApplicationBuilder().token(BOT_TOKEN).build()
@@ -42,14 +57,20 @@ def main() -> None:
         entry_points=[CommandHandler("start", BotCommands.start, block=False)],
         states={
             FRESH: [CallbackQueryHandler(BotCommands.create_room, pattern="^" + str(CREATE_ROOM) + "$"),
-                    CallbackQueryHandler(BotCommands.join_room, pattern="^" + str(JOIN_ROOM) + "$"),
+                    CallbackQueryHandler(BotCommands.join_room_start, pattern="^" + str(JOIN_ROOM) + "$"),
             ],
             # [CallbackQueryHandler('create_room', BotCommands.create_room),
             #         CallbackQueryHandler('join_room', BotCommands.join_room),
             # ],
+            ENTERCODE: [MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.join_room_code)],
             INROOM: [
-                CommandHandler('generate', BotCommands.generate)
+                CommandHandler('generate', BotCommands.generate),
+                CallbackQueryHandler(BotCommands.start_game, pattern="^" + str(START_GAME) + "$"),
             ],
+            INGAME: [
+                #placeholder
+                CommandHandler('generate', BotCommands.generate),
+            ]
         },
         fallbacks=[MessageHandler(filters.COMMAND, BotCommands.unknown)],
     )
