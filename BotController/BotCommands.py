@@ -30,7 +30,6 @@ from BotController import BotInitiator
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await PlayersManager.recordNewPlayer(update.message.from_user.username, update.message.from_user.id, context.user_data)
     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "Welcome1")
-    await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "Welcome2", reply_markup=BotInitiator.WelcomeKeyboard)
     
     if (context.args):
         roomCode = context.args[0]
@@ -40,6 +39,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return await join_room(update, context, roomCode)
         # return BotInitiator.INGAME
     
+    await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "Welcome2", reply_markup=BotInitiator.WelcomeKeyboard)
     return BotInitiator.FRESH
 
 async def create_room(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -69,7 +69,7 @@ async def join_room_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def join_room_code(update: Update, context: ContextTypes.DEFAULT_TYPE):
     room_code = update.message.text
-    return await join_room(update, context, roomCode)
+    return await join_room(update, context, room_code)
 
 #     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "JoinRoom1", **{"roomCode": room_code})
 #     await RoomHandler.joinRoom(update.message.from_user.username, room_code, context.bot)
@@ -91,7 +91,9 @@ async def join_room(update: Update, context: ContextTypes.DEFAULT_TYPE, roomCode
         await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "RoomNotFound")
         return BotInitiator.END
     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "JoinRoom1", **{"roomCode": roomCode})
-    await RoomHandler.joinRoom(update.message.from_user.username, roomCode, context.bot)
+    success = await RoomHandler.joinRoom(update.message.from_user.username, roomCode, context.bot)
+    if not success:
+        return BotInitiator.END
 
     waiting_to_start = asyncio.Event()
     context.user_data["waiting_to_start"] = waiting_to_start
@@ -120,7 +122,7 @@ async def start_game(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     #await DialogueReader.sendMessageByID(context.bot, update.callback_query.from_user.id, "CreateRoom1")
 
-    await RoomHandler.startGame(update.message.from_user.username, context.bot)
+    await RoomHandler.startGame(update.callback_query.from_user.username, context.bot)
     return BotInitiator.INGAME
 
 async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):

@@ -51,7 +51,7 @@ class DialogueReader:
             print("Message " + message + " not found in dialogues.txt")
         formattedText = cls.additionalProcessing(cls.dialogues[message])
         try:
-            await bot.send_message(chat_id=chat_id, text=formattedText)
+            await bot.send_message(chat_id=chat_id, text=formattedText, reply_markup=reply_markup)
         except error.Forbidden as e:
             logging.error("Error sending message to chat_id " + str(chat_id) + ": " + str(e))
 
@@ -62,7 +62,7 @@ class DialogueReader:
             print("Message " + message + " not found in dialogues.txt")
         formattedText = cls.additionalProcessing(cls._dialogues[message].format(**kwargs))
         try:
-            await bot.send_message(chat_id=chat_id, text=formattedText)
+            await bot.send_message(chat_id=chat_id, text=formattedText, reply_markup=reply_markup)
         except error.Forbidden as e:
             logging.error("Error sending message to chat_id " + str(chat_id) + ": " + str(e))
     

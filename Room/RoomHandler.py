@@ -97,4 +97,5 @@ class RoomHandler:
             return
         
         await room.startGame(bot)
-        asyncio.create_task(Prompting.startGamePhase1(room, bot))
+        asyncio.get_event_loop().create_task(Prompting.beginPhase1(bot, room))
+        print("RUNNEDE")

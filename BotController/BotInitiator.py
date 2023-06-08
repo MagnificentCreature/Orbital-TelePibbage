@@ -68,6 +68,7 @@ def main() -> None:
                 CommandHandler('leave_room', BotCommands.leave_room),
             ],
             INGAME: [
+                
                 CommandHandler('generate', BotCommands.generate)
             ]
         },

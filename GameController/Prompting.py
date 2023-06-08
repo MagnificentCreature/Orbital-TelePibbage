@@ -1,5 +1,5 @@
-def beginPhase1(bot, room):
-    sendPhase1Messages(bot, room)
+async def beginPhase1(bot, room):
+    await sendPhase1Messages(bot, room)
 
-def sendPhase1Messages(bot, room):
-    room.broadcast(bot, "Phase1")
+async def sendPhase1Messages(bot, room):
+    await room.broadcast(bot, "Phase1")
