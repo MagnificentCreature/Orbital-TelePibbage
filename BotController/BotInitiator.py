@@ -64,12 +64,11 @@ def main() -> None:
             # ],
             ENTERCODE: [MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.join_room_code)],
             INROOM: [
-                CommandHandler('generate', BotCommands.generate),
                 CallbackQueryHandler(BotCommands.start_game, pattern="^" + str(START_GAME) + "$"),
+                CommandHandler('leave_room', BotCommands.leave_room),
             ],
             INGAME: [
-                #placeholder
-                CommandHandler('generate', BotCommands.generate),
+                CommandHandler('generate', BotCommands.generate)
             ]
         },
         fallbacks=[MessageHandler(filters.COMMAND, BotCommands.unknown)],

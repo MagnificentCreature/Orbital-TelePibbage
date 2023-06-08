@@ -11,8 +11,13 @@ JoinRoom1, Joining game room {roomCode}...
 JoinRoom2, There are currently ({playerCount}/{maxPlayerCount}) players
 LeavingRoom, Leaving game room {roomCode}...
 PlayerJoined, @{player} has joined the lobby ({playerCount}/{maxPlayerCount})
-StartGameOption, When all players have joined, start the game!
 #Start Game dialogue
+StartGameOption, When all players have joined, start the game!
+StartingGame, Host @{host} has started the game! Get Ready!
+HostStartingGame, You are starting the game! Get Ready!
+# Game related dialogues
+GameStarted, Game has started! Send in your prompts!
+Phase1, Send in your prompts!
 StartGameWelcome, Ladies and gentlemen, boys and girls, welcome to the most exhilarating game show in town, TelePibbage! I am honored to be your host for today's thrilling competition.
 # Error Messages 
 InGame, Error to {action} room, perhaps you are already in another game
@@ -22,3 +27,5 @@ RoomFull, Error when {action} room, room is full!
 GameInProgress, Game is in progress, do "/join_audience {roomCode}" to join as audience
 RoomCreationFailed, Failed to create room
 UnknownCommand, Sorry, I did not understand that command.
+NotHost, You are not the host. Only the host can start the game.
+NotEnoughPlayers, Not enough players to start the game. Need at least 2 players.

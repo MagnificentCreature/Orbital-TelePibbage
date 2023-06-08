@@ -8,6 +8,8 @@ from os import path
 from BotController import BotInitiator
 import logging
 
+from telegram import error
+
 class DialogueReader:
 
     # Create a static variable to store the dialogues
@@ -30,12 +32,12 @@ class DialogueReader:
             # Return the dictionary
             return data
 
-    dir_path = path.dirname(path.realpath(__file__))
-    dialogues_path = path.join(dir_path, "dialogues.txt")
+    _dir_path = path.dirname(path.realpath(__file__))
+    _dialogues_path = path.join(_dir_path, "dialogues.txt")
 
     # Read the dialogues from the file
 
-    _dialogues = __read_dialogues(dialogues_path)
+    _dialogues = __read_dialogues(_dialogues_path)
 
     def additionalProcessing(inputString):
         # Replace \n with newline
@@ -47,8 +49,11 @@ class DialogueReader:
         #Use telegram api to send a message
         if (message not in cls._dialogues):
             print("Message " + message + " not found in dialogues.txt")
-        formattedText = cls.additionalProcessing(cls._dialogues[message])
-        await bot.send_message(chat_id=chat_id, text=formattedText, reply_markup=reply_markup)
+        formattedText = cls.additionalProcessing(cls.dialogues[message])
+        try:
+            await bot.send_message(chat_id=chat_id, text=formattedText)
+        except error.Forbidden as e:
+            logging.error("Error sending message to chat_id " + str(chat_id) + ": " + str(e))
 
     @classmethod
     async def sendMessageByID(cls, bot, chat_id, message, reply_markup=None, **kwargs):
@@ -56,11 +61,17 @@ class DialogueReader:
         if (message not in cls._dialogues):
             print("Message " + message + " not found in dialogues.txt")
         formattedText = cls.additionalProcessing(cls._dialogues[message].format(**kwargs))
-        await bot.send_message(chat_id=chat_id, text=formattedText, reply_markup=reply_markup)
+        try:
+            await bot.send_message(chat_id=chat_id, text=formattedText)
+        except error.Forbidden as e:
+            logging.error("Error sending message to chat_id " + str(chat_id) + ": " + str(e))
     
     @staticmethod
     async def sendImageURLByID(bot, chat_id, imageURL):
-        await bot.send_photo(chat_id=chat_id, photo=imageURL)
+        try:
+            await bot.send_photo(chat_id=chat_id, photo=imageURL)
+        except error.Forbidden as e:
+            logging.error("Error sending message to chat_id " + str(chat_id) + ": " + str(e))
 
     # def read_dialogues(filepath):
     #     with open(filepath, 'r') as f: 

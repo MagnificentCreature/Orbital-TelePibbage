@@ -11,23 +11,26 @@ class Player:
     _username = ""
     _chatID = 0
     _score = 0
-    _inGame = False
-    _roomCode = ""
-    _userCtx = None
+    _user_data = None
     
-    def __init__(self, username, chatID=0, _userCtx=None, score=0):
+    def __init__(self, username, chatID=0, _user_data={}, score=0):
         self._username = username
         self._chatID = chatID
         self._score = score
-        self._inGame = False
-        self._roomCode = ""
-        self._userCtx = _userCtx
+        self._user_data = _user_data
+        _user_data['in_game'] = False
+        _user_data['roomCode'] = ""
         
+    def updateUserData(self, _user_data):
+        self._user_data = _user_data
+        _user_data['in_game'] = False
+        _user_data['roomCode'] = ""
+
+    def getRoomCode(self):
+        return self._user_data['roomCode']
+
     def isFree(self):
-        return not self._inGame
-    
-    def isHost(self):
-        return False
+        return not self._user_data['in_game']
     
     def getScore(self):
         return self._score
@@ -36,16 +39,23 @@ class Player:
         return self._username
     
     def inRoom(self):
-        return self._roomCode != ""
+        return self._user_data['roomCode'] != ""
     
     def joinRoom(self, roomCode):
-        self._roomCode = roomCode
+        self._user_data['roomCode'] = roomCode
 
     async def leaveRoom(self, bot):
-        await self.sendMessage(bot, "LeavingRoom", **{'roomCode':self._roomCode})
-        tempRoomCode = self._roomCode
-        self._roomCode = None
+        await self.sendMessage(bot, "LeavingRoom", **{'roomCode':self.getRoomCode()})
+        tempRoomCode = self.getRoomCode()
+        self._user_data['roomCode'] = ""
         return tempRoomCode
+    
+    def setInGame(self):
+        self._user_data['in_game'] = True
+
+    async def startGame(self):
+        self._user_data['waiting_to_start'].set()
+        self.setInGame()
     
     async def sendMessage(self, bot, message):
         await DialogueReader.sendMessageByID(bot, self._chatID, message)
