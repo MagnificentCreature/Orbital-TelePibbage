@@ -45,6 +45,8 @@ class Player:
         self._user_data['roomCode'] = roomCode
 
     async def leaveRoom(self, bot):
+        if self._user_data['roomCode'] == "":
+            return
         await self.sendMessage(bot, "LeavingRoom", **{'roomCode':self.getRoomCode()})
         tempRoomCode = self.getRoomCode()
         self._user_data['roomCode'] = ""

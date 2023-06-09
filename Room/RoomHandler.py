@@ -34,8 +34,11 @@ class RoomHandler:
         del cls._rooms[room.getCode()]
 
     @classmethod
-    async def leaveRoom(cls, player, bot):
+    async def leaveRoom(cls, username, bot):
+        player = PlayersManager.queryPlayer(username)
         roomCode = await player.leaveRoom(bot)
+        if roomCode is None:
+            return
         room = cls._rooms[roomCode]
         result = await room.removePlayer(player)
         if result is None:
@@ -46,13 +49,12 @@ class RoomHandler:
         player = PlayersManager.queryPlayer(username)
         #check if room exists
         if roomCode not in cls._rooms:
-            await player.sendMessage(bot, "RoomNotFound")
             return False
         room = cls._rooms[roomCode]
 
         #check if player is already in a room
         if player.inRoom():
-            await cls.leaveRoom(player, bot)
+            await cls.leaveRoom(username, bot)
         await room.addPlayer(player, action, bot)
         return True
 

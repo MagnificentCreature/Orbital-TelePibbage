@@ -47,6 +47,7 @@ async def create_room(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return BotInitiator.INROOM
 
 async def join_room_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.callback_query.edit_message_text(text=DialogueReader.queryDialogue("EnterCode"))
     return BotInitiator.ENTERCODE
 
 async def join_room_code(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -54,16 +55,22 @@ async def join_room_code(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return await join_room(update, context, room_code)
 
 async def join_room(update: Update, context: ContextTypes.DEFAULT_TYPE, roomCode=None):
+    # Technically this part of the code is no longer necessary, this is only if the user does
+    # /join_room <room_code> as a command, now all calls to join_room have a roomCode in it
     try:
         if roomCode is None:
             roomCode = update.message.text.split(" ")[1]
     except IndexError:
-        await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "RoomNotFound")
-        return BotInitiator.END
+        await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "InvalidRoom")
+        return BotInitiator.FRESH
+    
     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "JoinRoom1", **{"roomCode": roomCode})
     success = await RoomHandler.joinRoom(update.message.from_user.username, roomCode, context.bot)
+    
     if not success:
-        return BotInitiator.END
+        await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "InvalidRoom")
+        await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "ReenterCode", reply_markup=BotInitiator.ReenterKeyboard)
+        return BotInitiator.ENTERCODE
 
     waiting_to_start = asyncio.Event()
     context.user_data["waiting_to_start"] = waiting_to_start
@@ -72,10 +79,15 @@ async def join_room(update: Update, context: ContextTypes.DEFAULT_TYPE, roomCode
 
     return BotInitiator.INGAME
 
-async def leave_room(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await RoomHandler.leaveRoom(update.message.from_user.username, context.bot)
-
+async def return_to_fresh(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.callback_query.edit_message_text(text=DialogueReader.queryDialogue("ReturningToStart"))
+    await RoomHandler.leaveRoom(update.callback_query.from_user.username, context.bot)
+    await DialogueReader.sendMessageByID(context.bot, update.callback_query.from_user.id, "Welcome2", reply_markup=BotInitiator.WelcomeKeyboard)
     return BotInitiator.FRESH
+
+# async def leave_room(update: Update, context: ContextTypes.DEFAULT_TYPE):
+#     await RoomHandler.leaveRoom(update.message.from_user.username, context.bot)
+#     return BotInitiator.FRESH
 
 async def generate(update: Update, context: ContextTypes.DEFAULT_TYPE):
     prompt = (" ").join(update.message.text.split(" ")[1:]) #TODO logic flow if invalid prompt or no prompt

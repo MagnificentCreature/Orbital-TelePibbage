@@ -18,14 +18,23 @@ BOT_TOKEN = conf.TELE_BOT_TOKEN
 
 # State definitions for fresh level commands
 CREATE_ROOM, JOIN_ROOM, START_GAME = map(chr, range(3))
-# 
-LEAVE_ROOM = map(chr, range(4))
+# Entercode and In_room level commands
+RETURN_TO_FRESH, LEAVE_ROOM = map(chr, range(3, 5))
+#Shortcut for Conversation Handler END
+END = ConversationHandler.END
 
 # for FRESH
 WelcomeKeyboard = InlineKeyboardMarkup([
     [
         InlineKeyboardButton(text="Create Room", callback_data=str(CREATE_ROOM)),
         InlineKeyboardButton(text="Join Room", callback_data=str(JOIN_ROOM)),
+    ],
+])
+
+# for Reentering Code
+ReenterKeyboard = InlineKeyboardMarkup([
+    [
+        InlineKeyboardButton(text="Back", callback_data=str(RETURN_TO_FRESH)),
     ],
 ])
 
@@ -60,10 +69,12 @@ def main() -> None:
             FRESH: [CallbackQueryHandler(BotCommands.create_room, pattern="^" + str(CREATE_ROOM) + "$"),
                     CallbackQueryHandler(BotCommands.join_room_start, pattern="^" + str(JOIN_ROOM) + "$"),
             ],
-            ENTERCODE: [MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.join_room_code)],
+            ENTERCODE: [MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.join_room_code),
+                        CallbackQueryHandler(BotCommands.return_to_fresh, pattern="^" + str(RETURN_TO_FRESH) + "$")
+            ],
             INROOM: [
                 CallbackQueryHandler(BotCommands.start_game, pattern="^" + str(START_GAME) + "$"),
-                CallbackQueryHandler(BotCommands.leave_room, pattern="^" + str(LEAVE_ROOM) + "$"),
+                CallbackQueryHandler(BotCommands.return_to_fresh, pattern="^" + str(LEAVE_ROOM) + "$"),
             ],
             INGAME: [
                 

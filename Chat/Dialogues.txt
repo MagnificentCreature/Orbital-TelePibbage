@@ -1,16 +1,18 @@
 # Each line is an entry stored in the form of key, text 
 Welcome1, Welcome to Pibbage! If you're new here, check <Insert youtube video/website> for the rules!
 Welcome2, When you're ready, press "Create Room" to create a game lobby or "Join Room" then enter your Room Code to join a game!
+ReturningToStart, Returning to start
 # Room related dialogues
 CreateRoom1, Creating game room...
 RoomCode, You have entered the game lobby.\nYour room code is {roomCode}
 Invite, Invite your friends to the room by sharing them this link: https://t.me/TelePibbageBot?start={roomCode}
-#WaitingToStart, Waiting for players to join... Type "/start_game" to start the game when everyone is ready!
-WaitingToStart2, Meanwhile, try /generate <prompt> to try your hands at generating some fun images! 
+WaitingToStart, Waiting for players to join... Type "/start_game" to start the game when everyone is ready!
+#WaitingToStart2, Meanwhile, try /generate <prompt> to try your hands at generating some fun images! 
 JoinRoom1, Joining game room {roomCode}...
 JoinRoom2, There are currently ({playerCount}/{maxPlayerCount}) players
 LeavingRoom, Leaving game room {roomCode}...
 PlayerJoined, @{player} has joined the lobby ({playerCount}/{maxPlayerCount})
+EnterCode, Enter room code. Room codes take the form of four uppercase letters
 #Start Game dialogue
 StartGameOption, When all players have joined, start the game!
 StartingGame, Host @{host} has started the game! Get Ready!
@@ -22,7 +24,8 @@ StartGameWelcome, Ladies and gentlemen, boys and girls, welcome to the most exhi
 # Error Messages 
 InGame, Error to {action} room, perhaps you are already in another game
 AlreadyInRoom, You are already in this room!
-RoomNotFound, Invalid Room Code! Room code either doesn't exist or is entered wrongly.\nRoom code is a sequence of four Uppercase letters
+InvalidRoom, Invalid Room Code! Room code either doesn't exist or is entered wrongly.\nRoom code is a sequence of four Uppercase letters
+ReenterCode, Reenter the roomcode or press back to return
 RoomFull, Error when {action} room, room is full!
 GameInProgress, Game is in progress, do "/join_audience {roomCode}" to join as audience
 RoomCreationFailed, Failed to create room

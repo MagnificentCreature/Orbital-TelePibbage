@@ -39,17 +39,22 @@ class DialogueReader:
 
     _dialogues = __read_dialogues(_dialogues_path)
 
+    @staticmethod
     def additionalProcessing(inputString):
         # Replace \n with newline
         inputString = inputString.replace("\\n", "\n")
         return inputString
+    
+    @classmethod
+    def queryDialogue(cls, key):
+        return cls.additionalProcessing(cls._dialogues[key])
 
     @classmethod
     async def sendMessageByID(cls, bot, chat_id, message, reply_markup=None):
         #Use telegram api to send a message
         if (message not in cls._dialogues):
             print("Message " + message + " not found in dialogues.txt")
-        formattedText = cls.additionalProcessing(cls.dialogues[message])
+        formattedText = cls.additionalProcessing(cls._dialogues[message])
         try:
             await bot.send_message(chat_id=chat_id, text=formattedText, reply_markup=reply_markup)
         except error.Forbidden as e:
