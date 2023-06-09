@@ -72,18 +72,3 @@ class DialogueReader:
             await bot.send_photo(chat_id=chat_id, photo=imageURL)
         except error.Forbidden as e:
             logging.error("Error sending message to chat_id " + str(chat_id) + ": " + str(e))
-
-    # def read_dialogues(filepath):
-    #     with open(filepath, 'r') as f: 
-    #         # Read the contents of the file into a list 
-    #         lines = f.readlines() 
-    #         # Create an empty dictionary 
-    #         data = {} 
-    #         # Loop through the list of lines 
-    #         for line in lines: 
-    #             # Split the line into key-value pairs 
-    #             key, value = line.strip().split(',') 
-    #             # Store the key-value pairs in the dictionary 
-    #             data[key] = value 
-    #         # Return the dictionary
-    #         return data
