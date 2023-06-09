@@ -16,9 +16,10 @@ from telegram.ext import (
 
 BOT_TOKEN = conf.TELE_BOT_TOKEN
 
-CREATE_ROOM, JOIN_ROOM, START_GAME = map(chr, range(3))
-
 # State definitions for fresh level commands
+CREATE_ROOM, JOIN_ROOM, START_GAME = map(chr, range(3))
+# 
+LEAVE_ROOM = map(chr, range(4))
 
 # for FRESH
 WelcomeKeyboard = InlineKeyboardMarkup([
@@ -59,13 +60,10 @@ def main() -> None:
             FRESH: [CallbackQueryHandler(BotCommands.create_room, pattern="^" + str(CREATE_ROOM) + "$"),
                     CallbackQueryHandler(BotCommands.join_room_start, pattern="^" + str(JOIN_ROOM) + "$"),
             ],
-            # [CallbackQueryHandler('create_room', BotCommands.create_room),
-            #         CallbackQueryHandler('join_room', BotCommands.join_room),
-            # ],
             ENTERCODE: [MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.join_room_code)],
             INROOM: [
                 CallbackQueryHandler(BotCommands.start_game, pattern="^" + str(START_GAME) + "$"),
-                CommandHandler('leave_room', BotCommands.leave_room),
+                CallbackQueryHandler(BotCommands.leave_room, pattern="^" + str(LEAVE_ROOM) + "$"),
             ],
             INGAME: [
                 
@@ -74,18 +72,6 @@ def main() -> None:
         },
         fallbacks=[MessageHandler(filters.COMMAND, BotCommands.unknown)],
     )
-
-    # start_handler = CommandHandler('start', BotCommands.start, block=False)
-    # create_room_handler = CommandHandler('create_room', BotCommands.create_room)
-    # join_room_handler = CommandHandler('join_room', BotCommands.join_room)
-    # generate_handler = CommandHandler('generate', BotCommands.generate)
-    # unknown_handler = MessageHandler(filters.COMMAND, BotCommands.unknown)
-
-    # application.add_handler(start_handler)
-    # application.add_handler(create_room_handler)
-    # application.add_handler(join_room_handler)
-    # application.add_handler(generate_handler)
-    # application.add_handler(unknown_handler)
 
     application.add_handler(conv_handler)
 
