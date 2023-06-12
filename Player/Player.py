@@ -59,11 +59,11 @@ class Player:
         self._user_data['waiting_to_start'].set()
         self.setInGame()
     
-    async def sendMessage(self, bot, message):
-        await DialogueReader.sendMessageByID(bot, self._chatID, message)
+    async def sendMessage(self, bot, message, reply_markup=None):
+        await DialogueReader.sendMessageByID(bot, self._chatID, message, reply_markup=reply_markup)
 
-    async def sendMessage(self, bot, message, **kwargs):
-        await DialogueReader.sendMessageByID(bot, self._chatID, message, **kwargs)
+    async def sendMessage(self, bot, message, reply_markup=None, **kwargs):
+        await DialogueReader.sendMessageByID(bot, self._chatID, message, reply_markup=reply_markup, **kwargs)
         
     async def sendImageURL(self, bot, imageURL):
         await DialogueReader.sendImageURLByID(bot, self._chatID, imageURL)

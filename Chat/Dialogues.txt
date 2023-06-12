@@ -13,6 +13,7 @@ JoinRoom2, There are currently ({playerCount}/{maxPlayerCount}) players
 LeavingRoom, Leaving game room {roomCode}...
 PlayerJoined, @{player} has joined the lobby ({playerCount}/{maxPlayerCount})
 EnterCode, Enter room code. Room codes take the form of four uppercase letters
+NewHost, You are now the host, press Start Game to start the game!
 #Start Game dialogue
 StartGameOption, When all players have joined, start the game!
 StartingGame, Host @{host} has started the game! Get Ready!

@@ -3,6 +3,7 @@ Class that holds data about rooms
 """
 
 import asyncio
+from BotController import BotInitiator
 
 class Room:
     _code = ""
@@ -46,8 +47,10 @@ class Room:
         # await player.sendMessage(bot, "WaitingToStart")
         # await player.sendMessage(bot, "WaitingToStart2")
         await asyncio.gather(
-            *[playerElem.sendMessage(bot, "PlayerJoined", **{'player':player.getUsername(), 'playerCount':len(self._players), 'maxPlayerCount':str(self.MAX_PLAYERS)}) for playerElem in self._players if playerElem != player]
+            *[playerElem.sendMessage(bot, "PlayerJoined", **{'player':player.getUsername(), 'playerCount':len(self._players), 'maxPlayerCount':str(self.MAX_PLAYERS)}) for playerElem in self._players if (playerElem != player or playerElem != self._host)]
         )
+        # send message to host
+        self._host.sendMessage(bot, "PlayerJoined", reply_markup=BotInitiator.StartGameKeyboard, **{'player':player.getUsername(), 'playerCount':len(self._players), 'maxPlayerCount':str(self.MAX_PLAYERS)})
 
     # Add player to room
     # Fails if is already in or if room is full
