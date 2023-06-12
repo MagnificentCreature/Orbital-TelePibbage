@@ -47,7 +47,7 @@ async def create_room(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return BotInitiator.INROOM
 
 async def join_room_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.callback_query.edit_message_text(text=DialogueReader.queryDialogue("EnterCode"))
+    await update.callback_query.edit_message_text(text=DialogueReader.queryDialogue("EnterCode"), reply_markup=BotInitiator.ReenterKeyboard)
     return BotInitiator.ENTERCODE
 
 async def join_room_code(update: Update, context: ContextTypes.DEFAULT_TYPE):
