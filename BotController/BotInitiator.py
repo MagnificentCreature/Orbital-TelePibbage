@@ -19,7 +19,7 @@ BOT_TOKEN = conf.TELE_BOT_TOKEN
 # State definitions for fresh level commands
 CREATE_ROOM, JOIN_ROOM, START_GAME = map(chr, range(3))
 # Entercode and In_room level commands
-RETURN_TO_FRESH, LEAVE_ROOM = map(chr, range(3, 5))
+RETURN_TO_FRESH = map(chr, range(3,4))
 #Shortcut for Conversation Handler END
 END = ConversationHandler.END
 
@@ -42,6 +42,9 @@ ReenterKeyboard = InlineKeyboardMarkup([
 StartGameKeyboard = InlineKeyboardMarkup([
     [
         InlineKeyboardButton(text="Start Game", callback_data=str(START_GAME)),
+    ],
+    [
+        InlineKeyboardButton(text="Back", callback_data=str(RETURN_TO_FRESH)),
     ],
 ])
 
@@ -74,7 +77,7 @@ def main() -> None:
             ],
             INROOM: [
                 CallbackQueryHandler(BotCommands.start_game, pattern="^" + str(START_GAME) + "$"),
-                CallbackQueryHandler(BotCommands.return_to_fresh, pattern="^" + str(LEAVE_ROOM) + "$"),
+                CallbackQueryHandler(BotCommands.return_to_fresh, pattern="^" + str(RETURN_TO_FRESH) + "$"),
             ],
             INGAME: [
                 

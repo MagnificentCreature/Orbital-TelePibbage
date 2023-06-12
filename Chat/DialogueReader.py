@@ -48,6 +48,10 @@ class DialogueReader:
     @classmethod
     def queryDialogue(cls, key):
         return cls.additionalProcessing(cls._dialogues[key])
+    
+    @classmethod
+    def queryDialogue(cls, key, **kwargs):
+        return cls.additionalProcessing(cls._dialogues[key].format(**kwargs))
 
     @classmethod
     async def sendMessageByID(cls, bot, chat_id, message, reply_markup=None):

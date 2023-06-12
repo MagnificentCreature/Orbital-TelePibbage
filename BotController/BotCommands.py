@@ -80,8 +80,11 @@ async def join_room(update: Update, context: ContextTypes.DEFAULT_TYPE, roomCode
     return BotInitiator.INGAME
 
 async def return_to_fresh(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.callback_query.edit_message_text(text=DialogueReader.queryDialogue("ReturningToStart"))
-    await RoomHandler.leaveRoom(update.callback_query.from_user.username, context.bot)
+    if context.user_data['roomCode'] == "":
+        await update.callback_query.edit_message_text(text=DialogueReader.queryDialogue("ReturningToStart"))
+    else:
+        await update.callback_query.delete_message()
+        await RoomHandler.leaveRoom(update.callback_query.from_user.username, context.bot)
     await DialogueReader.sendMessageByID(context.bot, update.callback_query.from_user.id, "Welcome2", reply_markup=BotInitiator.WelcomeKeyboard)
     return BotInitiator.FRESH
 
