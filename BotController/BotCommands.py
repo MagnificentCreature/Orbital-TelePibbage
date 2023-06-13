@@ -42,8 +42,6 @@ async def create_room(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await DialogueReader.sendMessageByID(context.bot, update.callback_query.from_user.id, "CreateRoom1")
     await RoomHandler.generateRoom(update.callback_query.from_user.username, context.bot)
 
-    await DialogueReader.sendMessageByID(context.bot, update.callback_query.from_user.id, "StartGameOption", reply_markup=BotInitiator.StartGameKeyboard)
-
     return BotInitiator.INROOM
 
 async def join_room_start(update: Update, context: ContextTypes.DEFAULT_TYPE):

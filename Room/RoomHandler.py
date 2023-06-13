@@ -7,6 +7,7 @@ So keeping track of who is in which room is important, and each player can only 
 import asyncio
 import random
 from GameController import Prompting
+from BotController import BotInitiator
 
 from Room.Room import Room
 
@@ -60,20 +61,23 @@ class RoomHandler:
 
     @classmethod
     async def generateRoom(cls, username, bot):
-        player = PlayersManager.queryPlayer(username)
+        host = PlayersManager.queryPlayer(username)
         #keep generating room codes while making sure there is no duplicate room codes
         code = cls.generateRoomCode()
         while code in cls._rooms:
             code = cls.generateRoomCode()
 
         #create room and add to rooms list
-        room = Room(code, player)
+        room = Room(code, host)
         cls._rooms[code] = room
 
         #add host to room
         if not await cls.joinRoom(username, code, bot, "create"):
-            await player.sendMessage(bot, "RoomCreationFailed")
+            await host.sendMessage(bot, "RoomCreationFailed")
             return False
+        
+        #Send start game message to host
+        # start_message = host.sendMessage(bot, "StartGameOption", reply_markup=BotInitiator.StartGameKeyboard)
 
         return True
     
