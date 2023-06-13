@@ -57,13 +57,35 @@ class Player:
 
     async def startGame(self):
         self._user_data['waiting_to_start'].set()
+        self.delContext('lobby_list')
         self.setInGame()
-    
-    async def sendMessage(self, bot, message, reply_markup=None):
-        await DialogueReader.sendMessageByID(bot, self._chatID, message, reply_markup=reply_markup)
 
-    async def sendMessage(self, bot, message, reply_markup=None, **kwargs):
-        await DialogueReader.sendMessageByID(bot, self._chatID, message, reply_markup=reply_markup, **kwargs)
+    async def deleteContext(self, key):
+        del self._user_data[key]
+
+    # Methods to send messages
+    async def editMessage(self, messageKey, message, reply_markup=None):
+        await self._user_data[messageKey].edit_text(text=DialogueReader.queryDialogue(message), reply_markup=reply_markup)
+
+    async def editMessage(self, messageKey, message, reply_markup=None, **kwargs):
+        await self._user_data[messageKey].edit_text(text=DialogueReader.queryDialogue(message, **kwargs), reply_markup=reply_markup)
+
+    async def deleteMessage(self, messageKey):
+        await self._user_data[messageKey].delete()
+        del self._user_data[messageKey]
+
+    # Including a message key will store the message's ID in the user_data which can be editted later
+    async def sendMessage(self, bot, message, messageKey=None, reply_markup=None):
+        messasgeID = await DialogueReader.sendMessageByID(bot, self._chatID, message, reply_markup=reply_markup)
+        if messageKey != None:
+            self._user_data[messageKey] = messasgeID
+
+    async def sendMessage(self, bot, message, messageKey=None, reply_markup=None, **kwargs):
+        messasgeID = await DialogueReader.sendMessageByID(bot, self._chatID, message, reply_markup=reply_markup, **kwargs)
+        if messageKey != None:
+            self._user_data[messageKey] = messasgeID
         
-    async def sendImageURL(self, bot, imageURL):
-        await DialogueReader.sendImageURLByID(bot, self._chatID, imageURL)
+    async def sendImageURL(self, bot, imageURL, messageKey=None, reply_markup=None):
+        messasgeID = await DialogueReader.sendImageURLByID(bot, self._chatID, imageURL, reply_markup=reply_markup)
+        if messageKey != None:
+            self._user_data[messageKey] = messasgeID

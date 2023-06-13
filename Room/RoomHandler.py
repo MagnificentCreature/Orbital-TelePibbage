@@ -46,7 +46,7 @@ class RoomHandler:
             cls.deleteRoom(room)
 
     @classmethod
-    async def joinRoom(cls, username, roomCode, bot, action="join"):
+    async def joinRoom(cls, username, roomCode, bot):
         player = PlayersManager.queryPlayer(username)
         #check if room exists
         if roomCode not in cls._rooms:
@@ -56,29 +56,39 @@ class RoomHandler:
         #check if player is already in a room
         if player.inRoom():
             await cls.leaveRoom(username, bot)
-        await room.addPlayer(player, action, bot)
+        
+        #add player to room
+        success = await room.addPlayer(player, "join", bot)
+        if not success:
+            return False
+        
+        #send start game message to player
+        await player.sendMessage(bot, "WaitingToStart", messageKey="waiting_to_start", reply_markup=BotInitiator.StartGameKeyboard)
+
         return True
+        
+
 
     @classmethod
     async def generateRoom(cls, username, bot):
         host = PlayersManager.queryPlayer(username)
         #keep generating room codes while making sure there is no duplicate room codes
-        code = cls.generateRoomCode()
-        while code in cls._rooms:
-            code = cls.generateRoomCode()
+        roomCode = cls.generateRoomCode()
+        while roomCode in cls._rooms:
+            roomCode = cls.generateRoomCode()
 
         #create room and add to rooms list
-        room = Room(code, host)
-        cls._rooms[code] = room
+        room = Room(roomCode, host)
+        cls._rooms[roomCode] = room
 
         #add host to room
-        if not await cls.joinRoom(username, code, bot, "create"):
+        if not await room.addPlayer(host, "create", bot):
             await host.sendMessage(bot, "RoomCreationFailed")
             return False
         
-        #Send start game message to host
-        # start_message = host.sendMessage(bot, "StartGameOption", reply_markup=BotInitiator.StartGameKeyboard)
-
+        # send start game message to host
+        await host.sendMessage("StartGameOption", messageKey="start_game_option", reply_markup=BotInitiator.StartGameKeyboard)
+        
         return True
     
     @classmethod
@@ -104,4 +114,3 @@ class RoomHandler:
         
         await room.startGame(bot)
         asyncio.get_event_loop().create_task(Prompting.beginPhase1(bot, room))
-        print("RUNNEDE")

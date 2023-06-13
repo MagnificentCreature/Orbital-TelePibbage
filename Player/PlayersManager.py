@@ -39,6 +39,7 @@ class PlayersManager:
         # check if player is already in the list
         if username in cls._playerRecord.keys():
             player = cls._playerRecord[username]
+            # TODO better solution to this?
             player.updateUserData(user_data)
             return player
         

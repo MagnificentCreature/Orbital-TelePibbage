@@ -4,19 +4,19 @@ Welcome2, When you're ready, press "Create Room" to create a game lobby or "Join
 ReturningToStart, Returning to start
 # Room related dialogues
 CreateRoom1, Creating game room...
-RoomCode, You have entered the game lobby.\nYour room code is {roomCode}
+RoomCode, You have successfully entered the game lobby.\nYour room code is {roomCode}
 Invite, Invite your friends to the room by sharing them this link: https://t.me/TelePibbageBot?start={roomCode}
-#WaitingToStart, Waiting for players to join... Type "/start_game" to start the game when everyone is ready!
-#WaitingToStart2, Meanwhile, try /generate <prompt> to try your hands at generating some fun images! 
+WaitingToStart, Waiting for host to start game...
+####WaitingToStart2, Meanwhile, try /generate <prompt> to try your hands at generating some fun images! 
 JoinRoom1, Joining game room {roomCode}...
-JoinRoom2, There are currently ({playerCount}/{maxPlayerCount}) players
+###JoinRoom2, There are currently ({playerCount}/{maxPlayerCount}) players
 LeavingRoom, Leaving game room {roomCode}...
 PlayerJoined, @{player} has joined the lobby ({playerCount}/{maxPlayerCount})
 EnterCode, Enter room code. Room codes take the form of four uppercase letters
 NewHost, You are now the host, press Start Game to start the game!
-LobbyList, Players in the lobby ({playerCount}/{maxPlayerCount}):\n{LobbyList}\nWhen all players are ready, start the game!
+LobbyList, Players in the lobby ({playerCount}/{maxPlayerCount}):\n{lobbyList}
 #Start Game dialogue
-StartGameOption, When all players have joined, start the game!
+StartGameOption, You are the host!\nWhen all players are ready, start the game!
 StartingGame, Host @{host} has started the game! Get Ready!
 HostStartingGame, You are starting the game! Get Ready!
 # Game related dialogues

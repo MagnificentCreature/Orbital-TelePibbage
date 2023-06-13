@@ -76,8 +76,8 @@ class DialogueReader:
             logging.error("Error sending message to chat_id " + str(chat_id) + ": " + str(e))
     
     @staticmethod
-    async def sendImageURLByID(bot, chat_id, imageURL):
+    async def sendImageURLByID(bot, chat_id, imageURL, reply_markup=None):
         try:
-            return await bot.send_photo(chat_id=chat_id, photo=imageURL)
+            return await bot.send_photo(chat_id=chat_id, photo=imageURL, reply_markup=reply_markup)
         except error.Forbidden as e:
             logging.error("Error sending message to chat_id " + str(chat_id) + ": " + str(e))

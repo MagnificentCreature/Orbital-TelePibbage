@@ -74,6 +74,7 @@ async def join_room(update: Update, context: ContextTypes.DEFAULT_TYPE, roomCode
     context.user_data["waiting_to_start"] = waiting_to_start
     await waiting_to_start.wait()
     context.user_data['waiting_to_start'].clear()
+    del context.user_data['waiting_to_start']
 
     return BotInitiator.INGAME
 

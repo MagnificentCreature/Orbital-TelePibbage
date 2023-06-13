@@ -12,7 +12,6 @@ class Room:
     MAX_PLAYERS = 8
     MIN_PLAYERS = 2
     _state = 0 # 0 = join state, 1 = game state
-    _start_message = None
 
     def __init__(self, code, host):
         self._code = code
@@ -50,17 +49,13 @@ class Room:
     # Dialogue messages to send when adding player
     async def __joinRoomMessages(self, bot, player):
         await player.sendMessage(bot, "RoomCode", **{'roomCode':self.getCode()})
-        # await player.sendMessage(bot, "JoinRoom2", **{'playerCount':len(self._players), 'maxPlayerCount':str(self.MAX_PLAYERS)})
-        # await player.sendMessage(bot, "WaitingToStart")
-        # await player.sendMessage(bot, "WaitingToStart2")
-        await asyncio.gather(
-            *[playerElem.sendMessage(bot, "PlayerJoined", **{'player':player.getUsername(), 'playerCount':len(self._players), 'maxPlayerCount':str(self.MAX_PLAYERS)}) for playerElem in self._players if (playerElem != player or playerElem != self._host)]
-        )
         await player.sendMessage(bot, "Invite", **{'roomCode':self.getCode()})
-        # send message to host
-        # self._host.sendMessage(bot, "PlayerJoined", reply_markup=BotInitiator.StartGameKeyboard, **{'player':player.getUsername(), 'playerCount':len(self._players), 'maxPlayerCount':str(self.MAX_PLAYERS)})
-        # edi the hosts message
-        self._start_message.edit_text("LobbyList", **{'PlayerList':self.getPlayerList(), 'playerCount':len(self._players), 'maxPlayerCount':str(self.MAX_PLAYERS)}, reply_markup=BotInitiator.StartGameKeyboard)
+        # send message to player
+        await player.sendMessage(bot, "LobbyList", messageKey="lobby_list", **{'playerCount':len(self._players), 'maxPlayerCount':str(self.MAX_PLAYERS), 'lobbyList':self.printPlayerList()})
+        # edit everyones messages
+        await asyncio.gather(
+            *[playerElem.editMessage("lobby_list", "LobbyList", **{'playerCount':len(self._players), 'maxPlayerCount':str(self.MAX_PLAYERS), 'lobbyList':self.printPlayerList()}) for playerElem in self._players if playerElem != player]
+        )
 
     # Add player to room
     # Fails if is already in or if room is full
@@ -97,6 +92,8 @@ class Room:
         if player == self._host:
             # if player is the host, make the next player the host
             self._host = self._players[1]
+            # TODO send new host messages
+            await self._host.editMessage("Host", **{'roomCode':self.getCode()})
             return True
         self._players.remove(player)
         return True

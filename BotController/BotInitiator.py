@@ -38,7 +38,14 @@ ReenterKeyboard = InlineKeyboardMarkup([
     ],
 ])
 
-# for INROOM
+# for Players in ENTER TEXT
+StartGameKeyboard = InlineKeyboardMarkup([
+    [
+        InlineKeyboardButton(text="Back", callback_data=str(RETURN_TO_FRESH)),
+    ],
+])
+
+# for Hosts INROOM
 StartGameKeyboard = InlineKeyboardMarkup([
     [
         InlineKeyboardButton(text="Start Game", callback_data=str(START_GAME)),
@@ -71,6 +78,7 @@ def main() -> None:
         states={
             FRESH: [CallbackQueryHandler(BotCommands.create_room, pattern="^" + str(CREATE_ROOM) + "$"),
                     CallbackQueryHandler(BotCommands.join_room_start, pattern="^" + str(JOIN_ROOM) + "$"),
+                    CallbackQueryHandler(BotCommands.return_to_fresh, pattern="^" + str(RETURN_TO_FRESH) + "$")
             ],
             ENTERCODE: [MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.join_room_code),
                         CallbackQueryHandler(BotCommands.return_to_fresh, pattern="^" + str(RETURN_TO_FRESH) + "$")
