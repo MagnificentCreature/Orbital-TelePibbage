@@ -38,5 +38,6 @@ async def imageQuery(prompt):
 
     response = requests.request("POST", URL, headers=headers, data=payload)
     myDict = json.loads(response.text)
+    print(response.text)
 
     return myDict["output"][0]

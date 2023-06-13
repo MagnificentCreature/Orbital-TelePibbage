@@ -35,15 +35,16 @@ class PlayersManager:
 
     # method that adds a player to the playerRecord
     @classmethod
-    async def recordNewPlayer(cls, username, id, userCtx):
+    async def recordNewPlayer(cls, username, id, user_data):
         # check if player is already in the list
         if username in cls._playerRecord.keys():
-            return cls._playerRecord[username]
+            player = cls._playerRecord[username]
+            # TODO better solution to this?
+            player.updateUserData(user_data)
+            return player
         
-        print("Adding new player " + username + " to player list")
-
         # add player to list
-        cls._playerRecord[username] = Player(username, id, userCtx)
+        cls._playerRecord[username] = Player(username, id, user_data)
 
         # # write to file
         with open(cls._players_path, "a") as f: # is this secure?

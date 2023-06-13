@@ -1,21 +1,36 @@
 # Each line is an entry stored in the form of key, text 
 Welcome1, Welcome to Pibbage! If you're new here, check <Insert youtube video/website> for the rules!
-Welcome2, When you're ready, type "/create_room" to create a game lobby or /join_room <RoomCode> to join a game!
+Welcome2, When you're ready, press "Create Room" to create a game lobby or "Join Room" then enter your Room Code to join a game!
+ReturningToStart, Returning to start
 # Room related dialogues
 CreateRoom1, Creating game room...
-RoomCode, You have entered the game lobby.\nYour room code is {roomCode}
+RoomCode, You have successfully entered the game lobby.\nYour room code is {roomCode}
 Invite, Invite your friends to the room by sharing them this link: https://t.me/TelePibbageBot?start={roomCode}
-WaitingToStart, Waiting for players to join... Type "/start_game" to start the game when everyone is ready!
-WaitingToStart2, Meanwhile, try /generate <prompt> to try your hands at generating some fun images! 
+WaitingToStart, Waiting for host to start game...
+####WaitingToStart2, Meanwhile, try /generate <prompt> to try your hands at generating some fun images! 
 JoinRoom1, Joining game room {roomCode}...
-JoinRoom2, There are currently ({playerCount}/{maxPlayerCount}) players
+###JoinRoom2, There are currently ({playerCount}/{maxPlayerCount}) players
 LeavingRoom, Leaving game room {roomCode}...
 PlayerJoined, @{player} has joined the lobby ({playerCount}/{maxPlayerCount})
+EnterCode, Enter room code. Room codes take the form of four uppercase letters
+NewHost, You are now the host, press Start Game to start the game!
+LobbyList, Players in the lobby ({playerCount}/{maxPlayerCount}):\n{lobbyList}
+#Start Game dialogue
+StartGameOption, You are the host!\nWhen all players are ready, start the game!
+StartingGame, Host @{host} has started the game! Get Ready!
+HostStartingGame, You are starting the game! Get Ready!
+# Game related dialogues
+GameStarted, Game has started! Send in your prompts!
+Phase1, Send in your prompts!
+StartGameWelcome, Ladies and gentlemen, boys and girls, welcome to the most exhilarating game show in town, TelePibbage! I am honored to be your host for today's thrilling competition.
 # Error Messages 
 InGame, Error to {action} room, perhaps you are already in another game
 AlreadyInRoom, You are already in this room!
-RoomNotFound, Invalid Room Code! Room code either doesn't exist or is entered wrongly.\nRoom code is a sequence of four Uppercase letters
+InvalidRoom, Invalid Room Code! Room code either doesn't exist or is entered wrongly.\nRoom code is a sequence of four Uppercase letters
+ReenterCode, Reenter the roomcode or press back to return
 RoomFull, Error when {action} room, room is full!
 GameInProgress, Game is in progress, do "/join_audience {roomCode}" to join as audience
 RoomCreationFailed, Failed to create room
 UnknownCommand, Sorry, I did not understand that command.
+NotHost, You are not the host. Only the host can start the game.
+NotEnoughPlayers, Not enough players to start the game. Need at least 2 players.

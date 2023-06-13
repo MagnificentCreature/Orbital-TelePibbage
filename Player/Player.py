@@ -11,23 +11,26 @@ class Player:
     _username = ""
     _chatID = 0
     _score = 0
-    _inGame = False
-    _roomCode = ""
-    _userCtx = None
+    _user_data = None
     
-    def __init__(self, username, chatID=0, _userCtx=None, score=0):
+    def __init__(self, username, chatID=0, _user_data={}, score=0):
         self._username = username
         self._chatID = chatID
         self._score = score
-        self._inGame = False
-        self._roomCode = ""
-        self._userCtx = _userCtx
+        self._user_data = _user_data
+        _user_data['in_game'] = False
+        _user_data['roomCode'] = ""
         
+    def updateUserData(self, _user_data):
+        self._user_data = _user_data
+        _user_data['in_game'] = False
+        _user_data['roomCode'] = ""
+
+    def getRoomCode(self):
+        return self._user_data['roomCode']
+
     def isFree(self):
-        return not self._inGame
-    
-    def isHost(self):
-        return False
+        return not self._user_data['in_game']
     
     def getScore(self):
         return self._score
@@ -36,22 +39,53 @@ class Player:
         return self._username
     
     def inRoom(self):
-        return self._roomCode != ""
+        return self._user_data['roomCode'] != ""
     
     def joinRoom(self, roomCode):
-        self._roomCode = roomCode
+        self._user_data['roomCode'] = roomCode
 
     async def leaveRoom(self, bot):
-        await self.sendMessage(bot, "LeavingRoom", **{'roomCode':self._roomCode})
-        tempRoomCode = self._roomCode
-        self._roomCode = None
+        if self._user_data['roomCode'] == "":
+            return
+        await self.sendMessage(bot, "LeavingRoom", **{'roomCode':self.getRoomCode()})
+        tempRoomCode = self.getRoomCode()
+        self._user_data['roomCode'] = ""
         return tempRoomCode
     
-    async def sendMessage(self, bot, message):
-        await DialogueReader.sendMessageByID(bot, self._chatID, message)
+    def setInGame(self):
+        self._user_data['in_game'] = True
 
-    async def sendMessage(self, bot, message, **kwargs):
-        await DialogueReader.sendMessageByID(bot, self._chatID, message, **kwargs)
+    async def startGame(self):
+        self._user_data['waiting_to_start'].set()
+        self.delContext('lobby_list')
+        self.setInGame()
+
+    async def deleteContext(self, key):
+        del self._user_data[key]
+
+    # Methods to send messages
+    async def editMessage(self, messageKey, message, reply_markup=None):
+        await self._user_data[messageKey].edit_text(text=DialogueReader.queryDialogue(message), reply_markup=reply_markup)
+
+    async def editMessage(self, messageKey, message, reply_markup=None, **kwargs):
+        await self._user_data[messageKey].edit_text(text=DialogueReader.queryDialogue(message, **kwargs), reply_markup=reply_markup)
+
+    async def deleteMessage(self, messageKey):
+        await self._user_data[messageKey].delete()
+        del self._user_data[messageKey]
+
+    # Including a message key will store the message's ID in the user_data which can be editted later
+    async def sendMessage(self, bot, message, messageKey=None, reply_markup=None):
+        messasgeID = await DialogueReader.sendMessageByID(bot, self._chatID, message, reply_markup=reply_markup)
+        if messageKey != None:
+            self._user_data[messageKey] = messasgeID
+
+    async def sendMessage(self, bot, message, messageKey=None, reply_markup=None, **kwargs):
+        messasgeID = await DialogueReader.sendMessageByID(bot, self._chatID, message, reply_markup=reply_markup, **kwargs)
+        if messageKey != None:
+            self._user_data[messageKey] = messasgeID
         
-    async def sendImageURL(self, bot, imageURL):
-        await DialogueReader.sendImageURLByID(bot, self._chatID, imageURL)
+    async def sendImageURL(self, bot, imageURL, messageKey=None, reply_markup=None):
+        messasgeID = await DialogueReader.sendImageURLByID(bot, self._chatID, imageURL, reply_markup=reply_markup)
+        if messageKey != None:
+            self._user_data[messageKey] = messasgeID
