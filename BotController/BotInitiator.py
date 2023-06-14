@@ -20,6 +20,8 @@ BOT_TOKEN = conf.TELE_BOT_TOKEN
 CREATE_ROOM, JOIN_ROOM, START_GAME = map(chr, range(3))
 # Entercode and In_room level commands
 RETURN_TO_FRESH = map(chr, range(3,4))
+# In_game level commands
+ENTER_PROMPT, ENTER_LIE, VOTE_LIE, VOTE_TRUTH = map(chr, range(4,8))
 #Shortcut for Conversation Handler END
 END = ConversationHandler.END
 
@@ -67,7 +69,7 @@ logging.basicConfig(
     level=logging.INFO
 )
 
-FRESH, ENTERCODE, INROOM, INGAME, PROMPTING_PHASE, LYING_PHASE, VOTING_PHASE = range(7)
+FRESH, ENTERCODE, INROOM, WAITING_FOR_HOST, PROMPTING_PHASE, SENT_PROMPT, LYING_PHASE, VOTING_PHASE = range(8)
 
 #Shortcut for returning to FRESH
 FRESH_CALLBACK = CallbackQueryHandler(BotCommands.return_to_fresh, pattern="^" + str(RETURN_TO_FRESH) + "$")
@@ -75,29 +77,46 @@ FRESH_CALLBACK = CallbackQueryHandler(BotCommands.return_to_fresh, pattern="^" +
 def main() -> None:
     application = ApplicationBuilder().token(BOT_TOKEN).build()
     
+    # In game conversation handler
+    game_conv_handler = ConversationHandler(
+        entry_points=[
+                CallbackQueryHandler(BotCommands.start_game, pattern="^" + str(START_GAME) + "$"),
+                MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.take_prompt),
+            ],
+        states={
+            PROMPTING_PHASE: [
+                MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.take_prompt),
+            ],
+            SENT_PROMPT: [
+                # TODO more stuff
+                MessageHandler(filters.COMMAND, BotCommands.generate)
+            ],
+        },
+        fallbacks=[MessageHandler(filters.COMMAND, BotCommands.unknown)],
+        map_to_parent={
+            WAITING_FOR_HOST: INROOM,
+        }
+    )
+
     # Add conversation handler with the states GENDER, PHOTO, LOCATION and BIO
-    conv_handler = ConversationHandler(
+    main_conv_handler = ConversationHandler(
         entry_points=[CommandHandler("start", BotCommands.start, block=False)],
         states={
-            FRESH: [CallbackQueryHandler(BotCommands.create_room, pattern="^" + str(CREATE_ROOM) + "$"),
+            FRESH: [CommandHandler("start", BotCommands.start),
+                    CallbackQueryHandler(BotCommands.create_room, pattern="^" + str(CREATE_ROOM) + "$"),
                     CallbackQueryHandler(BotCommands.join_room_start, pattern="^" + str(JOIN_ROOM) + "$"),
-                    FRESH_CALLBACK
             ],
             ENTERCODE: [MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.join_room_code),
                         FRESH_CALLBACK
             ],
             INROOM: [
-                CallbackQueryHandler(BotCommands.start_game, pattern="^" + str(START_GAME) + "$"),
+                game_conv_handler,
                 FRESH_CALLBACK,
             ],
-            INGAME: [
-                
-                CommandHandler('generate', BotCommands.generate)
-            ]
         },
         fallbacks=[MessageHandler(filters.COMMAND, BotCommands.unknown)],
     )
 
-    application.add_handler(conv_handler)
+    application.add_handler(main_conv_handler)
 
     application.run_polling()
