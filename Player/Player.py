@@ -12,6 +12,7 @@ class Player:
     _chatID = 0
     _score = 0
     _user_data = None
+    PROMPTING_PHASE, LYING_PHASE, VOTING_PHASE, REVEAL_PHASE = range(4)
     
     def __init__(self, username, chatID=0, _user_data={}, score=0):
         self._username = username
@@ -54,6 +55,12 @@ class Player:
         tempRoomCode = self.getRoomCode()
         self._user_data['roomCode'] = ""
         return tempRoomCode
+
+    def setPhase(self, phase):
+        self._user_data['phase'] = phase
+
+    def queryPhase(self, phase):
+        return self._user_data['phase'] == phase
 
     def setInGame(self):
         self._user_data['in_game'] = True

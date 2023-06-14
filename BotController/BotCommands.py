@@ -16,10 +16,10 @@ from telegram.ext import (
     # filters,
 )
 
-game_started_event = asyncio.Event()
-
 import sys
 from pathlib import Path
+
+from Player.Player import Player
 sys.path.insert(1, str(Path(__file__).parent.parent.absolute()))
 from Chat.DialogueReader import DialogueReader
 from Room.RoomHandler import RoomHandler
@@ -103,9 +103,22 @@ async def take_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     #Check if the user is in a game
     if not context.user_data['in_game']:
         return BotInitiator.WAITING_FOR_HOST
-    # TODO: if not handle prompt
-    print("sent stuff")
-    return BotInitiator.SENT_PROMPT
+    # TODO: handle bad prompts or failure to generate image
+    asyncio.wait_for(ImageGenerator.imageQuery(update.message).wait(), timeout=60)
+    context.user_data['phase'] = Player.PROMPTING_PHASE
+    return BotInitiator.LYING_PHASE
+
+async def take_lie(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    #Check if the user is in a game
+    if not context.user_data['in_game']:
+        return BotInitiator.WAITING_FOR_HOST
+    
+    # check if the user is in the lying phase
+    if context.user_data['phase'] != Player.LYING_PHASE:
+        # TODO Handle the phase error
+        return BotInitiator.PROMPTING_PHASE
+    
+    # TODO handle lies and continue the gameplay
 
 async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "UnknownCommand")

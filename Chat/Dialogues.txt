@@ -20,9 +20,8 @@ StartGameOption, You are the host!\nWhen all players are ready, start the game!
 StartingGame, Host @{host} has started the game! Get Ready!
 HostStartingGame, You are starting the game! Get Ready!
 # Game related dialogues
-GameStarted, Game has started! Send in your prompts!
-Phase1, Send in your prompts!
-StartGameWelcome, Ladies and gentlemen, boys and girls, welcome to the most exhilarating game show in town, TelePibbage! I am honored to be your host for today's thrilling competition.
+Phase1p1, Ladies and gentlemen, boys and girls, welcome to the most exhilarating game show in town, TelePibbage! I am honored to be your host for today's thrilling competition of witty imagery and trickery.
+Phase1p2, This is the prompting phase! With the help of my backstage magic monkeys with paintbrushes, I can convert your words into whacky images, so let your imaginations run wild and send me your most hilarious prompts!
 # Error Messages 
 InGame, Error to {action} room, perhaps you are already in another game
 AlreadyInRoom, You are already in this room!
