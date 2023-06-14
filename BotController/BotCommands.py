@@ -73,9 +73,12 @@ async def join_room(update: Update, context: ContextTypes.DEFAULT_TYPE, roomCode
     waiting_to_start = asyncio.Event()
     context.user_data["waiting_to_start"] = waiting_to_start
     await waiting_to_start.wait()
-    context.user_data['waiting_to_start'].clear()
     del context.user_data['waiting_to_start']
 
+    if context.user_data['roomCode'] == "": # If the user left the room, send a new welcome message
+        await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "Welcome2", reply_markup=BotInitiator.WelcomeKeyboard)
+        return BotInitiator.FRESH
+    
     return BotInitiator.INGAME
 
 async def return_to_fresh(update: Update, context: ContextTypes.DEFAULT_TYPE):

@@ -39,7 +39,7 @@ ReenterKeyboard = InlineKeyboardMarkup([
 ])
 
 # for Players in ENTER TEXT
-StartGameKeyboard = InlineKeyboardMarkup([
+WaitingKeyboard = InlineKeyboardMarkup([
     [
         InlineKeyboardButton(text="Back", callback_data=str(RETURN_TO_FRESH)),
     ],
@@ -69,6 +69,9 @@ logging.basicConfig(
 
 FRESH, ENTERCODE, INROOM, INGAME, PROMPTING_PHASE, LYING_PHASE, VOTING_PHASE = range(7)
 
+#Shortcut for returning to FRESH
+FRESH_CALLBACK = CallbackQueryHandler(BotCommands.return_to_fresh, pattern="^" + str(RETURN_TO_FRESH) + "$")
+
 def main() -> None:
     application = ApplicationBuilder().token(BOT_TOKEN).build()
     
@@ -78,14 +81,14 @@ def main() -> None:
         states={
             FRESH: [CallbackQueryHandler(BotCommands.create_room, pattern="^" + str(CREATE_ROOM) + "$"),
                     CallbackQueryHandler(BotCommands.join_room_start, pattern="^" + str(JOIN_ROOM) + "$"),
-                    CallbackQueryHandler(BotCommands.return_to_fresh, pattern="^" + str(RETURN_TO_FRESH) + "$")
+                    FRESH_CALLBACK
             ],
             ENTERCODE: [MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.join_room_code),
-                        CallbackQueryHandler(BotCommands.return_to_fresh, pattern="^" + str(RETURN_TO_FRESH) + "$")
+                        FRESH_CALLBACK
             ],
             INROOM: [
                 CallbackQueryHandler(BotCommands.start_game, pattern="^" + str(START_GAME) + "$"),
-                CallbackQueryHandler(BotCommands.return_to_fresh, pattern="^" + str(RETURN_TO_FRESH) + "$"),
+                FRESH_CALLBACK,
             ],
             INGAME: [
                 

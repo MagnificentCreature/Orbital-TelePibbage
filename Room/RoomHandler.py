@@ -63,11 +63,9 @@ class RoomHandler:
             return False
         
         #send start game message to player
-        await player.sendMessage(bot, "WaitingToStart", messageKey="waiting_to_start", reply_markup=BotInitiator.StartGameKeyboard)
+        await player.sendMessage(bot, "WaitingToStart", messageKey="waiting_to_start", reply_markup=BotInitiator.WaitingKeyboard)
 
         return True
-        
-
 
     @classmethod
     async def generateRoom(cls, username, bot):

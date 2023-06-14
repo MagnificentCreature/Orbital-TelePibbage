@@ -43,7 +43,9 @@ class Room:
     def printPlayerList(self):
         s = ""
         for player in self._players:
-            s += player.getUsername()+"\n"
+            s += "\n" + player.getUsername()
+            if player == self._host: 
+                s += " (Host)"
         return s
 
     # Dialogue messages to send when adding player
@@ -92,8 +94,9 @@ class Room:
         if player == self._host:
             # if player is the host, make the next player the host
             self._host = self._players[1]
-            # TODO send new host messages
+            # TODO Delete old "back" message and send you are the new host messages
             await self._host.editMessage("Host", **{'roomCode':self.getCode()})
+            # ALTERNATIVELY DELETE THE ROOM AND KICK EVERYONE
             return True
         self._players.remove(player)
         return True
