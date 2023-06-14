@@ -103,7 +103,6 @@ class Room:
             # Sesnd new host the host message
             await self._host.editMessage("waiting_to_start", "StartGameOption", newMessageKey="start_game_option", reply_markup=BotInitiator.StartGameKeyboard)
         self._players.remove(player)
-        print("Removed player from room" + player.getUsername())
         await self.__leaveRoomMessages()
         return True
     

@@ -41,7 +41,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def create_room(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await DialogueReader.sendMessageByID(context.bot, update.callback_query.from_user.id, "CreateRoom1")
     await RoomHandler.generateRoom(update.callback_query.from_user.username, context.bot)
-
     return BotInitiator.INROOM
 
 async def join_room_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -82,7 +81,6 @@ async def join_room(update: Update, context: ContextTypes.DEFAULT_TYPE, roomCode
     return BotInitiator.INROOM
 
 async def return_to_fresh(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    print("Returning to fresh")
     if context.user_data['roomCode'] == "":
         await update.callback_query.edit_message_text(text=DialogueReader.queryDialogue("ReturningToStart"))
     else:
@@ -104,8 +102,9 @@ async def start_game(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def take_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     #Check if the user is in a game
     if not context.user_data['in_game']:
-        return BotInitiator.INROOM
+        return BotInitiator.WAITING_FOR_HOST
     # TODO: if not handle prompt
+    print("sent stuff")
     return BotInitiator.SENT_PROMPT
 
 async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):

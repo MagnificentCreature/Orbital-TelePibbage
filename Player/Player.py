@@ -59,7 +59,7 @@ class Player:
         self._user_data['in_game'] = True
 
     async def startGame(self):
-        self.deleteContext('lobby_list')
+        await self.deleteContext('lobby_list')
         self.setInGame()
 
     async def deleteContext(self, key):
