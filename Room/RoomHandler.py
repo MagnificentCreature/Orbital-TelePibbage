@@ -85,7 +85,7 @@ class RoomHandler:
             return False
         
         # send start game message to host
-        await host.sendMessage("StartGameOption", messageKey="start_game_option", reply_markup=BotInitiator.StartGameKeyboard)
+        await host.sendMessage(bot, "StartGameOption", messageKey="start_game_option", reply_markup=BotInitiator.StartGameKeyboard)
         
         return True
     

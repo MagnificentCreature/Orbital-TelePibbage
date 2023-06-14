@@ -43,7 +43,7 @@ class Room:
     def printPlayerList(self):
         s = ""
         for player in self._players:
-            s += "\n" + player.getUsername()
+            s += "\n@" + player.getUsername()
             if player == self._host: 
                 s += " (Host)"
         return s
@@ -57,6 +57,12 @@ class Room:
         # edit everyones messages
         await asyncio.gather(
             *[playerElem.editMessage("lobby_list", "LobbyList", **{'playerCount':len(self._players), 'maxPlayerCount':str(self.MAX_PLAYERS), 'lobbyList':self.printPlayerList()}) for playerElem in self._players if playerElem != player]
+        )
+
+    async def __leaveRoomMessages(self):
+        # Update everyone elses lobby list
+        await asyncio.gather(
+            *[playerElem.editMessage("lobby_list", "LobbyList", **{'playerCount':len(self._players), 'maxPlayerCount':str(self.MAX_PLAYERS), 'lobbyList':self.printPlayerList()}) for playerElem in self._players]
         )
 
     # Add player to room
@@ -94,11 +100,11 @@ class Room:
         if player == self._host:
             # if player is the host, make the next player the host
             self._host = self._players[1]
-            # TODO Delete old "back" message and send you are the new host messages
-            await self._host.editMessage("Host", **{'roomCode':self.getCode()})
-            # ALTERNATIVELY DELETE THE ROOM AND KICK EVERYONE
-            return True
+            # Sesnd new host the host message
+            await self._host.editMessage("waiting_to_start", "StartGameOption", newMessageKey="start_game_option", reply_markup=BotInitiator.StartGameKeyboard)
         self._players.remove(player)
+        print("Removed player from room" + player.getUsername())
+        await self.__leaveRoomMessages()
         return True
     
     async def startGame(self, bot):

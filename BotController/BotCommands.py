@@ -70,18 +70,19 @@ async def join_room(update: Update, context: ContextTypes.DEFAULT_TYPE, roomCode
         await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "ReenterCode", reply_markup=BotInitiator.ReenterKeyboard)
         return BotInitiator.ENTERCODE
 
-    waiting_to_start = asyncio.Event()
-    context.user_data["waiting_to_start"] = waiting_to_start
-    await waiting_to_start.wait()
-    del context.user_data['waiting_to_start']
+    # waiting_to_start = asyncio.Event()
+    # context.user_data["waiting_to_start"] = waiting_to_start
+    # await waiting_to_start.wait()
+    # del context.user_data['waiting_to_start']
 
-    if context.user_data['roomCode'] == "": # If the user left the room, send a new welcome message
-        await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "Welcome2", reply_markup=BotInitiator.WelcomeKeyboard)
-        return BotInitiator.FRESH
+    # if context.user_data['roomCode'] == "": # If the user left the room, send a new welcome message
+    #     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "Welcome2", reply_markup=BotInitiator.WelcomeKeyboard)
+    #     return BotInitiator.FRESH
     
-    return BotInitiator.INGAME
+    return BotInitiator.INROOM
 
 async def return_to_fresh(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    print("Returning to fresh")
     if context.user_data['roomCode'] == "":
         await update.callback_query.edit_message_text(text=DialogueReader.queryDialogue("ReturningToStart"))
     else:
@@ -90,19 +91,22 @@ async def return_to_fresh(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await DialogueReader.sendMessageByID(context.bot, update.callback_query.from_user.id, "Welcome2", reply_markup=BotInitiator.WelcomeKeyboard)
     return BotInitiator.FRESH
 
-# async def leave_room(update: Update, context: ContextTypes.DEFAULT_TYPE):
-#     await RoomHandler.leaveRoom(update.message.from_user.username, context.bot)
-#     return BotInitiator.FRESH
-
 async def generate(update: Update, context: ContextTypes.DEFAULT_TYPE):
     prompt = (" ").join(update.message.text.split(" ")[1:]) #TODO logic flow if invalid prompt or no prompt
-    imageurl = await ImageGenerator.imageQuery(prompt)
+    imageurl = await ImageGenerator.imageQuery(prompt) 
     print(update.message.from_user.username + "Generated Image: " + str(imageurl))
     await DialogueReader.sendImageURLByID(context.bot, update.message.from_user.id, imageurl)
 
 async def start_game(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await RoomHandler.startGame(update.callback_query.from_user.username, context.bot)
-    return BotInitiator.INGAME
+    return BotInitiator.PROMPTING_PHASE
+
+async def take_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    #Check if the user is in a game
+    if not context.user_data['in_game']:
+        return BotInitiator.INROOM
+    # TODO: if not handle prompt
+    return BotInitiator.SENT_PROMPT
 
 async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "UnknownCommand")
