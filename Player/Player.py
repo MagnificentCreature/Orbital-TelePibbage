@@ -12,15 +12,19 @@ class Player:
     _chatID = 0
     _score = 0
     _user_data = None
+    _imageURL = ""
+    _sentPrompt = False
     PROMPTING_PHASE, LYING_PHASE, VOTING_PHASE, REVEAL_PHASE = range(4)
     
-    def __init__(self, username, chatID=0, _user_data={}, score=0):
+    def __init__(self, username, chatID=0, _user_data={}, score=0, sentPrompt=False):
         self._username = username
         self._chatID = chatID
         self._score = score
         self._user_data = _user_data
+        self._sentPrompt = sentPrompt
         _user_data['in_game'] = False
         _user_data['roomCode'] = ""
+        _user_data['phase'] = self.PROMPTING_PHASE
         
     def updateUserData(self, _user_data):
         # Initialise the user data
@@ -29,6 +33,7 @@ class Player:
         _user_data['in_game'] = False
         _user_data['roomCode'] = ""
         _user_data['in_game'] = False
+        _user_data['phase'] = self.PROMPTING_PHASE
 
     def getRoomCode(self):
         return self._user_data['roomCode']
@@ -58,12 +63,32 @@ class Player:
 
     def setPhase(self, phase):
         self._user_data['phase'] = phase
+        # self.user_data['phase'] = phase
+
+    def getPhase(self):
+        return self._user_data['phase']
+        # return self.user_data['phase']
 
     def queryPhase(self, phase):
         return self._user_data['phase'] == phase
+        # return self.user_data['phase'] == phase
 
     def setInGame(self):
         self._user_data['in_game'] = True
+
+    def setImageURL(self, imageURL):
+        self._imageURL = imageURL
+
+    def getImageURL(self):
+        print('url: ')
+        return self._imageURL
+    
+    def setPromptSent(self):
+        print(self._username + ' sent prompt set to true')
+        self._sentPrompt = True
+    
+    def sentPrompt(self):
+        return self._sentPrompt
 
     async def startGame(self):
         await self.deleteContext('lobby_list')

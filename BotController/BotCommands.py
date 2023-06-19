@@ -3,6 +3,7 @@ Handles user commands
 """
 
 import asyncio
+import time
 
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton, Update
 from BotController import BotCommands
@@ -104,9 +105,87 @@ async def take_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not context.user_data['in_game']:
         return BotInitiator.WAITING_FOR_HOST
     # TODO: handle bad prompts or failure to generate image
-    asyncio.wait_for(ImageGenerator.imageQuery(update.message).wait(), timeout=60)
-    context.user_data['phase'] = Player.PROMPTING_PHASE
+    #asyncio.wait_for(ImageGenerator.imageQuery(update.message).wait(), timeout=60)
+
+    message_text = update.message.text
+    # print('image generated')
+    await context.bot.send_message(chat_id=update.effective_chat.id, text='image generated')
+    #to save api tokens, uncomment when ready
+    # imageurl = await ImageGenerator.imageQuery(update.message.text) 
+    # PlayersManager.setImageURL(update.message.from_user.username, imageURL=str(imageurl))
+    # #RoomHandler.test(update.message.from_user.username)
+    # await DialogueReader.sendImageURLByID(context.bot, update.message.from_user.id, imageurl)
+
+    #context.user_data['phase'] = Player.PROMPTING_PHASE
+    #message is sent, so move to next phase alr
+    PlayersManager.setPromptSent(update.message.from_user.username)
+    # context.user_data['phase'] = Player.LYING_PHASE
+
+    # booly = False
+    # while not booly:
+    #     print('not yet')
+    #     await asyncio.sleep(5)
+    #     booly = await RoomHandler.allSentPrompts(update.message.from_user.username)
+
+    booly = await RoomHandler.allSentPrompts(update.message.from_user.username)
+    if booly:
+        RoomHandler.setAllUserDataPhase(update.message.from_user.username, Player.LYING_PHASE)
+    # await wait_for_all_players(update, context)
+    # print('alls gd')
+
     return BotInitiator.LYING_PHASE
+
+async def phaseTest(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    print('initiate test')
+    message_text = update.message.text
+    # print('image generated')
+    # if player in lying phase, means all players in lying phase
+    if context.user_data['phase'] == Player.LYING_PHASE:
+        await context.bot.send_message(chat_id=update.effective_chat.id, text='everyone in')
+    else:
+        await context.bot.send_message(chat_id=update.effective_chat.id, text='not everyone in')
+# async def wait_for_all_players(update, context: ContextTypes.DEFAULT_TYPE):
+#     room_code = context.user_data['roomCode']
+#     room = RoomHandler.getRoom(room_code)
+
+#     booly = False
+
+#     # while not booly:
+#     #     print('not yet')
+#     #     booly = await room.allSentPrompts()
+#     #     await asyncio.sleep(3)
+
+#     while not room.allSentPrompts():
+#         print('not yet')
+#         await asyncio.sleep(3)
+        
+# # while not room.allSentPrompts():
+# # await asyncio.sleep(1)
+# async def process_players(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    
+#     thisPlayer = PlayersManager.queryPlayer(update.message.from_user.username)
+#     roomCode = thisPlayer.getRoomCode()
+#     players = RoomHandler.returnPlayers(roomCode)
+#     print(players)
+#     tasks = []
+
+#     if players is not None:
+#         for player in players:
+#             if player is not None:
+#                 await take_prompt(update, context)  # Call take_prompt for each player individually
+#     # for player in players:
+#     #     if player is not None:  # Check if player is not None
+#     #         task = asyncio.create_task(take_prompt(update, context))
+#     #         tasks.append(task)
+
+#     # await asyncio.gather(*tasks)
+
+# # async def handle_player_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
+# #     task = asyncio.create_task(take_prompt(update, context))
+# #     # You can store the task object and use it later if needed
+
+# #     # Continue with other processing or await the task to complete
+# #     await task
 
 async def take_lie(update: Update, context: ContextTypes.DEFAULT_TYPE):
     #Check if the user is in a game

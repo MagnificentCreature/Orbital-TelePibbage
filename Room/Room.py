@@ -4,6 +4,7 @@ Class that holds data about rooms
 
 import asyncio
 from BotController import BotInitiator
+import Player
 
 class Room:
     _code = ""
@@ -12,6 +13,7 @@ class Room:
     MAX_PLAYERS = 8
     MIN_PLAYERS = 2
     _state = 0 # 0 = join state, 1 = game state
+    PROMPTING_PHASE, LYING_PHASE, VOTING_PHASE, REVEAL_PHASE = range(4)
 
     def __init__(self, code, host):
         self._code = code
@@ -119,3 +121,37 @@ class Room:
     # WIP this this will enable the features for audience to join
     def acceptingAudience(self):
         return self._state == 1 
+    
+    def test(self):
+        for playerObj in self._players: 
+            print(playerObj.getImageURL())
+
+    def setAllUserDataPhase(self, phase):
+        for playerObj in self._players: 
+            playerObj.setPhase(phase)
+            #for testing
+            print(playerObj.getUsername() + " " + str(playerObj.getPhase()))
+
+    def returnPlayerList(self):
+        print(self._players)
+        return self._players
+
+    #true if all have sent prompts and proceeded to lying phase
+    async def allSentPrompts(self):
+        for playerObj in self._players: 
+            print(playerObj.getUsername())
+            if not playerObj.sentPrompt():
+                print(playerObj.getUsername() + 'false')
+                return False
+        print('true')
+        return True
+        # for eachPlayer in self._players: 
+        #     if eachPlayer.queryPhase != Player.LYING_PHASE:
+        #         return False
+        # return True
+
+    async def allTakePrompt(self, updateList):
+        for update in updateList:
+            await handle_player_prompt(update, context)
+            
+             
