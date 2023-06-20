@@ -120,8 +120,16 @@ class RoomHandler:
         asyncio.get_event_loop().create_task(Prompting.beginPhase1(bot, room))
 
     @classmethod
-    def allSentPrompts(cls, roomCode):
-        return cls._rooms[roomCode].PromptCheck()
+    def checkState(cls, roomCode, state):
+        return cls._rooms[roomCode].checkState(state)
+
+    @classmethod
+    def itemCheckState(cls, roomCode, item):
+        return cls._rooms[roomCode].itemCheck(item)
+
+    @classmethod
+    def advanceState(cls, roomCode):
+        cls._rooms[roomCode].advanceState()
     
     # @classmethod
     # def setAllUserDataPhase(cls, username, phase):

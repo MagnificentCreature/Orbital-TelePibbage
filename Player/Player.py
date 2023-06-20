@@ -3,6 +3,7 @@ Player object, identified by his unique username.
 Stores information about his username, scores etc
 Can later be linked to a database to keep track of (leaderboard/overall scores)
 '''
+from enum import Enum
 
 from Chat.DialogueReader import DialogueReader
 
@@ -12,7 +13,10 @@ class Player:
     _chatID = 0
     _score = 0
     _user_data = None
-    PROMPTING_PHASE, LYING_PHASE, VOTING_PHASE, REVEAL_PHASE = range(4)
+    
+    class PlayerConstants(Enum):
+        PROMPT = "prompt"
+        LIE = "lie"
     
     def __init__(self, username, chatID=0, _user_data={}, score=0, sentPrompt=False):
         self._username = username
@@ -21,7 +25,6 @@ class Player:
         self._user_data = _user_data
         _user_data['in_game'] = False
         _user_data['roomCode'] = ""
-        _user_data['phase'] = self.PROMPTING_PHASE
         
     def updateUserData(self, _user_data):
         # Initialise the user data
@@ -29,8 +32,6 @@ class Player:
         self._user_data = _user_data
         _user_data['in_game'] = False
         _user_data['roomCode'] = ""
-        _user_data['in_game'] = False
-        _user_data['phase'] = self.PROMPTING_PHASE
 
     def getRoomCode(self):
         return self._user_data['roomCode']
@@ -58,23 +59,14 @@ class Player:
         self._user_data['roomCode'] = ""
         return tempRoomCode
 
-    def setPhase(self, phase):
-        self._user_data['phase'] = phase
-        # self.user_data['phase'] = phase
+    # def setPhase(self, phase):
+    #     self._user_data['phase'] = phase
 
-    # def getPhase(self):
-    #     return self._user_data['phase']
-    #     # return self.user_data['phase']
-
-    def queryPhase(self, phase):
-        return self._user_data['phase'] == phase
-        # return self.user_data['phase'] == phase
-
+    # def queryPhase(self, phase):
+    #     return self._user_data['phase'] == phase
+    
     def setInGame(self):
         self._user_data['in_game'] = True
-
-    # def setImageURL(self, imageURL):
-    #     self._user_data['imageURL'] = imageURL
 
     def getImageURL(self):
         try:
@@ -83,9 +75,11 @@ class Player:
             print("Player " + self._username + " has no imageURL key")
             return False
     
-    def querySentPrompt(self):
+    def querySentItem(self, itemKey):
+        if itemKey not in self.PlayerConstants.__members__.values()[0]:
+            return False
         try:
-            return self._user_data['prompt'] is not None
+            return self._user_data[itemKey] is not None
         except KeyError:
             print("Player " + self._username + " has no sent_prompt key")
             return False

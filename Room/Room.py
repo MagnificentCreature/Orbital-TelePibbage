@@ -1,10 +1,10 @@
 """
 Class that holds data about rooms
 """
-
+from enum import Enum
 import asyncio
 from BotController import BotInitiator
-import Player
+from Player.Player import Player
 
 class Room:
     _code = ""
@@ -13,13 +13,15 @@ class Room:
     MAX_PLAYERS = 8
     MIN_PLAYERS = 2
     _state = 0 # 0 = join state, 1 = game state
-    PROMPTING_PHASE, LYING_PHASE, VOTING_PHASE, REVEAL_PHASE = range(4)
+    
+    class State(Enum):
+        JOIN_STATE, PROMPTING_STAGE, LYING_STAGE, VOTING_STAGE, REVEAL_STAGE = range(5)
 
     def __init__(self, code, host):
         self._code = code
         self._host = host
         self._players = []
-        self._state = 0
+        self._state = Room.State.JOIN_STATE
 
     def getCode(self):
         return self._code
@@ -28,7 +30,7 @@ class Room:
         return player in self._players
     
     def joinState(self):
-        return self._state == 0
+        return self._state == Room.State.JOIN_STATE
     
     def isHost(self, player):
         return player == self._host
@@ -80,7 +82,7 @@ class Room:
         if (not player.isFree()):
             await player.sendMessage(bot, "InGame", **{'action':action})
             return False
-        if (self._state == 1):
+        if (self._state != Room.State.JOIN_STATE):
             await player.sendMessage(bot, "GameInProgress")
             return False
 
@@ -115,31 +117,38 @@ class Room:
                 continue
             await eachPlayer.sendMessage(bot, "StartingGame", **{'host':self._host.getUsername()})
             await eachPlayer.startGame()
-        self._state = 1
+        self.advanceState()
 
 
     # WIP this this will enable the features for audience to join
     def acceptingAudience(self):
-        return self._state == 1 
+        return #self._state == 1 
     
     # # TESTING COMMAND
     # def test(self):
     #     for playerObj in self._players: 
     #         print(playerObj.getImageURL())
 
-    def setAllUserDataPhase(self, phase):
-        for playerObj in self._players: 
-            playerObj.setPhase(phase)
-            #for testing
-            # print(playerObj.getUsername() + " " + str(playerObj.getPhase()))
+    def advanceState(self):
+        self._state += 1
+        if self._state not in Room.State.__members__.values()[1]:
+            # self._state = Room.State.JOIN_STATE
+            print("Room ended")
+
+    # def setAllUserDataPhase(self, phase):
+    #     for playerObj in self._players: 
+    #         playerObj.setPhase(phase)
+
+    async def checkState(self, state):
+        return self._state == state
 
     #true if all have sent prompts and proceeded to lying phase, also sets player phase to lying phaseq
-    async def PromptCheck(self):
+    async def itemCheck(self, item):
         for playerObj in self._players: 
-            if not playerObj.querySentPrompt():
+            if not playerObj.querySentItem(item):
                 return False
         # At this point all players have sent prompts, set all players to lying phase
-        self.setAllUserDataPhase(Player.LYING_PHASE)
+        self.advanceState()
         return True
             
              

@@ -21,6 +21,7 @@ import sys
 from pathlib import Path
 
 from Player.Player import Player
+from Room.Room import Room
 sys.path.insert(1, str(Path(__file__).parent.parent.absolute()))
 from Chat.DialogueReader import DialogueReader
 from Room.RoomHandler import RoomHandler
@@ -108,12 +109,7 @@ async def take_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # await DialogueReader.sendImageURLByID(context.bot, update.message.from_user.id, imageURL)
 
     await context.bot.send_message(chat_id=update.effective_chat.id, text='image generated: ' + context.user_data['prompt'])
-    
     await RoomHandler.allSentPrompts(context.user_data['roomCode'], context.bot)
-    # if booly:
-    #     RoomHandler.setAllUserDataPhase(update.message.from_user.username, Player.LYING_PHASE)
-    # await wait_for_all_players(update, context)
-    # print('alls gd')
 
     return BotInitiator.LYING_PHASE
 
@@ -174,12 +170,12 @@ async def take_lie(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not context.user_data['in_game']:
         return BotInitiator.WAITING_FOR_HOST
     
-    # check if the user is in the lying phase
-    if context.user_data['phase'] != Player.LYING_PHASE:
+    # check if the room is in the lying state
+    if RoomHandler.checkState(context.user_data['roomCode'], Room.State.LYING):
         # TODO Handle the phase error
         return BotInitiator.LYING_PHASE
     
-
+    context.user_data['lie'] = update.message.text
     waitingID = DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "WaitingForPlayersLies")
 
     return BotInitiator.VOTING_PHASE
