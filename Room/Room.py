@@ -4,7 +4,7 @@ Class that holds data about rooms
 from enum import Enum
 import asyncio
 from BotController import BotInitiator
-from Player.Player import Player
+from GameController import Prompting, Lying, Voting, Reveal
 
 class Room:
     _code = ""
@@ -117,7 +117,7 @@ class Room:
                 continue
             await eachPlayer.sendMessage(bot, "StartingGame", **{'host':self._host.getUsername()})
             await eachPlayer.startGame()
-        self.advanceState()
+        self.advanceState(bot)
 
 
     # WIP this this will enable the features for audience to join
@@ -129,12 +129,24 @@ class Room:
     #     for playerObj in self._players: 
     #         print(playerObj.getImageURL())
 
-    def advanceState(self):
-        self._state += 1
-        if self._state not in Room.State.__members__.values()[1]:
-            # self._state = Room.State.JOIN_STATE
-            print("Room ended")
+    async def advanceState(self, bot):
+        match self._state:
+            case Room.State.JOIN_STATE:
+                await Prompting.beginPhase1(bot, self)
+                self._state = Room.State.PROMPTING_STATE
+            case Room.State.PROMPTING_STATE:
+                await Lying.beginPhase2(bot, self)
+                self._state = Room.State.LYING_STATE
+            case Room.State.LYING_STATE:
+                #await Voting.beginPhase3(bot, self)
+                self._state = Room.State.VOTING_STATE
+            case Room.State.VOTING_STATE:
+                #await Reveal.beginPhase4(bot, self)
+                self._state = Room.State.REVEAL_STATE
+            case Room.State.REVEAL_STATE:
+                print("Game Over")
 
+        
     # def setAllUserDataPhase(self, phase):
     #     for playerObj in self._players: 
     #         playerObj.setPhase(phase)
@@ -143,12 +155,12 @@ class Room:
         return self._state == state
 
     #true if all have sent prompts and proceeded to lying phase, also sets player phase to lying phaseq
-    async def checkItems(self, item):
+    async def checkItems(self, item, bot):
         for playerObj in self._players: 
             if not playerObj.querySentItem(item):
                 return False
         # At this point all players have sent prompts, set all players to lying phase
-        self.advanceState()
+        self.advanceState(bot)
         return True
             
              

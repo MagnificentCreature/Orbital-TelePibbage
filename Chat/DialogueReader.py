@@ -43,6 +43,8 @@ class DialogueReader:
     def additionalProcessing(inputString):
         # Replace \n with newline
         inputString = inputString.replace("\\n", "\n")
+        # capitalise the first letter
+        inputString = inputString[0].upper() + inputString[1:]
         return inputString
     
     @classmethod

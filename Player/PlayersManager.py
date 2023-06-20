@@ -1,5 +1,6 @@
 '''
 Singleton controller class that manages things to do with players in the global context
+The purpose of this class is solely to interact with the database
 Can be later replaced with the interace that interacts with a player database
 For now it will interact with a text file
 '''

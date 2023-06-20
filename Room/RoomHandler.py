@@ -117,19 +117,14 @@ class RoomHandler:
             return
         
         await room.startGame(bot)
-        asyncio.get_event_loop().create_task(Prompting.beginPhase1(bot, room))
 
     @classmethod
     def checkState(cls, roomCode, state):
         return cls._rooms[roomCode].checkState(state)
 
     @classmethod
-    def checkItems(cls, roomCode, item):
-        return cls._rooms[roomCode].checkItems(item)
-
-    @classmethod
-    def advanceState(cls, roomCode):
-        cls._rooms[roomCode].advanceState()
+    def checkItems(cls, roomCode, item, bot):
+        return cls._rooms[roomCode].checkItems(item, bot)
     
     # @classmethod
     # def setAllUserDataPhase(cls, username, phase):

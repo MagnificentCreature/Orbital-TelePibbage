@@ -28,6 +28,7 @@ from Room.RoomHandler import RoomHandler
 from Player.PlayersManager import PlayersManager
 from ImageGeneration import ImageGenerator
 from BotController import BotInitiator
+from GameController import Lying
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await PlayersManager.recordNewPlayer(update.message.from_user.username, update.message.from_user.id, context.user_data)
@@ -108,8 +109,9 @@ async def take_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # context.user_data['imageURL'] = imageURL
     # await DialogueReader.sendImageURLByID(context.bot, update.message.from_user.id, imageURL)
 
-    await context.bot.send_message(chat_id=update.effective_chat.id, text='image generated: ' + context.user_data['prompt'])
-    await RoomHandler.checkItems(context.user_data['roomCode'], Player.PlayerConstants.PROMPT)
+    waitingID = DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "WaitingForItems", **{'item': "prompt"})     #TODO find a way to delete this message when the next phase starts
+    await context.bot.send_message(chat_id=update.effective_chat.id, text='The image you generated: ' + context.user_data['prompt'])
+    await RoomHandler.checkItems(context.user_data['roomCode'], Player.PlayerConstants.PROMPT, context.bot)
 
     return BotInitiator.LYING_PHASE
 
@@ -175,9 +177,14 @@ async def take_lie(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # TODO Handle the phase error
         return BotInitiator.LYING_PHASE
     
-    context.user_data['lie'] = update.message.text
-    waitingID = DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "WaitingForPlayersLies")
+    
+    context.user_data['lie'] = update.message.text #TODO Put the players lie with the corresponding image
+    # TODO: handle bad lies or failure to generate image
 
+    waitingID = await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "WaitingForItems", **{'item': "lie"})     #TODO find a way to delete this message when the next round starts
+
+    await RoomHandler.checkItems(context.user_data['roomCode'], Player.PlayerConstants.LIE, context.bot)
+    
     return BotInitiator.VOTING_PHASE
     # TODO handle lies and continue the gameplay
 
