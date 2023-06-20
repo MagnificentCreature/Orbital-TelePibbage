@@ -76,12 +76,12 @@ class Player:
             return False
     
     def querySentItem(self, itemKey):
-        if itemKey not in self.PlayerConstants.__members__.values()[0]:
+        if itemKey not in Player.PlayerConstants.__members__.values():
+            print("oops")
             return False
         try:
-            return self._user_data[itemKey] is not None
+            return self._user_data[itemKey.value] is not None
         except KeyError:
-            print("Player " + self._username + " has no sent_prompt key")
             return False
     
     async def startGame(self):

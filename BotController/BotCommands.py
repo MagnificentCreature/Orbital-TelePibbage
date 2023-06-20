@@ -109,7 +109,7 @@ async def take_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # context.user_data['imageURL'] = imageURL
     # await DialogueReader.sendImageURLByID(context.bot, update.message.from_user.id, imageURL)
 
-    waitingID = DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "WaitingForItems", **{'item': "prompt"})     #TODO find a way to delete this message when the next phase starts
+    waitingID = await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "WaitingForItems", **{'item': "prompt"})     #TODO find a way to delete this message when the next phase starts
     await context.bot.send_message(chat_id=update.effective_chat.id, text='The image you generated: ' + context.user_data['prompt'])
     await RoomHandler.checkItems(context.user_data['roomCode'], Player.PlayerConstants.PROMPT, context.bot)
 
@@ -173,7 +173,7 @@ async def take_lie(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return BotInitiator.WAITING_FOR_HOST
     
     # check if the room is in the lying state
-    if RoomHandler.checkState(context.user_data['roomCode'], Room.State.LYING_STATE):
+    if await RoomHandler.checkState(context.user_data['roomCode'], Room.State.LYING_STATE):
         # TODO Handle the phase error
         return BotInitiator.LYING_PHASE
     

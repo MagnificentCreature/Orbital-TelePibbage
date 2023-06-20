@@ -4,7 +4,7 @@ Class that holds data about rooms
 from enum import Enum
 import asyncio
 from BotController import BotInitiator
-from GameController import Prompting, Lying, Voting, Reveal
+from GameController import Prompting, Lying #, Voting, Reveal
 
 class Room:
     _code = ""
@@ -117,7 +117,7 @@ class Room:
                 continue
             await eachPlayer.sendMessage(bot, "StartingGame", **{'host':self._host.getUsername()})
             await eachPlayer.startGame()
-        self.advanceState(bot)
+        await self.advanceState(bot)
 
 
     # WIP this this will enable the features for audience to join
@@ -160,7 +160,7 @@ class Room:
             if not playerObj.querySentItem(item):
                 return False
         # At this point all players have sent prompts, set all players to lying phase
-        self.advanceState(bot)
+        await self.advanceState(bot)
         return True
             
              
