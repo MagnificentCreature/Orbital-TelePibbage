@@ -15,7 +15,7 @@ class Room:
     _state = 0 # 0 = join state, 1 = game state
     
     class State(Enum):
-        JOIN_STATE, PROMPTING_STAGE, LYING_STAGE, VOTING_STAGE, REVEAL_STAGE = range(5)
+        JOIN_STATE, PROMPTING_STATE, LYING_STATE, VOTING_STATE, REVEAL_STATE = range(5)
 
     def __init__(self, code, host):
         self._code = code
@@ -143,7 +143,7 @@ class Room:
         return self._state == state
 
     #true if all have sent prompts and proceeded to lying phase, also sets player phase to lying phaseq
-    async def itemCheck(self, item):
+    async def checkItems(self, item):
         for playerObj in self._players: 
             if not playerObj.querySentItem(item):
                 return False

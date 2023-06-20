@@ -124,8 +124,8 @@ class RoomHandler:
         return cls._rooms[roomCode].checkState(state)
 
     @classmethod
-    def itemCheckState(cls, roomCode, item):
-        return cls._rooms[roomCode].itemCheck(item)
+    def checkItems(cls, roomCode, item):
+        return cls._rooms[roomCode].checkItems(item)
 
     @classmethod
     def advanceState(cls, roomCode):
