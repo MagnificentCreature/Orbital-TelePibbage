@@ -65,16 +65,16 @@ class PlayersManager:
     # def getRoom(username):
     #     return username.getRoomCode()
 
-    @classmethod
-    def setImageURL(cls, username, imageURL):
-        playerObject = cls._playerRecord[username]
-        playerObject._imageURL = imageURL
+    # @classmethod
+    # def setImageURL(cls, username, imageURL):
+    #     playerObject = cls._playerRecord[username]
+    #     playerObject._imageURL = imageURL
 
-    @classmethod
-    def setPromptSent(cls, username):
-        playerObject = cls._playerRecord[username]
-        print('calling playerobj')
-        playerObject.setPromptSent()
+    # @classmethod
+    # def setPlayerPhase(cls, username, phase):
+    #     playerObject = cls._playerRecord[username]
+    #     print('calling playerobj')
+    #     playerObject.setPromptSent()
     # @classmethod
     # async def allSentPrompts(cls, bot):
     #     for eachPlayer in cls._playerRecord: 

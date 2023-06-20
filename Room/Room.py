@@ -36,9 +36,9 @@ class Room:
     def hasMinPlayers(self):
         return len(self._players) >= Room.MIN_PLAYERS
     
-    async def broadcast(self, bot, message, **kwargs):
+    async def broadcast(self, bot, message, messageKey=None,reply_markup=None, **kwargs):
         asyncio.gather(
-            *[player.sendMessage(bot, message, **kwargs) for player in self._players]
+            *[player.sendMessage(bot, message, messageKey, reply_markup, **kwargs) for player in self._players]
         )
 
     # Return a string of the players usernames in a list format
@@ -122,36 +122,24 @@ class Room:
     def acceptingAudience(self):
         return self._state == 1 
     
-    def test(self):
-        for playerObj in self._players: 
-            print(playerObj.getImageURL())
+    # # TESTING COMMAND
+    # def test(self):
+    #     for playerObj in self._players: 
+    #         print(playerObj.getImageURL())
 
     def setAllUserDataPhase(self, phase):
         for playerObj in self._players: 
             playerObj.setPhase(phase)
             #for testing
-            print(playerObj.getUsername() + " " + str(playerObj.getPhase()))
+            # print(playerObj.getUsername() + " " + str(playerObj.getPhase()))
 
-    def returnPlayerList(self):
-        print(self._players)
-        return self._players
-
-    #true if all have sent prompts and proceeded to lying phase
-    async def allSentPrompts(self):
+    #true if all have sent prompts and proceeded to lying phase, also sets player phase to lying phaseq
+    async def PromptCheck(self):
         for playerObj in self._players: 
-            print(playerObj.getUsername())
-            if not playerObj.sentPrompt():
-                print(playerObj.getUsername() + 'false')
+            if not playerObj.querySentPrompt():
                 return False
-        print('true')
+        # At this point all players have sent prompts, set all players to lying phase
+        self.setAllUserDataPhase(Player.LYING_PHASE)
         return True
-        # for eachPlayer in self._players: 
-        #     if eachPlayer.queryPhase != Player.LYING_PHASE:
-        #         return False
-        # return True
-
-    async def allTakePrompt(self, updateList):
-        for update in updateList:
-            await handle_player_prompt(update, context)
             
              

@@ -120,29 +120,21 @@ class RoomHandler:
         asyncio.get_event_loop().create_task(Prompting.beginPhase1(bot, room))
 
     @classmethod
-    def allSentPrompts(cls, username):
-        player = PlayersManager.queryPlayer(username)
-
-        #for testing
-        print(username + " " + str(player.getPhase()))
-
-        roomCode = player.getRoomCode()
-        room = cls._rooms[roomCode]
-
-        return room.allSentPrompts()
+    def allSentPrompts(cls, roomCode):
+        return cls._rooms[roomCode].PromptCheck()
     
-    @classmethod
-    def setAllUserDataPhase(cls, username, phase):
-        player = PlayersManager.queryPlayer(username)
+    # @classmethod
+    # def setAllUserDataPhase(cls, username, phase):
+    #     player = PlayersManager.queryPlayer(username)
 
-        # player.setPhase(phase)
-        # #for testing
-        # print(username + " " + str(player.getPhase()))
+    #     # player.setPhase(phase)
+    #     # #for testing
+    #     # print(username + " " + str(player.getPhase()))
 
-        roomCode = player.getRoomCode()
-        room = cls._rooms[roomCode]
+    #     roomCode = player.getRoomCode()
+    #     room = cls._rooms[roomCode]
 
-        room.setAllUserDataPhase(phase)
+    #     room.setAllUserDataPhase(phase)
     
     # @classmethod
     # def allTakePrompt(cls, username, update):
@@ -151,14 +143,6 @@ class RoomHandler:
     #     room = cls._rooms[roomCode]
     #     room.allTakePrompt()
         # cls._updateList.append(update)
-
-    
-    #obtain all players in room
-    @classmethod
-    def returnPlayers(cls, roomCode):
-        room = cls._rooms[roomCode]
-        print(room)
-        return room.returnPlayerList()
 
     # @classmethod
     # def test(cls, username):

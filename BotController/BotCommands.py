@@ -69,15 +69,6 @@ async def join_room(update: Update, context: ContextTypes.DEFAULT_TYPE, roomCode
         await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "InvalidRoom")
         await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "ReenterCode", reply_markup=BotInitiator.ReenterKeyboard)
         return BotInitiator.ENTERCODE
-
-    # waiting_to_start = asyncio.Event()
-    # context.user_data["waiting_to_start"] = waiting_to_start
-    # await waiting_to_start.wait()
-    # del context.user_data['waiting_to_start']
-
-    # if context.user_data['roomCode'] == "": # If the user left the room, send a new welcome message
-    #     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "Welcome2", reply_markup=BotInitiator.WelcomeKeyboard)
-    #     return BotInitiator.FRESH
     
     return BotInitiator.INROOM
 
@@ -92,9 +83,9 @@ async def return_to_fresh(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def generate(update: Update, context: ContextTypes.DEFAULT_TYPE):
     prompt = (" ").join(update.message.text.split(" ")[1:]) #TODO logic flow if invalid prompt or no prompt
-    imageurl = await ImageGenerator.imageQuery(prompt) 
-    print(update.message.from_user.username + "Generated Image: " + str(imageurl))
-    await DialogueReader.sendImageURLByID(context.bot, update.message.from_user.id, imageurl)
+    imageURL = await ImageGenerator.imageQuery(prompt) 
+    print(update.message.from_user.username + "Generated Image: " + str(imageURL))
+    await DialogueReader.sendImageURLByID(context.bot, update.message.from_user.id, imageURL)
 
 async def start_game(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await RoomHandler.startGame(update.callback_query.from_user.username, context.bot)
@@ -107,43 +98,34 @@ async def take_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # TODO: handle bad prompts or failure to generate image
     #asyncio.wait_for(ImageGenerator.imageQuery(update.message).wait(), timeout=60)
 
-    message_text = update.message.text
-    # print('image generated')
-    await context.bot.send_message(chat_id=update.effective_chat.id, text='image generated')
-    #to save api tokens, uncomment when ready
-    # imageurl = await ImageGenerator.imageQuery(update.message.text) 
-    # PlayersManager.setImageURL(update.message.from_user.username, imageURL=str(imageurl))
-    # #RoomHandler.test(update.message.from_user.username)
-    # await DialogueReader.sendImageURLByID(context.bot, update.message.from_user.id, imageurl)
+    #to save api calls, uncomment when ready to deploy
+    context.user_data['prompt'] = update.message.text
+    # imageURL = await ImageGenerator.imageQuery(update.message.text)
+    # if imageURL is None:
+    #     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "InvalidPrompt")
+    #     return BotInitiator.PROMPTING_PHASE
+    # context.user_data['imageURL'] = imageURL
+    # await DialogueReader.sendImageURLByID(context.bot, update.message.from_user.id, imageURL)
 
-    #context.user_data['phase'] = Player.PROMPTING_PHASE
-    #message is sent, so move to next phase alr
-    PlayersManager.setPromptSent(update.message.from_user.username)
-    # context.user_data['phase'] = Player.LYING_PHASE
-
-    # booly = False
-    # while not booly:
-    #     print('not yet')
-    #     await asyncio.sleep(5)
-    #     booly = await RoomHandler.allSentPrompts(update.message.from_user.username)
-
-    booly = await RoomHandler.allSentPrompts(update.message.from_user.username)
-    if booly:
-        RoomHandler.setAllUserDataPhase(update.message.from_user.username, Player.LYING_PHASE)
+    await context.bot.send_message(chat_id=update.effective_chat.id, text='image generated: ' + context.user_data['prompt'])
+    
+    await RoomHandler.allSentPrompts(context.user_data['roomCode'], context.bot)
+    # if booly:
+    #     RoomHandler.setAllUserDataPhase(update.message.from_user.username, Player.LYING_PHASE)
     # await wait_for_all_players(update, context)
     # print('alls gd')
 
     return BotInitiator.LYING_PHASE
 
-async def phaseTest(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    print('initiate test')
-    message_text = update.message.text
-    # print('image generated')
-    # if player in lying phase, means all players in lying phase
-    if context.user_data['phase'] == Player.LYING_PHASE:
-        await context.bot.send_message(chat_id=update.effective_chat.id, text='everyone in')
-    else:
-        await context.bot.send_message(chat_id=update.effective_chat.id, text='not everyone in')
+# async def phaseTest(update: Update, context: ContextTypes.DEFAULT_TYPE):
+#     print('initiate test')
+#     message_text = update.message.text
+#     # print('image generated')
+#     # if player in lying phase, means all players in lying phase
+#     if context.user_data['phase'] == Player.LYING_PHASE:
+#         await context.bot.send_message(chat_id=update.effective_chat.id, text='everyone in')
+#     else:
+#         await context.bot.send_message(chat_id=update.effective_chat.id, text='not everyone in')
 # async def wait_for_all_players(update, context: ContextTypes.DEFAULT_TYPE):
 #     room_code = context.user_data['roomCode']
 #     room = RoomHandler.getRoom(room_code)
@@ -195,8 +177,12 @@ async def take_lie(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # check if the user is in the lying phase
     if context.user_data['phase'] != Player.LYING_PHASE:
         # TODO Handle the phase error
-        return BotInitiator.PROMPTING_PHASE
+        return BotInitiator.LYING_PHASE
     
+
+    waitingID = DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "WaitingForPlayersLies")
+
+    return BotInitiator.VOTING_PHASE
     # TODO handle lies and continue the gameplay
 
 async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
