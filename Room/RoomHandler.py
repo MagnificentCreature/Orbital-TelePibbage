@@ -8,6 +8,7 @@ import asyncio
 import random
 from GameController import Prompting
 from BotController import BotInitiator
+import Player
 
 from Room.Room import Room
 
@@ -19,6 +20,7 @@ from Player.PlayersManager import PlayersManager
 class RoomHandler:
     #hashset of rooms by their room code
     _rooms = {}
+    _updateList = []
 
    #Static method that generates a random four alphabet room code
     @staticmethod
@@ -28,6 +30,10 @@ class RoomHandler:
             #randomly choose between Capital letters A-Z
             code += chr(random.randint(65, 90))
         return code
+    
+    @classmethod
+    def getRoom(cls, roomCode):
+        return cls._rooms[roomCode]
     
     #method that deletes a room
     @classmethod
@@ -111,4 +117,41 @@ class RoomHandler:
             return
         
         await room.startGame(bot)
-        asyncio.get_event_loop().create_task(Prompting.beginPhase1(bot, room))
+
+    @classmethod
+    def checkState(cls, roomCode, state):
+        return cls._rooms[roomCode].checkState(state)
+
+    @classmethod
+    def checkItems(cls, roomCode, item, bot):
+        return cls._rooms[roomCode].checkItems(item, bot)
+    
+    # @classmethod
+    # def setAllUserDataPhase(cls, username, phase):
+    #     player = PlayersManager.queryPlayer(username)
+
+    #     # player.setPhase(phase)
+    #     # #for testing
+    #     # print(username + " " + str(player.getPhase()))
+
+    #     roomCode = player.getRoomCode()
+    #     room = cls._rooms[roomCode]
+
+    #     room.setAllUserDataPhase(phase)
+    
+    # @classmethod
+    # def allTakePrompt(cls, username, update):
+    #     player = PlayersManager.queryPlayer(username)
+    #     roomCode = player.getRoomCode()
+    #     room = cls._rooms[roomCode]
+    #     room.allTakePrompt()
+        # cls._updateList.append(update)
+
+    # @classmethod
+    # def test(cls, username):
+    #     player = PlayersManager.queryPlayer(username)
+    #     roomCode = player.getRoomCode()
+    #     room = cls._rooms[roomCode]
+    #     room.returnPlayerList()
+
+    
