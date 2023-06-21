@@ -6,7 +6,7 @@ So keeping track of who is in which room is important, and each player can only 
 
 import asyncio
 import random
-from GameController import Prompting
+from GameController import Prompting, Lying, Image
 from BotController import BotInitiator
 import Player
 
@@ -125,6 +125,11 @@ class RoomHandler:
     @classmethod
     def checkItems(cls, roomCode, item, bot):
         return cls._rooms[roomCode].checkItems(item, bot)
+    
+    @classmethod
+    def takeImage(cls, roomCode, username, imageURL):
+        player = PlayersManager.queryPlayer(username)
+        cls._rooms[roomCode].takeImage(player, Image(imageURL))
     
     # @classmethod
     # def setAllUserDataPhase(cls, username, phase):

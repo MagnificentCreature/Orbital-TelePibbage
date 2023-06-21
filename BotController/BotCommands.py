@@ -107,7 +107,7 @@ async def take_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # if imageURL is None:
     #     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "InvalidPrompt")
     #     return BotInitiator.PROMPTING_PHASE
-    # context.user_data['imageURL'] = imageURL
+    # RoomHandler.takeImage(context.user_data['roomCode'], update.message.from_user.username, imageURL)
     # await DialogueReader.sendImageURLByID(context.bot, update.message.from_user.id, imageURL)
 
     waitingID = await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "WaitingForItems", **{'item': "prompt"})     #TODO find a way to delete this message when the next phase starts
@@ -179,7 +179,7 @@ async def take_lie(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return BotInitiator.LYING_PHASE
     
     
-    context.user_data['imageLie'].insertLie(update.message.text, update.message.from_user.username) #TODO Put the players lie with the corresponding image
+    context.user_data['imageLie'].insertLie(update.message.text, update.message.from_user.username)
     
     # TODO: handle bad lies or failure to generate image
     print(context.user_data['lie'])
