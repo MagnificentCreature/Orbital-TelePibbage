@@ -13,6 +13,7 @@ class Room:
     MAX_PLAYERS = 8
     MIN_PLAYERS = 2
     _state = 0 # 0 = join state, 1 = game state
+    _playerToImage = {} #dictionary of player to list of images
     
     class State(Enum):
         JOIN_STATE, PROMPTING_STATE, LYING_STATE, VOTING_STATE, REVEAL_STATE = range(5)
@@ -117,6 +118,7 @@ class Room:
                 continue
             await eachPlayer.sendMessage(bot, "StartingGame", **{'host':self._host.getUsername()})
             await eachPlayer.startGame()
+            self._playerToImage[eachPlayer] = []
         await self.advanceState(bot)
         return True
 
@@ -128,6 +130,16 @@ class Room:
     # def test(self):
     #     for playerObj in self._players: 
     #         print(playerObj.getImageURL())
+
+    async def takeImage(self, player, image):
+        if player not in self._players:
+            return False
+        if self._state != Room.State.PROMPTING_STATE:
+            return False
+        for eachPlayer in self._players:
+            if eachPlayer == player:
+                continue
+            self._playerToImage[player].append(image)
 
     async def advanceState(self, bot):
         match self._state:
@@ -163,4 +175,5 @@ class Room:
         await self.advanceState(bot)
         return True
             
+    
              
