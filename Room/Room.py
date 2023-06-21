@@ -118,6 +118,7 @@ class Room:
             await eachPlayer.sendMessage(bot, "StartingGame", **{'host':self._host.getUsername()})
             await eachPlayer.startGame()
         await self.advanceState(bot)
+        return True
 
 
     # WIP this this will enable the features for audience to join

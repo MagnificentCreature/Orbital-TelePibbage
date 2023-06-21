@@ -90,7 +90,8 @@ async def generate(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await DialogueReader.sendImageURLByID(context.bot, update.message.from_user.id, imageURL)
 
 async def start_game(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await RoomHandler.startGame(update.callback_query.from_user.username, context.bot)
+    if not await RoomHandler.startGame(update.callback_query.from_user.username, context.bot):
+        return BotInitiator.INROOM
     return BotInitiator.PROMPTING_PHASE
 
 async def take_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
