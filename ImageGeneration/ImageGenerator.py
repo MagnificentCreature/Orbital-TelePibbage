@@ -33,12 +33,11 @@ headers = {
 }
 
 @staticmethod
-def printImageHash(imageUrl):
+def getImageHash(imageUrl):
     response = requests.get(imageUrl)
     imageBytes = response.content
-    imageHash = hashlib.sha256(imageBytes).hexdigest()
-    print("Hash of Above image: " + imageHash)
-
+    return hashlib.sha256(imageBytes).hexdigest()
+    
 @staticmethod
 async def imageQuery(prompt):
     payload_data = PAYLOAD_DATA_TEMPLATE.copy()
@@ -48,6 +47,8 @@ async def imageQuery(prompt):
     response = requests.request("POST", URL, headers=headers, data=payload)
     myDict = json.loads(response.text)
     print(response.text)
-    printImageHash(myDict["output"][0])
+    if getImageHash(myDict["output"][0]) == CENSOR_HASH:
+        print("Image is censored")
+        return None
 
     return myDict["output"][0]
