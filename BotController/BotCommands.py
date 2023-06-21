@@ -173,7 +173,7 @@ async def take_lie(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return BotInitiator.WAITING_FOR_HOST
     
     # check if the room is in the lying state
-    if await RoomHandler.checkState(context.user_data['roomCode'], Room.State.LYING_STATE):
+    if not await RoomHandler.checkState(context.user_data['roomCode'], Room.State.LYING_STATE):
         # TODO Handle the phase error
         return BotInitiator.LYING_PHASE
     

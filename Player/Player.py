@@ -77,7 +77,6 @@ class Player:
     
     def querySentItem(self, itemKey):
         if itemKey not in Player.PlayerConstants.__members__.values():
-            print("oops")
             return False
         try:
             return self._user_data[itemKey.value] is not None
