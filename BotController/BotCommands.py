@@ -183,7 +183,10 @@ async def take_lie(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         if context.user_data['next_lie'] is not None:
             await context.user_data['next_lie'].insertLie(update.message.text, update.message.from_user.username)
-            await RoomHandler.sendNextImage(context.bot, context.user_data["roomCode"], update.message.from_user.username)
+            if not await RoomHandler.sendNextImage(context.bot, context.user_data["roomCode"], update.message.from_user.username):
+                waitingID = await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "WaitingForItems", **{'item': "lie"})     #TODO find a way to delete this message when the next round starts
+                await RoomHandler.checkItems(context.user_data['roomCode'], Player.PlayerConstants.LIE, context.bot)
+                return BotInitiator.VOTING_PHASE
             return BotInitiator.LYING_PHASE
     except KeyError:
         logging.log(0, "Key error in lying phase, player does not have next_lie")
@@ -192,9 +195,7 @@ async def take_lie(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # TODO: handle bad lies or failure to generate image
     
     waitingID = await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "WaitingForItems", **{'item': "lie"})     #TODO find a way to delete this message when the next round starts
-
     await RoomHandler.checkItems(context.user_data['roomCode'], Player.PlayerConstants.LIE, context.bot)
-    
     return BotInitiator.VOTING_PHASE
     # TODO handle lies and continue the gameplay
 

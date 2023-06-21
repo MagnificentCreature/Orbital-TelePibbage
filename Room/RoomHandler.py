@@ -136,6 +136,6 @@ class RoomHandler:
     @classmethod
     async def sendNextImage(cls, bot, roomCode, username):
         player = PlayersManager.queryPlayer(username)
-        await Lying.sendNextImage(bot, cls._rooms[roomCode], player)
+        return await Lying.sendNextImage(bot, cls._rooms[roomCode], player)
 
     
