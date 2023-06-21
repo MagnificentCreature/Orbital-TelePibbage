@@ -17,5 +17,7 @@ class Image:
     async def insertLie(self, lie, username):
         self.imageLies.append((lie, username))
 
+        
+
 
     

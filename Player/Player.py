@@ -16,7 +16,7 @@ class Player:
     
     class PlayerConstants(Enum):
         PROMPT = "prompt"
-        LIE = "lie"
+        NEXT_LIE = "next_lie"
     
     def __init__(self, username, chatID=0, _user_data={}, score=0, sentPrompt=False):
         self._username = username
