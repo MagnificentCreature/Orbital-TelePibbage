@@ -3,6 +3,7 @@ Player object, identified by his unique username.
 Stores information about his username, scores etc
 Can later be linked to a database to keep track of (leaderboard/overall scores)
 '''
+from enum import Enum
 
 from Chat.DialogueReader import DialogueReader
 
@@ -12,9 +13,12 @@ class Player:
     _chatID = 0
     _score = 0
     _user_data = None
-    PROMPTING_PHASE, LYING_PHASE, VOTING_PHASE, REVEAL_PHASE = range(4)
     
-    def __init__(self, username, chatID=0, _user_data={}, score=0):
+    class PlayerConstants(Enum):
+        PROMPT = "prompt"
+        LIE = "lie"
+    
+    def __init__(self, username, chatID=0, _user_data={}, score=0, sentPrompt=False):
         self._username = username
         self._chatID = chatID
         self._score = score
@@ -28,7 +32,6 @@ class Player:
         self._user_data = _user_data
         _user_data['in_game'] = False
         _user_data['roomCode'] = ""
-        _user_data['in_game'] = False
 
     def getRoomCode(self):
         return self._user_data['roomCode']
@@ -56,15 +59,31 @@ class Player:
         self._user_data['roomCode'] = ""
         return tempRoomCode
 
-    def setPhase(self, phase):
-        self._user_data['phase'] = phase
+    # def setPhase(self, phase):
+    #     self._user_data['phase'] = phase
 
-    def queryPhase(self, phase):
-        return self._user_data['phase'] == phase
-
+    # def queryPhase(self, phase):
+    #     return self._user_data['phase'] == phase
+    
     def setInGame(self):
         self._user_data['in_game'] = True
 
+    def getImageURL(self):
+        try:
+            return self._user_data['imageURL']
+        except KeyError:
+            print("Player " + self._username + " has no imageURL key")
+            return False
+    
+    def querySentItem(self, itemKey):
+        if itemKey not in Player.PlayerConstants.__members__.values():
+            print("oops")
+            return False
+        try:
+            return self._user_data[itemKey.value] is not None
+        except KeyError:
+            return False
+    
     async def startGame(self):
         await self.deleteContext('lobby_list')
         self.setInGame()

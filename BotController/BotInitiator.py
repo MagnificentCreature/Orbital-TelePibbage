@@ -88,12 +88,13 @@ def main() -> None:
         states={
             PROMPTING_PHASE: [
                 MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.take_prompt),
-                MessageHandler(filters.COMMAND, BotCommands.generate)
             ],
             LYING_PHASE: [
-                # TODO more stuff
-                MessageHandler(filters.COMMAND, BotCommands.generate)
+                MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.take_lie),
             ],
+            VOTING_PHASE: [
+                # TODO more stuff
+            ]
         },
         fallbacks=[MessageHandler(filters.COMMAND, BotCommands.unknown)],
         map_to_parent={

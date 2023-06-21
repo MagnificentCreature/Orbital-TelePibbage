@@ -1,9 +1,10 @@
 """
 Class that holds data about rooms
 """
-
+from enum import Enum
 import asyncio
 from BotController import BotInitiator
+from GameController import Prompting, Lying #, Voting, Reveal
 
 class Room:
     _code = ""
@@ -12,12 +13,15 @@ class Room:
     MAX_PLAYERS = 8
     MIN_PLAYERS = 2
     _state = 0 # 0 = join state, 1 = game state
+    
+    class State(Enum):
+        JOIN_STATE, PROMPTING_STATE, LYING_STATE, VOTING_STATE, REVEAL_STATE = range(5)
 
     def __init__(self, code, host):
         self._code = code
         self._host = host
         self._players = []
-        self._state = 0
+        self._state = Room.State.JOIN_STATE
 
     def getCode(self):
         return self._code
@@ -26,7 +30,7 @@ class Room:
         return player in self._players
     
     def joinState(self):
-        return self._state == 0
+        return self._state == Room.State.JOIN_STATE
     
     def isHost(self, player):
         return player == self._host
@@ -34,9 +38,9 @@ class Room:
     def hasMinPlayers(self):
         return len(self._players) >= Room.MIN_PLAYERS
     
-    async def broadcast(self, bot, message, **kwargs):
+    async def broadcast(self, bot, message, messageKey=None,reply_markup=None, **kwargs):
         asyncio.gather(
-            *[player.sendMessage(bot, message, **kwargs) for player in self._players]
+            *[player.sendMessage(bot, message, messageKey, reply_markup, **kwargs) for player in self._players]
         )
 
     # Return a string of the players usernames in a list format
@@ -78,7 +82,7 @@ class Room:
         if (not player.isFree()):
             await player.sendMessage(bot, "InGame", **{'action':action})
             return False
-        if (self._state == 1):
+        if (self._state != Room.State.JOIN_STATE):
             await player.sendMessage(bot, "GameInProgress")
             return False
 
@@ -113,9 +117,50 @@ class Room:
                 continue
             await eachPlayer.sendMessage(bot, "StartingGame", **{'host':self._host.getUsername()})
             await eachPlayer.startGame()
-        self._state = 1
+        await self.advanceState(bot)
 
 
     # WIP this this will enable the features for audience to join
     def acceptingAudience(self):
-        return self._state == 1 
+        return #self._state == 1 
+    
+    # # TESTING COMMAND
+    # def test(self):
+    #     for playerObj in self._players: 
+    #         print(playerObj.getImageURL())
+
+    async def advanceState(self, bot):
+        match self._state:
+            case Room.State.JOIN_STATE:
+                await Prompting.beginPhase1(bot, self)
+                self._state = Room.State.PROMPTING_STATE
+            case Room.State.PROMPTING_STATE:
+                await Lying.beginPhase2(bot, self)
+                self._state = Room.State.LYING_STATE
+            case Room.State.LYING_STATE:
+                #await Voting.beginPhase3(bot, self)
+                self._state = Room.State.VOTING_STATE
+            case Room.State.VOTING_STATE:
+                #await Reveal.beginPhase4(bot, self)
+                self._state = Room.State.REVEAL_STATE
+            case Room.State.REVEAL_STATE:
+                print("Game Over")
+
+        
+    # def setAllUserDataPhase(self, phase):
+    #     for playerObj in self._players: 
+    #         playerObj.setPhase(phase)
+
+    async def checkState(self, state):
+        return self._state == state
+
+    #true if all have sent prompts and proceeded to lying phase, also sets player phase to lying phaseq
+    async def checkItems(self, item, bot):
+        for playerObj in self._players: 
+            if not playerObj.querySentItem(item):
+                return False
+        # At this point all players have sent prompts, set all players to lying phase
+        await self.advanceState(bot)
+        return True
+            
+             
