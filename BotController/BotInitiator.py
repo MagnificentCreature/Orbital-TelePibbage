@@ -99,6 +99,7 @@ def main() -> None:
         fallbacks=[MessageHandler(filters.COMMAND, BotCommands.unknown)],
         map_to_parent={
             WAITING_FOR_HOST: INROOM,
+            INROOM: INROOM,
         }
     )
 
