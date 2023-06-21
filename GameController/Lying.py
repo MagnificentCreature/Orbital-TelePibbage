@@ -22,5 +22,5 @@ async def sendNextImage(bot, room, username):
         return None
     image = imageList.imageList.pop(random.randint(0, len(imageList) - 1))
     player.setItem(Player.PlayerConstants.NEXT_LIE, image) # fill second param with image
-    player.sendImage(bot, image.getURL())
+    player.sendImage(bot, image.getImageURL())
 
