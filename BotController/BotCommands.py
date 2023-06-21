@@ -4,6 +4,7 @@ Handles user commands
 
 import asyncio
 import time
+import logging
 
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton, Update
 from BotController import BotCommands
@@ -178,12 +179,17 @@ async def take_lie(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # TODO Handle the phase error
         return BotInitiator.LYING_PHASE
     
-    
-    context.user_data['imageLie'].insertLie(update.message.text, update.message.from_user.username)
+    try:
+        if context.user_data['next_lie'] is not None:
+            context.user_data['next_lie'].insertLie(update.message.text, update.message.from_user.username)
+            await RoomHandler.sendNextImage(context.bot, context.user_data["roomCode"], update.message.from_user.username)
+            return BotInitiator.LYING_PHASE
+    except KeyError:
+        logging.log(0, "Key error in lying phase, player does not have next_lie")
+        return BotInitiator.LYING_PHASE
     
     # TODO: handle bad lies or failure to generate image
-    print(context.user_data['lie'])
-
+    
     waitingID = await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "WaitingForItems", **{'item': "lie"})     #TODO find a way to delete this message when the next round starts
 
     await RoomHandler.checkItems(context.user_data['roomCode'], Player.PlayerConstants.LIE, context.bot)

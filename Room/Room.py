@@ -13,7 +13,8 @@ class Room:
     MAX_PLAYERS = 8
     MIN_PLAYERS = 2
     _state = 0 # 0 = join state, 1 = game state
-    _playerToImage = {} #dictionary of player to list of images
+    _list_of_image = []
+    _playerToRemainingImages = {} #dictionary of player to list of images they have yet to give lies for
     
     class State(Enum):
         JOIN_STATE, PROMPTING_STATE, LYING_STATE, VOTING_STATE, REVEAL_STATE = range(5)
@@ -43,6 +44,11 @@ class Room:
         asyncio.gather(
             *[player.sendMessage(bot, message, messageKey, reply_markup, **kwargs) for player in self._players]
         )
+
+    async def boardCall(self, bot, func):
+        asyncio.gather(
+            *[func(bot, self, player) for player in self._players]
+        )   
 
     # Return a string of the players usernames in a list format
     def printPlayerList(self):
@@ -114,36 +120,6 @@ class Room:
         await self.__leaveRoomMessages()
         return True
     
-    async def startGame(self, bot):
-        for eachPlayer in self._players:
-            if eachPlayer == self._host:
-                eachPlayer.setInGame()
-                continue
-            await eachPlayer.sendMessage(bot, "StartingGame", **{'host':self._host.getUsername()})
-            await eachPlayer.startGame()
-            self._playerToImage[eachPlayer] = []
-        await self.advanceState(bot)
-        return True
-
-    # WIP this this will enable the features for audience to join
-    def acceptingAudience(self):
-        return #self._state == 1 
-    
-    # # TESTING COMMAND
-    # def test(self):
-    #     for playerObj in self._players: 
-    #         print(playerObj.getImageURL())
-
-    async def takeImage(self, player, image):
-        if player not in self._players:
-            return False
-        if self._state != Room.State.PROMPTING_STATE:
-            return False
-        for eachPlayer in self._players:
-            if eachPlayer == player:
-                continue
-            self._playerToImage[player].append(image)
-
     async def advanceState(self, bot):
         match self._state:
             case Room.State.JOIN_STATE:
@@ -151,8 +127,10 @@ class Room:
                 self._state = Room.State.PROMPTING_STATE
             case Room.State.PROMPTING_STATE:
                 await Lying.beginPhase2(bot, self)
+                # TODO: Maybe delete the players usercontext['prompt']?
                 self._state = Room.State.LYING_STATE
             case Room.State.LYING_STATE:
+                # TODO: Maybe delete the players usercontext['lies']?
                 #await Voting.beginPhase3(bot, self)
                 self._state = Room.State.VOTING_STATE
             case Room.State.VOTING_STATE:
@@ -161,18 +139,43 @@ class Room:
             case Room.State.REVEAL_STATE:
                 print("Game Over")
 
-    # def setAllUserDataPhase(self, phase):
-    #     for playerObj in self._players: 
-    #         playerObj.setPhase(phase)
-
-    #true if all have sent prompts and proceeded to lying phase, also sets player phase to lying phaseq
+    async def startGame(self, bot):
+        for eachPlayer in self._players:
+            if eachPlayer == self._host:
+                eachPlayer.setInGame()
+                continue
+            await eachPlayer.sendMessage(bot, "StartingGame", **{'host':self._host.getUsername()})
+            await eachPlayer.startGame()
+            self._playerToRemainingImages[eachPlayer] = []
+        await self.advanceState(bot)
+        return True
+    
+    #true if all have sent prompts(or other item) and proceeded to next phase
     async def checkItems(self, item, bot):
         for playerObj in self._players: 
             if not playerObj.querySentItem(item):
                 return False
-        # At this point all players have sent prompts, set all players to lying phase
+        # At this point all players have sent prompts, advance state
         await self.advanceState(bot)
         return True
+
+    # WIP this this will enable the features for audience to join
+    def acceptingAudience(self):
+        return #self._state == 1 
+
+    async def takeImage(self, player, image):
+        if player not in self._players:
+            return False
+        if self._state != Room.State.PROMPTING_STATE:
+            return False
+        self._list_of_image.append(image)
+        for eachPlayer in self._players:
+            if eachPlayer == player:
+                continue
+            self._playerToRemainingImages[player].append(image)
+
+    async def getImageList(self, player):
+        return self._playerToRemainingImages[player]
             
     
              

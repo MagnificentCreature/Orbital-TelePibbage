@@ -8,7 +8,6 @@ import asyncio
 import random
 from GameController import Prompting, Lying, Image
 from BotController import BotInitiator
-import Player
 
 from Room.Room import Room
 
@@ -30,10 +29,6 @@ class RoomHandler:
             #randomly choose between Capital letters A-Z
             code += chr(random.randint(65, 90))
         return code
-    
-    @classmethod
-    def getRoom(cls, roomCode):
-        return cls._rooms[roomCode]
     
     #method that deletes a room
     @classmethod
@@ -126,37 +121,19 @@ class RoomHandler:
     def checkItems(cls, roomCode, item, bot):
         return cls._rooms[roomCode].checkItems(item, bot)
     
+    '''
+    Prompting Phase methods
+    '''
     @classmethod
     def takeImage(cls, roomCode, username, imageURL):
         player = PlayersManager.queryPlayer(username)
         cls._rooms[roomCode].takeImage(player, Image(imageURL))
-    
-    # @classmethod
-    # def setAllUserDataPhase(cls, username, phase):
-    #     player = PlayersManager.queryPlayer(username)
 
-    #     # player.setPhase(phase)
-    #     # #for testing
-    #     # print(username + " " + str(player.getPhase()))
-
-    #     roomCode = player.getRoomCode()
-    #     room = cls._rooms[roomCode]
-
-    #     room.setAllUserDataPhase(phase)
-    
-    # @classmethod
-    # def allTakePrompt(cls, username, update):
-    #     player = PlayersManager.queryPlayer(username)
-    #     roomCode = player.getRoomCode()
-    #     room = cls._rooms[roomCode]
-    #     room.allTakePrompt()
-        # cls._updateList.append(update)
-
-    # @classmethod
-    # def test(cls, username):
-    #     player = PlayersManager.queryPlayer(username)
-    #     roomCode = player.getRoomCode()
-    #     room = cls._rooms[roomCode]
-    #     room.returnPlayerList()
+    '''
+    Lying Phase Methods
+    '''
+    @classmethod
+    async def sendNextImage(cls, bot, roomCode, username):
+        await Lying.sendNextImage(bot, cls._rooms[roomCode], username)
 
     
