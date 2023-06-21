@@ -7,5 +7,7 @@ async def sendPhase2Messages(bot, room):
 
 async def sendNextImage(bot, room, username):
     # TODO: Send the player the next image he should come up with a lie for
+    player = room.getNextPlayer()
+    player['imageLie'] = "A";
     return
 

@@ -179,7 +179,8 @@ async def take_lie(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return BotInitiator.LYING_PHASE
     
     
-    context.user_data['lie'] = update.message.text #TODO Put the players lie with the corresponding image
+    context.user_data['imageLie'].insertLie(update.message.text, update.message.from_user.username) #TODO Put the players lie with the corresponding image
+    
     # TODO: handle bad lies or failure to generate image
     print(context.user_data['lie'])
 

@@ -70,7 +70,7 @@ class Player:
 
     def getImageURL(self):
         try:
-            return self._user_data['imageURL']
+            return self._user_data['image']
         except KeyError:
             print("Player " + self._username + " has no imageURL key")
             return False
