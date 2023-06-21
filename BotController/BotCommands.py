@@ -180,6 +180,7 @@ async def take_lie(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     context.user_data['lie'] = update.message.text #TODO Put the players lie with the corresponding image
     # TODO: handle bad lies or failure to generate image
+    print(context.user_data['lie'])
 
     waitingID = await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "WaitingForItems", **{'item': "lie"})     #TODO find a way to delete this message when the next round starts
 
