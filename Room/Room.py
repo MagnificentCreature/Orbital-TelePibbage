@@ -41,14 +41,12 @@ class Room:
         return len(self._players) >= Room.MIN_PLAYERS
     
     async def broadcast(self, bot, message, messageKey=None,reply_markup=None, **kwargs):
-        asyncio.gather(
-            *[player.sendMessage(bot, message, messageKey, reply_markup, **kwargs) for player in self._players]
-        )
+        for player in self._players:
+            await player.sendMessage(bot, message, messageKey, reply_markup, **kwargs)
 
     async def broadCall(self, bot, func):
-        asyncio.gather(
-            *[func(bot, self, player) for player in self._players]
-        )   
+        for player in self._players:
+            func(bot, self, player)
 
     # Return a string of the players usernames in a list format
     def printPlayerList(self):
