@@ -104,12 +104,13 @@ async def take_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     #to save api calls, uncomment when ready to deploy
     context.user_data['prompt'] = update.message.text
-    # imageURL = await ImageGenerator.imageQuery(update.message.text)
-    # if imageURL is None:
-    #     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "InvalidPrompt")
-    #     return BotInitiator.PROMPTING_PHASE
-    # RoomHandler.takeImage(context.user_data['roomCode'], update.message.from_user.username, imageURL)
-    # await DialogueReader.sendImageURLByID(context.bot, update.message.from_user.id, imageURL)
+    await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "PromptRecieved")
+    imageURL = await ImageGenerator.imageQuery(update.message.text)
+    if imageURL is None:
+        await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "InvalidPrompt")
+        return BotInitiator.PROMPTING_PHASE
+    await RoomHandler.takeImage(context.user_data['roomCode'], update.message.from_user.username, update.message.text, imageURL)
+    await DialogueReader.sendImageURLByID(context.bot, update.message.from_user.id, imageURL)
 
     waitingID = await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "WaitingForItems", **{'item': "prompt"})     #TODO find a way to delete this message when the next phase starts
     await context.bot.send_message(chat_id=update.effective_chat.id, text='The image you generated: ' + context.user_data['prompt'])
@@ -181,7 +182,7 @@ async def take_lie(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     try:
         if context.user_data['next_lie'] is not None:
-            context.user_data['next_lie'].insertLie(update.message.text, update.message.from_user.username)
+            await context.user_data['next_lie'].insertLie(update.message.text, update.message.from_user.username)
             await RoomHandler.sendNextImage(context.bot, context.user_data["roomCode"], update.message.from_user.username)
             return BotInitiator.LYING_PHASE
     except KeyError:

@@ -11,16 +11,15 @@ async def sendPhase2Messages(bot, room):
     await room.broadcast(bot, "Phase2p1")
     await room.broadcast(bot, "Phase2p2")
 
-async def sendNextImage(bot, room, username):
+async def sendNextImage(bot, room, player):
     # TODO: Send the player the next image he should come up with a lie for
-    player = PlayersManager.queryPlayer(username)
-    imageList = room.getImageList(player)
+    imageList = await room.getImageList(player)
     if len(imageList) <= 0:
         player.setItem(Player.PlayerConstants.NEXT_LIE, None)
         player.setItem(Player.PlayerConstants.LIE, True)
         player.deleteContext(Player.PlayerConstants.NEXT_LIE)
         return None
-    image = imageList.imageList.pop(random.randint(0, len(imageList) - 1))
+    image = imageList.pop(random.randint(0, len(imageList) - 1))
     player.setItem(Player.PlayerConstants.NEXT_LIE, image) # fill second param with image
-    player.sendImage(bot, image.getImageURL())
+    await player.sendImageURL(bot, image.getImageURL())
 

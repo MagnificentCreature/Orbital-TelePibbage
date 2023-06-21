@@ -90,10 +90,10 @@ class Player:
             return False
     
     async def startGame(self):
-        await self.deleteContext('lobby_list')
+        self.deleteContext('lobby_list')
         self.setInGame()
 
-    async def deleteContext(self, key):
+    def deleteContext(self, key):
         del self._user_data[key]
 
     # Methods to send messages

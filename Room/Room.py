@@ -13,7 +13,7 @@ class Room:
     MAX_PLAYERS = 8
     MIN_PLAYERS = 2
     _state = 0 # 0 = join state, 1 = game state
-    _list_of_image = []
+    _list_of_images = []
     _playerToRemainingImages = {} #dictionary of player to list of images they have yet to give lies for
     
     class State(Enum):
@@ -45,7 +45,7 @@ class Room:
             *[player.sendMessage(bot, message, messageKey, reply_markup, **kwargs) for player in self._players]
         )
 
-    async def boardCall(self, bot, func):
+    async def broadCall(self, bot, func):
         asyncio.gather(
             *[func(bot, self, player) for player in self._players]
         )   
@@ -132,6 +132,7 @@ class Room:
             case Room.State.LYING_STATE:
                 # TODO: Maybe delete the players usercontext['lies']?
                 #await Voting.beginPhase3(bot, self)
+                print("going to voting phase")
                 self._state = Room.State.VOTING_STATE
             case Room.State.VOTING_STATE:
                 #await Reveal.beginPhase4(bot, self)
@@ -141,12 +142,12 @@ class Room:
 
     async def startGame(self, bot):
         for eachPlayer in self._players:
+            self._playerToRemainingImages[eachPlayer] = []
             if eachPlayer == self._host:
                 eachPlayer.setInGame()
                 continue
             await eachPlayer.sendMessage(bot, "StartingGame", **{'host':self._host.getUsername()})
             await eachPlayer.startGame()
-            self._playerToRemainingImages[eachPlayer] = []
         await self.advanceState(bot)
         return True
     
@@ -168,11 +169,11 @@ class Room:
             return False
         if self._state != Room.State.PROMPTING_STATE:
             return False
-        self._list_of_image.append(image)
+        self._list_of_images.append(image)
         for eachPlayer in self._players:
             if eachPlayer == player:
                 continue
-            self._playerToRemainingImages[player].append(image)
+            self._playerToRemainingImages[eachPlayer].append(image)
 
     async def getImageList(self, player):
         return self._playerToRemainingImages[player]
