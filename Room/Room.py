@@ -70,6 +70,9 @@ class Room:
             *[playerElem.editMessage("lobby_list", "LobbyList", **{'playerCount':len(self._players), 'maxPlayerCount':str(self.MAX_PLAYERS), 'lobbyList':self.printPlayerList()}) for playerElem in self._players]
         )
 
+    async def checkState(self, state):
+        return self._state == state
+
     # Add player to room
     # Fails if is already in or if room is full
     async def addPlayer(self, player, action, bot):
@@ -158,13 +161,9 @@ class Room:
             case Room.State.REVEAL_STATE:
                 print("Game Over")
 
-        
     # def setAllUserDataPhase(self, phase):
     #     for playerObj in self._players: 
     #         playerObj.setPhase(phase)
-
-    async def checkState(self, state):
-        return self._state == state
 
     #true if all have sent prompts and proceeded to lying phase, also sets player phase to lying phaseq
     async def checkItems(self, item, bot):

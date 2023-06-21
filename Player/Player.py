@@ -75,6 +75,11 @@ class Player:
             print("Player " + self._username + " has no imageURL key")
             return False
     
+    def setItem(self, itemKey, value):
+        if itemKey not in Player.PlayerConstants.__members__.values():
+            return False
+        self._user_data[itemKey.value] = value
+
     def querySentItem(self, itemKey):
         if itemKey not in Player.PlayerConstants.__members__.values():
             return False
