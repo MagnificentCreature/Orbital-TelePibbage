@@ -171,7 +171,6 @@ class Room:
         for eachPlayer in self._players:
             if eachPlayer == player:
                 continue
-            self._playerToRemainingImages[eachPlayer].append(image)
- #Hi           
+            self._playerToRemainingImages[eachPlayer].append(image)           
     
              
