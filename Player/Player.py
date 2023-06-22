@@ -79,7 +79,6 @@ class Player:
     def setItem(self, itemKey, value):
         if itemKey not in Player.PlayerConstants.__members__.values():
             return False
-        print("Setting " + itemKey.value + " to " + str(value))
         self._user_data[itemKey.value] = value
 
     def querySentItem(self, itemKey):
@@ -95,7 +94,10 @@ class Player:
         self.setInGame()
 
     def deleteContext(self, key):
-        del self._user_data[key]
+        try:
+            del self._user_data[key]
+        except KeyError:
+            del self._user_data[key.value]
 
     # Methods to send messages
     async def editMessage(self, messageKey, message, newMessageKey=None, reply_markup=None):

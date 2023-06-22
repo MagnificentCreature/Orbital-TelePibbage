@@ -189,11 +189,9 @@ async def take_lie(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 return BotInitiator.VOTING_PHASE
             return BotInitiator.LYING_PHASE
     except KeyError:
-        print("Key error?")
         return BotInitiator.LYING_PHASE
     
     # TODO: handle bad lies or failure to generate image
-    print("WHY AM I HERE")
     return BotInitiator.LYING_PHASE
     # waitingID = await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "WaitingForItems", **{'item': "lie"})     #TODO find a way to delete this message when the next round starts
     # await RoomHandler.checkItems(context.user_data['roomCode'], Player.PlayerConstants.LIE, context.bot)

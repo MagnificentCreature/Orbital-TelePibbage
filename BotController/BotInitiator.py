@@ -82,12 +82,12 @@ def main() -> None:
     # In game conversation handler
     game_conv_handler = ConversationHandler(
         entry_points=[
-                CallbackQueryHandler(BotCommands.start_game, pattern="^" + str(START_GAME) + "$"),
-                MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.take_prompt),
+                CallbackQueryHandler(BotCommands.start_game, pattern="^" + str(START_GAME) + "$", block=False),
+                MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.take_prompt, block=False),
             ],
         states={
             PROMPTING_PHASE: [
-                MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.take_prompt),
+                MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.take_prompt, block=False),
             ],
             LYING_PHASE: [
                 MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.take_lie),
