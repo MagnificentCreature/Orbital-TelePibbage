@@ -30,6 +30,8 @@ from ImageGeneration import ImageGenerator
 from BotController import BotInitiator
 from GameController import Lying
 
+MIN_PROMPT_LENGTH = 3
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await PlayersManager.recordNewPlayer(update.message.from_user.username, update.message.from_user.id, context.user_data)
     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "Welcome1")
@@ -103,7 +105,7 @@ async def take_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     prompt = update.message.text
     # check if prompt is less than 3 words
-    if len(prompt.split(" ")) < 3:
+    if len(prompt.split(" ")) < MIN_PROMPT_LENGTH:
         await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "PromptFewWords")
         return BotInitiator.PROMPTING_PHASE
     #to save api calls, uncomment when ready to deploy
