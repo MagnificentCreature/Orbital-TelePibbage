@@ -8,13 +8,7 @@ import time
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton, Update
 from BotController import BotCommands
 from telegram.ext import (
-    # Application,
-    CallbackQueryHandler,
-    # CommandHandler,
     ContextTypes,
-    # ConversationHandler,
-    # MessageHandler,
-    # filters,
 )
 
 import sys
@@ -202,6 +196,7 @@ async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYP
     data = query.data.split(':')
     image_url = data[1]
     player = data[2]
+    update.callback_query.answer()
 
     room = RoomHandler.getRoom(context.user_data['roomCode'])
     image_list = room.getImageList()
@@ -214,6 +209,8 @@ async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYP
                     PlayersManager.addPoints(update.message.from_user.username)
 
                     print(f"Selected lie: {lie}")
+
+
 
     # await query.answer()  
     return BotInitiator.REVEAL_PHASE  
