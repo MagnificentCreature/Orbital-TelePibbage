@@ -23,6 +23,7 @@ RETURN_TO_FRESH = map(chr, range(3,4))
 # In_game level commands
 ENTER_PROMPT, ENTER_LIE, VOTE_LIE, VOTE_TRUTH = map(chr, range(4,8))
 #Shortcut for Conversation Handler END
+VOTE = 'vote_\d+'
 END = ConversationHandler.END
 
 # for FRESH
@@ -69,9 +70,9 @@ logging.basicConfig(
     level=logging.INFO
 )
 
-FRESH, ENTERCODE, INROOM, WAITING_FOR_HOST, PROMPTING_PHASE, LYING_PHASE, VOTING_PHASE = range(7)
+FRESH, ENTERCODE, INROOM, WAITING_FOR_HOST, PROMPTING_PHASE, LYING_PHASE, VOTING_PHASE, REVEAL_PHASE = range(8)
 # create option 1 to 8 for the voting round
-OPTION1, OPTION2, OPTION3, OPTION4, OPTION5, OPTION6, OPTION7, OPTION8 = map(chr, range(7,15))
+OPTION1, OPTION2, OPTION3, OPTION4, OPTION5, OPTION6, OPTION7, OPTION8 = map(chr, range(8,16))
 
 #Shortcut for returning to FRESH
 FRESH_CALLBACK = CallbackQueryHandler(BotCommands.return_to_fresh, pattern="^" + str(RETURN_TO_FRESH) + "$")
@@ -82,19 +83,18 @@ def main() -> None:
     # In game conversation handler
     game_conv_handler = ConversationHandler(
         entry_points=[
-                CallbackQueryHandler(BotCommands.start_game, pattern="^" + str(START_GAME) + "$", block=False),
-                MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.take_prompt, block=False),
+                CallbackQueryHandler(BotCommands.start_game, pattern="^" + str(START_GAME) + "$"),
+                MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.take_prompt),
             ],
         states={
             PROMPTING_PHASE: [
-                MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.take_prompt, block=False),
+                MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.take_prompt),
             ],
             LYING_PHASE: [
                 MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.take_lie),
             ],
             VOTING_PHASE: [
-                # TODO more stuff
-                MessageHandler(filters.COMMAND, BotCommands.unknown)
+                CallbackQueryHandler(BotCommands.handle_vote_callback, pattern="^" + VOTE + "$"),
             ]
         },
         fallbacks=[MessageHandler(filters.COMMAND, BotCommands.unknown)],
@@ -106,7 +106,7 @@ def main() -> None:
 
     # Add conversation handler with the states GENDER, PHOTO, LOCATION and BIO
     main_conv_handler = ConversationHandler(
-        entry_points=[CommandHandler("start", BotCommands.start, block=False)],
+        entry_points=[CommandHandler("start", BotCommands.start)],
         states={
             FRESH: [CommandHandler("start", BotCommands.start),
                     CallbackQueryHandler(BotCommands.create_room, pattern="^" + str(CREATE_ROOM) + "$"),

@@ -197,5 +197,26 @@ async def take_lie(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # await RoomHandler.checkItems(context.user_data['roomCode'], Player.PlayerConstants.LIE, context.bot)
     # return BotInitiator.VOTING_PHASE
 
+async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    data = query.data.split(':')
+    image_url = data[1]
+    player = data[2]
+
+    room = RoomHandler.getRoom(context.user_data['roomCode'])
+    image_list = room.getImageList()
+
+    for imageObj in image_list:
+        if imageObj.getImageURL() == image_url:
+            for lie, lie_player in imageObj.getImageLies():
+
+                if lie_player == player:
+                    PlayersManager.addPoints(update.message.from_user.username)
+
+                    print(f"Selected lie: {lie}")
+
+    # await query.answer()  
+    return BotInitiator.REVEAL_PHASE  
+
 async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "UnknownCommand")

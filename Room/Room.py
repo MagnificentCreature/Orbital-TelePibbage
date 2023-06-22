@@ -4,7 +4,9 @@ Class that holds data about rooms
 from enum import Enum
 import asyncio
 from BotController import BotInitiator
-from GameController import Prompting, Lying #, Voting, Reveal
+from GameController import Prompting, Lying, Voting#,  Reveal
+from GameController.Image import Image
+from telegram import InlineKeyboardMarkup, InlineKeyboardButton, Update
 
 class Room:
     _code = ""
@@ -14,6 +16,19 @@ class Room:
     MIN_PLAYERS = 2
     _state = 0 # 0 = join state, 1 = game state
     _list_of_images = []
+
+    # _list_of_images = [
+    #     Image("Author 1", "Prompt 1", "https://example.com/image1.jpg"),
+    #     Image("Author 2", "Prompt 2", "https://example.com/image2.jpg"),
+    #     Image("Author 3", "Prompt 3", "https://example.com/image3.jpg")
+    # ]
+
+    # # Insert some sample lies for testing
+    # _list_of_images[0].insertLie("Lie 1 by Player 1", "Player 1")
+    # _list_of_images[0].insertLie("Lie 2 by Player 2", "Player 2")
+    # _list_of_images[1].insertLie("Lie 3 by Player 1", "Player 1")
+    # _list_of_images[2].insertLie("Lie 4 by Player 2", "Player 2")
+
     _playerToRemainingImages = {} #dictionary of player to list of images they have yet to give lies for
     
     class State(Enum):
@@ -129,7 +144,7 @@ class Room:
                 self._state = Room.State.LYING_STATE
             case Room.State.LYING_STATE:
                 # TODO: Maybe delete the players usercontext['lies']?
-                #await Voting.beginPhase3(bot, self)
+                await Voting.beginPhase3(bot, self)
                 print("going to voting phase")
                 self._state = Room.State.VOTING_STATE
             case Room.State.VOTING_STATE:
@@ -171,6 +186,21 @@ class Room:
         for eachPlayer in self._players:
             if eachPlayer == player:
                 continue
-            self._playerToRemainingImages[eachPlayer].append(image)           
+            self._playerToRemainingImages[eachPlayer].append(image) 
+
+    async def getImageList(self, player):
+        return self._playerToRemainingImages[player]                      
     
-             
+    async def collate_votes(self, bot):
+        print('collate run')
+        #in each image object, contains an array with tuples of (lie, player)
+        for imageObj in self._list_of_images:
+            image_url = imageObj.getImageURL()
+            lie_buttons = imageObj.getInlineKeyboard()
+            print('buttons '+ str(lie_buttons))
+
+            for eachPlayer in self._players:
+                #await bot.send_message(chat_id=eachPlayer.getChatID(), text='everyone in', reply_markup=lie_buttons)
+                await eachPlayer.sendImageURL(bot, image_url, reply_markup=lie_buttons)     
+
+                
