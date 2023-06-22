@@ -79,6 +79,7 @@ class Player:
     def setItem(self, itemKey, value):
         if itemKey not in Player.PlayerConstants.__members__.values():
             return False
+        print("Setting " + itemKey.value + " to " + str(value))
         self._user_data[itemKey.value] = value
 
     def querySentItem(self, itemKey):

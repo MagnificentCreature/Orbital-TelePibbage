@@ -18,9 +18,9 @@ async def sendNextImage(bot, room, player):
         player.setItem(Player.PlayerConstants.NEXT_LIE, None)
         player.setItem(Player.PlayerConstants.LIE, True)
         player.deleteContext(Player.PlayerConstants.NEXT_LIE)
+        print("DONE")
         return False
     image = imageList.pop(random.randint(0, len(imageList) - 1))
     player.setItem(Player.PlayerConstants.NEXT_LIE, image) # fill second param with image
     await player.sendImageURL(bot, image.getImageURL())
     return True
-

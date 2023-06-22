@@ -94,6 +94,7 @@ def main() -> None:
             ],
             VOTING_PHASE: [
                 # TODO more stuff
+                MessageHandler(filters.COMMAND, BotCommands.unknown)
             ]
         },
         fallbacks=[MessageHandler(filters.COMMAND, BotCommands.unknown)],

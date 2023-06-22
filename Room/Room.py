@@ -46,7 +46,7 @@ class Room:
 
     async def broadCall(self, bot, func):
         for player in self._players:
-            func(bot, self, player)
+            await func(bot, self, player)
 
     # Return a string of the players usernames in a list format
     def printPlayerList(self):

@@ -37,4 +37,4 @@ RoomCreationFailed, Failed to create room
 UnknownCommand, Sorry, I did not understand that command.
 NotHost, You are not the host. Only the host can start the game.
 NotEnoughPlayers, Not enough players to start the game. Need at least 2 players.
-InvalidPrompt, Prompt was invalid for various reasons, try sending another prompt again
+InvalidPrompt, Image was censored for various reasons, try sending the same prompt or another prompt again

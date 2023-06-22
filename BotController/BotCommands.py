@@ -4,7 +4,6 @@ Handles user commands
 
 import asyncio
 import time
-import logging
 
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton, Update
 from BotController import BotCommands
@@ -103,12 +102,12 @@ async def take_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     #asyncio.wait_for(ImageGenerator.imageQuery(update.message).wait(), timeout=60)
 
     #to save api calls, uncomment when ready to deploy
-    context.user_data['prompt'] = update.message.text
     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "PromptRecieved")
     imageURL = await ImageGenerator.imageQuery(update.message.text)
     if imageURL is None:
         await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "InvalidPrompt")
         return BotInitiator.PROMPTING_PHASE
+    context.user_data['prompt'] = update.message.text
     await RoomHandler.takeImage(context.user_data['roomCode'], update.message.from_user.username, update.message.text, imageURL)
     await DialogueReader.sendImageURLByID(context.bot, update.message.from_user.id, imageURL)
 
@@ -178,6 +177,7 @@ async def take_lie(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # check if the room is in the lying state
     if not await RoomHandler.checkState(context.user_data['roomCode'], Room.State.LYING_STATE):
         # TODO Handle the phase error
+        print("Error: Not in lying phase")
         return BotInitiator.LYING_PHASE
     
     try:
@@ -189,15 +189,15 @@ async def take_lie(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 return BotInitiator.VOTING_PHASE
             return BotInitiator.LYING_PHASE
     except KeyError:
-        logging.log(0, "Key error in lying phase, player does not have next_lie")
+        print("Key error?")
         return BotInitiator.LYING_PHASE
     
     # TODO: handle bad lies or failure to generate image
-    
-    waitingID = await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "WaitingForItems", **{'item': "lie"})     #TODO find a way to delete this message when the next round starts
-    await RoomHandler.checkItems(context.user_data['roomCode'], Player.PlayerConstants.LIE, context.bot)
-    return BotInitiator.VOTING_PHASE
-    # TODO handle lies and continue the gameplay
+    print("WHY AM I HERE")
+    return BotInitiator.LYING_PHASE
+    # waitingID = await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "WaitingForItems", **{'item': "lie"})     #TODO find a way to delete this message when the next round starts
+    # await RoomHandler.checkItems(context.user_data['roomCode'], Player.PlayerConstants.LIE, context.bot)
+    # return BotInitiator.VOTING_PHASE
 
 async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "UnknownCommand")
