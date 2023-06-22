@@ -94,7 +94,7 @@ def main() -> None:
                 MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.take_lie),
             ],
             VOTING_PHASE: [
-                CallbackQueryHandler(BotCommands.handle_vote_callback, pattern="^" + VOTE + "$"),
+                CallbackQueryHandler(BotCommands.handle_vote_callback, pattern=r"^vote+$"),
             ]
         },
         fallbacks=[MessageHandler(filters.COMMAND, BotCommands.unknown)],

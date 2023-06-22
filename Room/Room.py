@@ -16,6 +16,8 @@ class Room:
     MIN_PLAYERS = 2
     _state = 0 # 0 = join state, 1 = game state
     _list_of_images = []
+    _list_copy = []
+    _voting_image = None
 
     # _list_of_images = [
     #     Image("Author 1", "Prompt 1", "https://example.com/image1.jpg"),
@@ -145,6 +147,7 @@ class Room:
             case Room.State.LYING_STATE:
                 # TODO: Maybe delete the players usercontext['lies']?
                 await Voting.beginPhase3(bot, self)
+                self._list_copy = self._list_of_images.copy()
                 print("going to voting phase")
                 self._state = Room.State.VOTING_STATE
             case Room.State.VOTING_STATE:
@@ -190,17 +193,30 @@ class Room:
 
     async def getImageList(self, player):
         return self._playerToRemainingImages[player]                      
-    
+
     async def collate_votes(self, bot):
         print('collate run')
-        #in each image object, contains an array with tuples of (lie, player)
-        for imageObj in self._list_of_images:
-            image_url = imageObj.getImageURL()
-            lie_buttons = imageObj.getInlineKeyboard()
-            print('buttons '+ str(lie_buttons))
 
-            for eachPlayer in self._players:
-                #await bot.send_message(chat_id=eachPlayer.getChatID(), text='everyone in', reply_markup=lie_buttons)
-                await eachPlayer.sendImageURL(bot, image_url, reply_markup=lie_buttons)     
+        if len(self._list_copy) <= 0:
+            print('empty list copy')
+            return False
 
-                
+        imageObj = self._list_copy.pop()
+
+        image_url = imageObj.getImageURL()
+        lie_buttons = imageObj.getInlineKeyboard()
+        author = imageObj.getAuthor()
+        print('buttons '+ str(lie_buttons))
+
+        self._voting_image = imageObj
+
+        for eachPlayer in self._players:
+            if eachPlayer.getUsername() == author:
+                await eachPlayer.sendImageURL(bot, image_url)    
+            else:
+                await eachPlayer.sendImageURL(bot, image_url, reply_markup=lie_buttons) 
+
+    async def getVotingImage(self):
+        return self._voting_image  
+ 
+                        

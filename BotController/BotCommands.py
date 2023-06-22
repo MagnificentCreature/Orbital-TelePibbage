@@ -198,22 +198,27 @@ async def take_lie(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # return BotInitiator.VOTING_PHASE
 
 async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
+    query = update.callback_query.message
     data = query.data.split(':')
-    image_url = data[1]
-    player = data[2]
+    # image_url = data[1]
+    lie_author = data[1]
+    player = update.callback_query.from_user.username
 
     room = RoomHandler.getRoom(context.user_data['roomCode'])
-    image_list = room.getImageList()
+    image_list = room.getImageList(player)
 
-    for imageObj in image_list:
-        if imageObj.getImageURL() == image_url:
-            for lie, lie_player in imageObj.getImageLies():
+    votingImage = room.getVotingImage()
 
-                if lie_player == player:
-                    PlayersManager.addPoints(update.message.from_user.username)
+    
 
-                    print(f"Selected lie: {lie}")
+    # for imageObj in image_list:
+    #     if imageObj.getImageURL() == image_url:
+    #         for lie, lie_player in imageObj.getImageLies():
+
+    #             if lie_player == player:
+    #                 PlayersManager.addPoints(update.message.from_user.username)
+
+    #                 print(f"Selected lie: {lie}")
 
     # await query.answer()  
     return BotInitiator.REVEAL_PHASE  
