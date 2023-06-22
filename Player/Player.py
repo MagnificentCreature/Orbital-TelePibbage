@@ -26,6 +26,9 @@ class Player:
         self._user_data = _user_data
         _user_data['in_game'] = False
         _user_data['roomCode'] = ""
+
+    def __str__(self):
+        return self._username
         
     def updateUserData(self, _user_data):
         # Initialise the user data
