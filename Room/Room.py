@@ -172,9 +172,6 @@ class Room:
             if eachPlayer == player:
                 continue
             self._playerToRemainingImages[eachPlayer].append(image)
-
-    async def getImageList(self, player):
-        return self._playerToRemainingImages[player]
-            
+ #Hi           
     
              
