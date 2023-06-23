@@ -159,12 +159,19 @@ async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYP
     await votingImage.addPlayersTricked(lieAuthor, playerTricked)
     context.user_data['has_voted'] = True
     await DialogueReader.sendMessageByID(context.bot, update.callback_query.from_user.id, "WaitingForItems", **{'item': "vote"})     #TODO find a way to delete this message when the next round starts    
+    
+    # checkItems returns True after everyone places voe for one image
     if await room.checkItems(Player.PlayerConstants.HAS_VOTED, context.bot, advance=False):
+        #reveal
+        votingImage.showPlayersTricked()
+
+        # checks anymore images 
         hasNext = await room.broadcast_voting_image(context.bot)
         if not hasNext:
             await room.advanceState(context.bot)
             return BotInitiator.REVEAL_PHASE
         context.user_data['has_voted'] = False
+
         return BotInitiator.LYING_PHASE
 
     # for imageObj in image_list:

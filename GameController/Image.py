@@ -62,4 +62,6 @@ class Image:
             else:
                 message += f"This was a LIE by {lieAuthor}"
 
+        #add who gains points
+
         return message
