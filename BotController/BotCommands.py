@@ -184,6 +184,5 @@ async def reveal_lies(update: Update, context: ContextTypes.DEFAULT_TYPE):
     votingImage = await room.getVotingImage()
     await votingImage.showPlayersTricked()
 
-
 async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "UnknownCommand")

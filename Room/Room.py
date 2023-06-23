@@ -5,7 +5,7 @@ from enum import Enum
 import asyncio
 from collections import deque
 from BotController import BotInitiator
-from GameController import Prompting, Lying, Voting#,  Reveal
+from GameController import Prompting, Lying, Voting, Reveal
 from GameController.Image import Image
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton, Update
 
@@ -153,7 +153,7 @@ class Room:
                 await Voting.beginPhase3(bot, self)
                 self._state = Room.State.VOTING_STATE
             case Room.State.VOTING_STATE:
-                #await Reveal.beginPhase4(bot, self)
+                await Reveal.beginPhase4(bot, self)
                 print("GOING TO THE REVEAL STATE")
                 self._state = Room.State.REVEAL_STATE
             case Room.State.REVEAL_STATE:
@@ -207,7 +207,6 @@ class Room:
         image_url = imageObj.getImageURL()
         author = imageObj.getAuthor()
         # print('buttons '+ str(lie_buttons))
-
 
         self._current_voting_image = imageObj
 
