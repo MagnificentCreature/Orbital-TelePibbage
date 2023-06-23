@@ -147,9 +147,7 @@ async def take_lie(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
-    print(query)
-    print(query.message)
-    data = query.split(':')
+    data = query.data.split(':')
     lie = data[1]
     lieAuthor = data[2]
     playerTricked = update.callback_query.from_user.username
@@ -157,15 +155,16 @@ async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYP
     room = RoomHandler.getRoom(context.user_data['roomCode'])
     # image_list = room.getImageList(player)
 
-    votingImage = room.getVotingImage()
-    print('player tricked ' + playerTricked)
-    votingImage.addPlayersTricked(lieAuthor, playerTricked)
+    votingImage = await room.getVotingImage()
+    await votingImage.addPlayersTricked(lieAuthor, playerTricked)
     context.user_data['has_voted'] = True
-    await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "WaitingForItems", **{'item': "vote"})     #TODO find a way to delete this message when the next round starts    
-    if room.checkItems(Player.PlayerConstants.HAS_VOTED, context.bot, advance=False):
-        hasNext = room.broadcastImage()
+    await DialogueReader.sendMessageByID(context.bot, update.callback_query.from_user.id, "WaitingForItems", **{'item': "vote"})     #TODO find a way to delete this message when the next round starts    
+    if await room.checkItems(Player.PlayerConstants.HAS_VOTED, context.bot, advance=False):
+        hasNext = await room.broadcast_voting_image(context.bot)
         if not hasNext:
+            await room.advanceState(context.bot)
             return BotInitiator.REVEAL_PHASE
+        context.user_data['has_voted'] = False
         return BotInitiator.LYING_PHASE
 
     # for imageObj in image_list:
@@ -182,8 +181,8 @@ async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYP
 
 async def reveal_lies(update: Update, context: ContextTypes.DEFAULT_TYPE):
     room = RoomHandler.getRoom(context.user_data['roomCode'])
-    votingImage = room.getVotingImage()
-    votingImage.showPlayersTricked()
+    votingImage = await room.getVotingImage()
+    await votingImage.showPlayersTricked()
 
 
 async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):

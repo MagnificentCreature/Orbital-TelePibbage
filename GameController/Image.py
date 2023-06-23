@@ -7,6 +7,7 @@ import random
 class Image:
     author = "a" #store author
     prompt = "a"
+    correct_players = []
     imageURL = "a" #store imageURL
     imageLies = {} #store imageLies as a dict:tuple of lie_author:(lie, [list of players who fell for the lie])
 
@@ -28,7 +29,12 @@ class Image:
         self.imageLies[lieAuthor] = (lie, [])
 
     async def addPlayersTricked(self, lieAuthor, playerTricked):
-        self.imageLies[lieAuthor][1].append(playerTricked.getUsername())
+        if lieAuthor == self.author:
+            # if the prompt picked was by the original author means its the truth
+            self.correct_players.append(playerTricked)
+            return
+        self.imageLies[lieAuthor][1].append(playerTricked)
+        
 
     def getInlineKeyboard(self):
         lie_buttons = []

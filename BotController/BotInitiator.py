@@ -93,6 +93,9 @@ def main() -> None:
             ],
             VOTING_PHASE: [
                 CallbackQueryHandler(BotCommands.handle_vote_callback, pattern=VOTE_REGEX),
+            ],
+            REVEAL_PHASE: [
+                MessageHandler(filters.COMMAND, BotCommands.unknown)
             ]
         },
         fallbacks=[MessageHandler(filters.COMMAND, BotCommands.unknown)],

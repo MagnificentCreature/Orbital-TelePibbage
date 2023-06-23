@@ -9,6 +9,8 @@ from GameController import Prompting, Lying, Voting#,  Reveal
 from GameController.Image import Image
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton, Update
 
+from Player.Player import Player
+
 class Room:
     _code = ""
     _host = None #player object
@@ -152,6 +154,7 @@ class Room:
                 self._state = Room.State.VOTING_STATE
             case Room.State.VOTING_STATE:
                 #await Reveal.beginPhase4(bot, self)
+                print("GOING TO THE REVEAL STATE")
                 self._state = Room.State.REVEAL_STATE
             case Room.State.REVEAL_STATE:
                 print("Game Over")
@@ -196,21 +199,27 @@ class Room:
         return self._playerToRemainingImages[player]                      
 
     async def broadcast_voting_image(self, bot):
+        if len(self._list_copy) <= 0:
+            print("list is empty")
+            return False 
+
         imageObj = self._list_copy.pop()
         image_url = imageObj.getImageURL()
         lie_buttons = imageObj.getInlineKeyboard()
         author = imageObj.getAuthor()
         # print('buttons '+ str(lie_buttons))
+        
 
         self._current_voting_image = imageObj
 
         for eachPlayer in self._players:
             if eachPlayer.getUsername() == author:
+                eachPlayer.setItem(Player.PlayerConstants.HAS_VOTED, True)
                 await eachPlayer.sendImageURL(bot, image_url)    
             else:
                 await eachPlayer.sendImageURL(bot, image_url, reply_markup=lie_buttons)
-        if len(self._list_copy) <= 0:
-            return False #Return false to indicate that there are no more images to send after
+        # if len(self._list_copy) <= 0:
+        #     return False #Return false to indicate that there are no more images to send after
         return True
 
     async def getVotingImage(self):
