@@ -128,8 +128,8 @@ class Player:
         if messageKey != None:
             self._user_data[messageKey] = messasgeID
 
-    async def sendMessage(self, bot, message, messageKey=None, reply_markup=None, **kwargs):
-        messasgeID = await DialogueReader.sendMessageByID(bot, self._chatID, message, reply_markup=reply_markup, **kwargs)
+    async def sendMessage(self, bot, message, messageKey=None, reply_markup=None, raw=False, **kwargs):
+        messasgeID = await DialogueReader.sendMessageByID(bot, self._chatID, message, reply_markup=reply_markup, raw=raw, **kwargs)
         if messageKey != None:
             self._user_data[messageKey] = messasgeID
         
