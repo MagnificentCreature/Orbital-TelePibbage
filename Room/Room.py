@@ -5,7 +5,7 @@ from enum import Enum
 import asyncio
 from collections import deque
 from BotController import BotInitiator
-from GameController import Prompting, Lying, Voting#,  Reveal
+from GameController import Prompting, Lying, Voting, Reveal
 from GameController.Image import Image
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton, Update
 
@@ -60,9 +60,9 @@ class Room:
     def hasMinPlayers(self):
         return len(self._players) >= Room.MIN_PLAYERS
     
-    async def broadcast(self, bot, message, messageKey=None,reply_markup=None, **kwargs):
+    async def broadcast(self, bot, message, messageKey=None,reply_markup=None, raw=False, **kwargs):
         for player in self._players:
-            await player.sendMessage(bot, message, messageKey, reply_markup, **kwargs)
+            await player.sendMessage(bot, message, messageKey, reply_markup, raw=raw, **kwargs)
 
     async def broadCall(self, bot, func):
         for player in self._players:
@@ -153,7 +153,7 @@ class Room:
                 await Voting.beginPhase3(bot, self)
                 self._state = Room.State.VOTING_STATE
             case Room.State.VOTING_STATE:
-                #await Reveal.beginPhase4(bot, self)
+                await Reveal.beginPhase4(bot, self)
                 print("GOING TO THE REVEAL STATE")
                 self._state = Room.State.REVEAL_STATE
             case Room.State.REVEAL_STATE:
@@ -205,10 +205,8 @@ class Room:
 
         imageObj = self._list_copy.pop()
         image_url = imageObj.getImageURL()
-        lie_buttons = imageObj.getInlineKeyboard()
         author = imageObj.getAuthor()
         # print('buttons '+ str(lie_buttons))
-        
 
         self._current_voting_image = imageObj
 
@@ -217,7 +215,7 @@ class Room:
                 eachPlayer.setItem(Player.PlayerConstants.HAS_VOTED, True)
                 await eachPlayer.sendImageURL(bot, image_url)    
             else:
-                await eachPlayer.sendImageURL(bot, image_url, reply_markup=lie_buttons)
+                await eachPlayer.sendImageURL(bot, image_url, reply_markup=imageObj.getInlineKeyboard(eachPlayer.getUsername()))
         # if len(self._list_copy) <= 0:
         #     return False #Return false to indicate that there are no more images to send after
         return True
