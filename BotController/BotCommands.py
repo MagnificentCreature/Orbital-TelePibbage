@@ -30,6 +30,8 @@ from ImageGeneration import ImageGenerator
 from BotController import BotInitiator
 from GameController import Lying
 
+MIN_PROMPT_LENGTH = 3
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await PlayersManager.recordNewPlayer(update.message.from_user.username, update.message.from_user.id, context.user_data)
     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "Welcome1")
@@ -101,14 +103,19 @@ async def take_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # TODO: handle bad prompts or failure to generate image
     #asyncio.wait_for(ImageGenerator.imageQuery(update.message).wait(), timeout=60)
 
+    prompt = update.message.text
+    # check if prompt is less than 3 words
+    if len(prompt.split(" ")) < MIN_PROMPT_LENGTH:
+        await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "PromptFewWords")
+        return BotInitiator.PROMPTING_PHASE
     #to save api calls, uncomment when ready to deploy
     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "PromptRecieved")
-    imageURL = await ImageGenerator.imageQuery(update.message.text)
+    imageURL = await ImageGenerator.imageQuery(prompt)
     if imageURL is None:
         await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "InvalidPrompt")
         return BotInitiator.PROMPTING_PHASE
-    context.user_data['prompt'] = update.message.text
-    await RoomHandler.takeImage(context.user_data['roomCode'], update.message.from_user.username, update.message.text, imageURL)
+    context.user_data['prompt'] = prompt
+    await RoomHandler.takeImage(context.user_data['roomCode'], update.message.from_user.username, prompt, imageURL)
     await DialogueReader.sendImageURLByID(context.bot, update.message.from_user.id, imageURL)
 
     waitingID = await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "WaitingForItems", **{'item': "prompt"})     #TODO find a way to delete this message when the next phase starts
@@ -159,12 +166,19 @@ async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYP
     await votingImage.addPlayersTricked(lieAuthor, playerTricked)
     context.user_data['has_voted'] = True
     await DialogueReader.sendMessageByID(context.bot, update.callback_query.from_user.id, "WaitingForItems", **{'item': "vote"})     #TODO find a way to delete this message when the next round starts    
+    
+    # checkItems returns True after everyone places voe for one image
     if await room.checkItems(Player.PlayerConstants.HAS_VOTED, context.bot, advance=False):
+        #reveal
+        votingImage.showPlayersTricked()
+
+        # checks anymore images 
         hasNext = await room.broadcast_voting_image(context.bot)
         if not hasNext:
             await room.advanceState(context.bot)
             return BotInitiator.REVEAL_PHASE
         context.user_data['has_voted'] = False
+
         return BotInitiator.LYING_PHASE
 
     # for imageObj in image_list:
@@ -183,7 +197,6 @@ async def reveal_lies(update: Update, context: ContextTypes.DEFAULT_TYPE):
     room = RoomHandler.getRoom(context.user_data['roomCode'])
     votingImage = await room.getVotingImage()
     await votingImage.showPlayersTricked()
-
 
 async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "UnknownCommand")
