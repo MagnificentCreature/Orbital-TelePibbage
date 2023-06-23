@@ -122,6 +122,10 @@ class RoomHandler:
     def checkItems(cls, roomCode, item, bot):
         return cls._rooms[roomCode].checkItems(item, bot)
     
+    @classmethod
+    def getRoom(cls, roomCode):
+        return cls._rooms[roomCode]  
+    
     '''
     Prompting Phase methods
     '''

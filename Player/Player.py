@@ -18,6 +18,7 @@ class Player:
         PROMPT = "prompt"
         LIE = "lie"
         NEXT_LIE = "next_lie"
+        HAS_VOTED = "has_voted"
     
     def __init__(self, username, chatID=0, _user_data={}, score=0, sentPrompt=False):
         self._username = username
@@ -26,6 +27,9 @@ class Player:
         self._user_data = _user_data
         _user_data['in_game'] = False
         _user_data['roomCode'] = ""
+
+    def __str__(self):
+        return self._username
         
     def updateUserData(self, _user_data):
         # Initialise the user data
@@ -45,6 +49,9 @@ class Player:
     
     def getUsername(self):
         return self._username
+
+    def getChatID(self):
+        return self._chatID
     
     def inRoom(self):
         return self._user_data['roomCode'] != ""
@@ -116,13 +123,13 @@ class Player:
         del self._user_data[messageKey]
 
     # Including a message key will store the message's ID in the user_data which can be editted later
-    async def sendMessage(self, bot, message, messageKey=None, reply_markup=None):
-        messasgeID = await DialogueReader.sendMessageByID(bot, self._chatID, message, reply_markup=reply_markup)
+    async def sendMessage(self, bot, message, messageKey=None, reply_markup=None, raw=False):
+        messasgeID = await DialogueReader.sendMessageByID(bot, self._chatID, message, raw=raw, reply_markup=reply_markup)
         if messageKey != None:
             self._user_data[messageKey] = messasgeID
 
-    async def sendMessage(self, bot, message, messageKey=None, reply_markup=None, **kwargs):
-        messasgeID = await DialogueReader.sendMessageByID(bot, self._chatID, message, reply_markup=reply_markup, **kwargs)
+    async def sendMessage(self, bot, message, messageKey=None, reply_markup=None, raw=False, **kwargs):
+        messasgeID = await DialogueReader.sendMessageByID(bot, self._chatID, message, reply_markup=reply_markup, raw=raw, **kwargs)
         if messageKey != None:
             self._user_data[messageKey] = messasgeID
         

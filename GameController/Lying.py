@@ -13,7 +13,7 @@ async def sendPhase2Messages(bot, room):
 
 async def sendNextImage(bot, room, player):
     # TODO: Send the player the next image he should come up with a lie for
-    imageList = await room.getImageList(player)
+    imageList = await room.getRemainingImages(player)
     if len(imageList) <= 0:
         player.deleteContext(Player.PlayerConstants.NEXT_LIE.value)
         player.setItem(Player.PlayerConstants.LIE, True)
