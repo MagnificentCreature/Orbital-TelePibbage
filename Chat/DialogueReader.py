@@ -63,7 +63,7 @@ class DialogueReader:
         formattedText = cls.additionalProcessing(cls._dialogues[message])
         try:
             if raw:
-                return await bot.send_message(chat_id=chat_id, text=message, reply_markup=reply_markup)
+                return await bot.send_message(chat_id=chat_id, text=message, reply_markup=reply_markup) 
             return await bot.send_message(chat_id=chat_id, text=formattedText, reply_markup=reply_markup)
         except error.Forbidden as e:
             logging.error("Error sending message to chat_id " + str(chat_id) + ": " + str(e))
