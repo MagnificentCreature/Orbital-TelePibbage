@@ -3,6 +3,7 @@ Class that holds data about rooms
 """
 from enum import Enum
 import asyncio
+from collections import deque
 from BotController import BotInitiator
 from GameController import Prompting, Lying, Voting#,  Reveal
 from GameController.Image import Image
@@ -16,8 +17,8 @@ class Room:
     MIN_PLAYERS = 2
     _state = 0 # 0 = join state, 1 = game state
     _list_of_images = []
-    _list_copy = []
-    _voting_image = None
+    _list_copy = None
+    _current_voting_image = None
 
     # _list_of_images = [
     #     Image("Author 1", "Prompt 1", "https://example.com/image1.jpg"),
@@ -146,9 +147,8 @@ class Room:
                 self._state = Room.State.LYING_STATE
             case Room.State.LYING_STATE:
                 # TODO: Maybe delete the players usercontext['lies']?
+                self._list_copy = self._list_of_images.copy() # TODO: Move this into VotingPhase3
                 await Voting.beginPhase3(bot, self)
-                self._list_copy = self._list_of_images.copy()
-                print("going to voting phase")
                 self._state = Room.State.VOTING_STATE
             case Room.State.VOTING_STATE:
                 #await Reveal.beginPhase4(bot, self)
@@ -168,12 +168,13 @@ class Room:
         return True
     
     #true if all have sent prompts(or other item) and proceeded to next phase
-    async def checkItems(self, item, bot):
+    async def checkItems(self, item, bot, advance=True):
         for playerObj in self._players: 
             if not playerObj.querySentItem(item):
                 return False
         # At this point all players have sent prompts, advance state
-        await self.advanceState(bot)
+        if advance:
+            await self.advanceState(bot)
         return True
 
     # WIP this this will enable the features for audience to join
@@ -194,29 +195,25 @@ class Room:
     async def getRemainingImages(self, player):
         return self._playerToRemainingImages[player]                      
 
-    async def collate_votes(self, bot):
-        print('collate run')
-
-        if len(self._list_copy) <= 0:
-            print('empty list copy')
-            return False
-
+    async def broadcast_voting_image(self, bot):
         imageObj = self._list_copy.pop()
-
         image_url = imageObj.getImageURL()
         lie_buttons = imageObj.getInlineKeyboard()
         author = imageObj.getAuthor()
-        print('buttons '+ str(lie_buttons))
+        # print('buttons '+ str(lie_buttons))
 
-        self._voting_image = imageObj
+        self._current_voting_image = imageObj
 
         for eachPlayer in self._players:
             if eachPlayer.getUsername() == author:
                 await eachPlayer.sendImageURL(bot, image_url)    
             else:
-                await eachPlayer.sendImageURL(bot, image_url, reply_markup=lie_buttons) 
+                await eachPlayer.sendImageURL(bot, image_url, reply_markup=lie_buttons)
+        if len(self._list_copy) <= 0:
+            return False #Return false to indicate that there are no more images to send after
+        return True
 
     async def getVotingImage(self):
-        return self._voting_image  
+        return self._current_voting_image
  
                         

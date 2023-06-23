@@ -117,58 +117,6 @@ async def take_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     return BotInitiator.LYING_PHASE
 
-# async def phaseTest(update: Update, context: ContextTypes.DEFAULT_TYPE):
-#     print('initiate test')
-#     message_text = update.message.text
-#     # print('image generated')
-#     # if player in lying phase, means all players in lying phase
-#     if context.user_data['phase'] == Player.LYING_PHASE:
-#         await context.bot.send_message(chat_id=update.effective_chat.id, text='everyone in')
-#     else:
-#         await context.bot.send_message(chat_id=update.effective_chat.id, text='not everyone in')
-# async def wait_for_all_players(update, context: ContextTypes.DEFAULT_TYPE):
-#     room_code = context.user_data['roomCode']
-#     room = RoomHandler.getRoom(room_code)
-
-#     booly = False
-
-#     # while not booly:
-#     #     print('not yet')
-#     #     booly = await room.allSentPrompts()
-#     #     await asyncio.sleep(3)
-
-#     while not room.allSentPrompts():
-#         print('not yet')
-#         await asyncio.sleep(3)
-        
-# # while not room.allSentPrompts():
-# # await asyncio.sleep(1)
-# async def process_players(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    
-#     thisPlayer = PlayersManager.queryPlayer(update.message.from_user.username)
-#     roomCode = thisPlayer.getRoomCode()
-#     players = RoomHandler.returnPlayers(roomCode)
-#     print(players)
-#     tasks = []
-
-#     if players is not None:
-#         for player in players:
-#             if player is not None:
-#                 await take_prompt(update, context)  # Call take_prompt for each player individually
-#     # for player in players:
-#     #     if player is not None:  # Check if player is not None
-#     #         task = asyncio.create_task(take_prompt(update, context))
-#     #         tasks.append(task)
-
-#     # await asyncio.gather(*tasks)
-
-# # async def handle_player_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
-# #     task = asyncio.create_task(take_prompt(update, context))
-# #     # You can store the task object and use it later if needed
-
-# #     # Continue with other processing or await the task to complete
-# #     await task
-
 async def take_lie(update: Update, context: ContextTypes.DEFAULT_TYPE):
     #Check if the user is in a game
     if not context.user_data['in_game']:
@@ -198,8 +146,10 @@ async def take_lie(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # return BotInitiator.VOTING_PHASE
 
 async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query.message
-    data = query.data.split(':')
+    query = update.callback_query
+    print(query)
+    print(query.message)
+    data = query.split(':')
     lie = data[1]
     lieAuthor = data[2]
     playerTricked = update.callback_query.from_user.username
@@ -210,6 +160,13 @@ async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYP
     votingImage = room.getVotingImage()
     print('player tricked ' + playerTricked)
     votingImage.addPlayersTricked(lieAuthor, playerTricked)
+    context.user_data['has_voted'] = True
+    await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "WaitingForItems", **{'item': "vote"})     #TODO find a way to delete this message when the next round starts    
+    if room.checkItems(Player.PlayerConstants.HAS_VOTED, context.bot, advance=False):
+        hasNext = room.broadcastImage()
+        if not hasNext:
+            return BotInitiator.REVEAL_PHASE
+        return BotInitiator.LYING_PHASE
 
     # for imageObj in image_list:
     #     if imageObj.getImageURL() == image_url:

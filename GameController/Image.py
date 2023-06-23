@@ -14,7 +14,7 @@ class Image:
         self.author = author
         self.prompt = prompt
         self.imageURL = imageURL
-        self.imageLies = []
+        self.imageLies = {}
 
     def getImageURL(self):
         return self.imageURL
@@ -32,10 +32,10 @@ class Image:
 
     def getInlineKeyboard(self):
         lie_buttons = []
-        for lie, currPlayerUsername in self.imageLies:
-            lie_button = InlineKeyboardButton(lie, callback_data=f"vote:{lie}:{currPlayerUsername}")
+        for lieAuthor, (lie, _playerTricked) in self.imageLies.items():
+            lie_button = InlineKeyboardButton(lie, callback_data=f"v:{lie}:{lieAuthor}")
             lie_buttons.append([lie_button])
-        prompt_button = InlineKeyboardButton(self.prompt, callback_data=f"vote:{self.prompt}:{self.author}")
+        prompt_button = InlineKeyboardButton(self.prompt, callback_data=f"v:{self.prompt}:{self.author}")
         lie_buttons.append([prompt_button])
         random.shuffle(lie_buttons)
 

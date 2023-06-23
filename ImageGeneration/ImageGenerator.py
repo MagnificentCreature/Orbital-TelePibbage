@@ -47,8 +47,12 @@ async def imageQuery(prompt):
     response = requests.request("POST", URL, headers=headers, data=payload)
     myDict = json.loads(response.text)
     print(response.text)
-    if getImageHash(myDict["output"][0]) == CENSOR_HASH:
-        print("Image is censored")
-        return None
+    try :
+      if getImageHash(myDict["output"][0]) == CENSOR_HASH:
+          print("Image is censored")
+          return None
 
-    return myDict["output"][0]
+      return myDict["output"][0]
+    except IndexError:
+      print()
+      return None

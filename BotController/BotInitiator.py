@@ -23,8 +23,9 @@ RETURN_TO_FRESH = map(chr, range(3,4))
 # In_game level commands
 ENTER_PROMPT, ENTER_LIE, VOTE_LIE, VOTE_TRUTH = map(chr, range(4,8))
 #Shortcut for Conversation Handler END
-VOTE = 'vote_\d+'
 END = ConversationHandler.END
+#VOTE REGEX
+VOTE_REGEX = r"v:[^:]+:[^:]+"
 
 # for FRESH
 WelcomeKeyboard = InlineKeyboardMarkup([
@@ -91,7 +92,7 @@ def main() -> None:
                 MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.take_lie),
             ],
             VOTING_PHASE: [
-                CallbackQueryHandler(BotCommands.handle_vote_callback, pattern=r"^vote+$"),
+                CallbackQueryHandler(BotCommands.handle_vote_callback, pattern=VOTE_REGEX),
             ]
         },
         fallbacks=[MessageHandler(filters.COMMAND, BotCommands.unknown)],
