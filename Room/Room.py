@@ -60,9 +60,9 @@ class Room:
     def hasMinPlayers(self):
         return len(self._players) >= Room.MIN_PLAYERS
     
-    async def broadcast(self, bot, message, messageKey=None,reply_markup=None, **kwargs):
+    async def broadcast(self, bot, message, messageKey=None,reply_markup=None, raw=False, **kwargs):
         for player in self._players:
-            await player.sendMessage(bot, message, messageKey, reply_markup, **kwargs)
+            await player.sendMessage(bot, message, messageKey, reply_markup, raw=raw, **kwargs)
 
     async def broadCall(self, bot, func):
         for player in self._players:
