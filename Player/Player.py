@@ -123,11 +123,11 @@ class Player:
         del self._user_data[messageKey]
 
     # Including a message key will store the message's ID in the user_data which can be editted later
-    async def sendMessage(self, bot, message, messageKey=None, reply_markup=None):
-        messasgeID = await DialogueReader.sendMessageByID(bot, self._chatID, message, reply_markup=reply_markup)
+    async def sendMessage(self, bot, message, messageKey=None, reply_markup=None, raw=False):
+        messasgeID = await DialogueReader.sendMessageByID(bot, self._chatID, message, raw=raw, reply_markup=reply_markup)
         if messageKey != None:
             self._user_data[messageKey] = messasgeID
-
+            
     async def sendMessage(self, bot, message, messageKey=None, reply_markup=None, **kwargs):
         messasgeID = await DialogueReader.sendMessageByID(bot, self._chatID, message, reply_markup=reply_markup, **kwargs)
         if messageKey != None:
