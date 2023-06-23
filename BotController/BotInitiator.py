@@ -24,6 +24,8 @@ RETURN_TO_FRESH = map(chr, range(3,4))
 ENTER_PROMPT, ENTER_LIE, VOTE_LIE, VOTE_TRUTH = map(chr, range(4,8))
 #Shortcut for Conversation Handler END
 END = ConversationHandler.END
+#VOTE REGEX
+VOTE_REGEX = r"v:[^:]+:[^:]+"
 
 # for FRESH
 WelcomeKeyboard = InlineKeyboardMarkup([
@@ -69,10 +71,7 @@ logging.basicConfig(
     level=logging.INFO
 )
 
-FRESH, ENTERCODE, INROOM, WAITING_FOR_HOST, PROMPTING_PHASE, LYING_PHASE, VOTING_PHASE = range(7)
-# create option 1 to 8 for the voting round
-OPTION1, OPTION2, OPTION3, OPTION4, OPTION5, OPTION6, OPTION7, OPTION8 = map(chr, range(7,15))
-
+FRESH, ENTERCODE, INROOM, WAITING_FOR_HOST, PROMPTING_PHASE, LYING_PHASE, VOTING_PHASE, REVEAL_PHASE = range(8)
 #Shortcut for returning to FRESH
 FRESH_CALLBACK = CallbackQueryHandler(BotCommands.return_to_fresh, pattern="^" + str(RETURN_TO_FRESH) + "$")
 
@@ -93,18 +92,22 @@ def main() -> None:
                 MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.take_lie),
             ],
             VOTING_PHASE: [
-                # TODO more stuff
+                CallbackQueryHandler(BotCommands.handle_vote_callback, pattern=VOTE_REGEX),
+            ],
+            REVEAL_PHASE: [
+                MessageHandler(filters.COMMAND, BotCommands.unknown)
             ]
         },
         fallbacks=[MessageHandler(filters.COMMAND, BotCommands.unknown)],
         map_to_parent={
             WAITING_FOR_HOST: INROOM,
+            INROOM: INROOM,
         }
     )
 
     # Add conversation handler with the states GENDER, PHOTO, LOCATION and BIO
     main_conv_handler = ConversationHandler(
-        entry_points=[CommandHandler("start", BotCommands.start, block=False)],
+        entry_points=[CommandHandler("start", BotCommands.start)],
         states={
             FRESH: [CommandHandler("start", BotCommands.start),
                     CallbackQueryHandler(BotCommands.create_room, pattern="^" + str(CREATE_ROOM) + "$"),

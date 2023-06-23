@@ -17,6 +17,8 @@ class Player:
     class PlayerConstants(Enum):
         PROMPT = "prompt"
         LIE = "lie"
+        NEXT_LIE = "next_lie"
+        HAS_VOTED = "has_voted"
     
     def __init__(self, username, chatID=0, _user_data={}, score=0, sentPrompt=False):
         self._username = username
@@ -25,6 +27,9 @@ class Player:
         self._user_data = _user_data
         _user_data['in_game'] = False
         _user_data['roomCode'] = ""
+
+    def __str__(self):
+        return self._username
         
     def updateUserData(self, _user_data):
         # Initialise the user data
@@ -44,6 +49,9 @@ class Player:
     
     def getUsername(self):
         return self._username
+
+    def getChatID(self):
+        return self._chatID
     
     def inRoom(self):
         return self._user_data['roomCode'] != ""
@@ -70,11 +78,16 @@ class Player:
 
     def getImageURL(self):
         try:
-            return self._user_data['imageURL']
+            return self._user_data['image']
         except KeyError:
             print("Player " + self._username + " has no imageURL key")
             return False
     
+    def setItem(self, itemKey, value):
+        if itemKey not in Player.PlayerConstants.__members__.values():
+            return False
+        self._user_data[itemKey.value] = value
+
     def querySentItem(self, itemKey):
         if itemKey not in Player.PlayerConstants.__members__.values():
             return False
@@ -84,11 +97,14 @@ class Player:
             return False
     
     async def startGame(self):
-        await self.deleteContext('lobby_list')
+        self.deleteContext('lobby_list')
         self.setInGame()
 
-    async def deleteContext(self, key):
-        del self._user_data[key]
+    def deleteContext(self, key):
+        try:
+            del self._user_data[key]
+        except KeyError:
+            del self._user_data[key.value]
 
     # Methods to send messages
     async def editMessage(self, messageKey, message, newMessageKey=None, reply_markup=None):
@@ -107,8 +123,8 @@ class Player:
         del self._user_data[messageKey]
 
     # Including a message key will store the message's ID in the user_data which can be editted later
-    async def sendMessage(self, bot, message, messageKey=None, reply_markup=None):
-        messasgeID = await DialogueReader.sendMessageByID(bot, self._chatID, message, reply_markup=reply_markup)
+    async def sendMessage(self, bot, message, messageKey=None, reply_markup=None, raw=False):
+        messasgeID = await DialogueReader.sendMessageByID(bot, self._chatID, message, raw=raw, reply_markup=reply_markup)
         if messageKey != None:
             self._user_data[messageKey] = messasgeID
 
