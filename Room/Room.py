@@ -191,7 +191,7 @@ class Room:
                 continue
             self._playerToRemainingImages[eachPlayer].append(image) 
 
-    async def getImageList(self, player):
+    async def getRemainingImages(self, player):
         return self._playerToRemainingImages[player]                      
 
     async def collate_votes(self, bot):

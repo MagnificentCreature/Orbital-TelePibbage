@@ -8,7 +8,13 @@ import time
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton, Update
 from BotController import BotCommands
 from telegram.ext import (
+    # Application,
+    CallbackQueryHandler,
+    # CommandHandler,
     ContextTypes,
+    # ConversationHandler,
+    # MessageHandler,
+    # filters,
 )
 
 import sys
@@ -111,6 +117,58 @@ async def take_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     return BotInitiator.LYING_PHASE
 
+# async def phaseTest(update: Update, context: ContextTypes.DEFAULT_TYPE):
+#     print('initiate test')
+#     message_text = update.message.text
+#     # print('image generated')
+#     # if player in lying phase, means all players in lying phase
+#     if context.user_data['phase'] == Player.LYING_PHASE:
+#         await context.bot.send_message(chat_id=update.effective_chat.id, text='everyone in')
+#     else:
+#         await context.bot.send_message(chat_id=update.effective_chat.id, text='not everyone in')
+# async def wait_for_all_players(update, context: ContextTypes.DEFAULT_TYPE):
+#     room_code = context.user_data['roomCode']
+#     room = RoomHandler.getRoom(room_code)
+
+#     booly = False
+
+#     # while not booly:
+#     #     print('not yet')
+#     #     booly = await room.allSentPrompts()
+#     #     await asyncio.sleep(3)
+
+#     while not room.allSentPrompts():
+#         print('not yet')
+#         await asyncio.sleep(3)
+        
+# # while not room.allSentPrompts():
+# # await asyncio.sleep(1)
+# async def process_players(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    
+#     thisPlayer = PlayersManager.queryPlayer(update.message.from_user.username)
+#     roomCode = thisPlayer.getRoomCode()
+#     players = RoomHandler.returnPlayers(roomCode)
+#     print(players)
+#     tasks = []
+
+#     if players is not None:
+#         for player in players:
+#             if player is not None:
+#                 await take_prompt(update, context)  # Call take_prompt for each player individually
+#     # for player in players:
+#     #     if player is not None:  # Check if player is not None
+#     #         task = asyncio.create_task(take_prompt(update, context))
+#     #         tasks.append(task)
+
+#     # await asyncio.gather(*tasks)
+
+# # async def handle_player_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
+# #     task = asyncio.create_task(take_prompt(update, context))
+# #     # You can store the task object and use it later if needed
+
+# #     # Continue with other processing or await the task to complete
+# #     await task
+
 async def take_lie(update: Update, context: ContextTypes.DEFAULT_TYPE):
     #Check if the user is in a game
     if not context.user_data['in_game']:
@@ -142,16 +200,16 @@ async def take_lie(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query.message
     data = query.data.split(':')
-    # image_url = data[1]
-    lie_author = data[1]
-    player = update.callback_query.from_user.username
+    lie = data[1]
+    lieAuthor = data[2]
+    playerTricked = update.callback_query.from_user.username
 
     room = RoomHandler.getRoom(context.user_data['roomCode'])
-    image_list = room.getImageList(player)
+    # image_list = room.getImageList(player)
 
     votingImage = room.getVotingImage()
-
-    
+    print('player tricked ' + playerTricked)
+    votingImage.addPlayersTricked(lieAuthor, playerTricked)
 
     # for imageObj in image_list:
     #     if imageObj.getImageURL() == image_url:
@@ -162,10 +220,14 @@ async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYP
 
     #                 print(f"Selected lie: {lie}")
 
-
-
     # await query.answer()  
     return BotInitiator.REVEAL_PHASE  
+
+async def reveal_lies(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    room = RoomHandler.getRoom(context.user_data['roomCode'])
+    votingImage = room.getVotingImage()
+    votingImage.showPlayersTricked()
+
 
 async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "UnknownCommand")
