@@ -205,10 +205,9 @@ class Room:
 
         imageObj = self._list_copy.pop()
         image_url = imageObj.getImageURL()
-        lie_buttons = imageObj.getInlineKeyboard()
         author = imageObj.getAuthor()
         # print('buttons '+ str(lie_buttons))
-        
+
 
         self._current_voting_image = imageObj
 
@@ -217,7 +216,7 @@ class Room:
                 eachPlayer.setItem(Player.PlayerConstants.HAS_VOTED, True)
                 await eachPlayer.sendImageURL(bot, image_url)    
             else:
-                await eachPlayer.sendImageURL(bot, image_url, reply_markup=lie_buttons)
+                await eachPlayer.sendImageURL(bot, image_url, reply_markup=imageObj.getInlineKeyboard(eachPlayer.getUsername()))
         # if len(self._list_copy) <= 0:
         #     return False #Return false to indicate that there are no more images to send after
         return True

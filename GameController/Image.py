@@ -36,9 +36,11 @@ class Image:
         self.imageLies[lieAuthor][1].append(playerTricked)
         
 
-    def getInlineKeyboard(self):
+    def getInlineKeyboard(self, reciever):
         lie_buttons = []
         for lieAuthor, (lie, _playerTricked) in self.imageLies.items():
+            if lieAuthor == reciever:
+                continue
             lie_button = InlineKeyboardButton(lie, callback_data=f"v:{lie}:{lieAuthor}")
             lie_buttons.append([lie_button])
         prompt_button = InlineKeyboardButton(self.prompt, callback_data=f"v:{self.prompt}:{self.author}")
