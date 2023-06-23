@@ -218,5 +218,8 @@ class Room:
 
     async def getVotingImage(self):
         return self._voting_image  
+    
+    async def getImageListCopy(self):
+        return self._list_copy
  
                         
