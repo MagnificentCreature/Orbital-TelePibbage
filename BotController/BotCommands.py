@@ -30,6 +30,8 @@ from ImageGeneration import ImageGenerator
 from BotController import BotInitiator
 from GameController import Lying
 
+MIN_PROMPT_LENGTH = 3
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await PlayersManager.recordNewPlayer(update.message.from_user.username, update.message.from_user.id, context.user_data)
     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "Welcome1")
@@ -101,6 +103,11 @@ async def take_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # TODO: handle bad prompts or failure to generate image
     #asyncio.wait_for(ImageGenerator.imageQuery(update.message).wait(), timeout=60)
 
+    prompt = update.message.text
+    # check if prompt is less than 3 words
+    if len(prompt.split(" ")) < MIN_PROMPT_LENGTH:
+        await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "PromptFewWords")
+        return BotInitiator.PROMPTING_PHASE
     #to save api calls, uncomment when ready to deploy
     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "PromptRecieved")
     imageURL = await ImageGenerator.imageQuery(update.message.text)
