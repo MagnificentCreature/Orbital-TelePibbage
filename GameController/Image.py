@@ -35,8 +35,6 @@ class Image:
         if lieAuthor == self.author:
             # if the prompt picked was by the original author means its the truth
             self.correct_players.append(playerTricked)
-            print("ADDING PLAYER " + str(playerTricked) + "TO CORRECT_PLAYERS")
-            print(self.correct_players)
             return
         self.imageLies[lieAuthor][1].append(playerTricked)
         
@@ -77,7 +75,6 @@ class Image:
         
         message += f"PROMPT: {self.prompt}\n"
         # iterate through all players who got the right answer
-        print(self.correct_players)
         for correct_player in self.correct_players:
             message += f"Player who picked this prompt: @{correct_player}\n"
             message += f"{correct_player} gains 1000 points!\n"

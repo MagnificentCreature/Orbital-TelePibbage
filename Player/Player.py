@@ -95,7 +95,7 @@ class Player:
         if itemKey not in Player.PlayerConstants.__members__.values():
             return False
         try:
-            return self._user_data[itemKey.value] is not None
+            return self._user_data[itemKey.value] is not None and self._user_data[itemKey.value] is not False
         except KeyError:
             return False
     

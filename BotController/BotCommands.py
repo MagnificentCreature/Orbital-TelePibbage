@@ -147,6 +147,12 @@ async def take_lie(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # return BotInitiator.VOTING_PHASE
 
 async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    # Flow contorl check if the player has already voted
+    if context.user_data['has_voted']:
+        return BotInitiator.VOTING_PHASE
+    
+    print(update.callback_query.from_user.username + " voted for " + update.callback_query.data)
+    
     query = update.callback_query
     data = re.split(r"(?<!\\):", query.data)
     lie = data[1]
@@ -175,7 +181,7 @@ async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYP
             await room.advanceState(context.bot)
             return BotInitiator.REVEAL_PHASE
 
-        return BotInitiator.LYING_PHASE
+        return BotInitiator.VOTING_PHASE
 
     # for imageObj in image_list:
     #     if imageObj.getImageURL() == image_url:
