@@ -1,11 +1,10 @@
 import requests
 import hashlib
 import json
-# import conf
+import conf
 import math
 
-AI_API_TOKEN = "7vFwuHHVpUoOW5his0TrwewJP40w1WDeydVQTMMllgzHBzjvLl6kcrqHGfTR"
-# AI_API_TOKEN = conf.SD_API_TOKEN
+AI_API_TOKEN = conf.SD_API_TOKEN
 
 URL = "https://stablediffusionapi.com/api/v4/dreambooth"
 FETCH_URL = "https://stablediffusionapi.com/api/v4/dreambooth/fetch"
@@ -75,7 +74,7 @@ def getImageHash(imageUrl):
     return hashlib.sha256(imageBytes).hexdigest()
     
 @staticmethod
-def imageQuery(prompt):
+async def imageQuery(prompt):
     payload_data = PAYLOAD_DATA_TEMPLATE_V4.copy()
     payload_data["prompt"] = prompt
     payload = json.dumps(payload_data)
@@ -83,6 +82,9 @@ def imageQuery(prompt):
       response = requests.request("POST", URL, headers=headers, data=payload)
       myDict = json.loads(response.text)
       print(response.text)
+      if myDict["status"] == "failure":
+         print("Failure")
+         return None
       if myDict["status"] == "processing":
         print("Image is processing")
         eta = math.ceil(float(myDict["eta"]))
@@ -91,6 +93,10 @@ def imageQuery(prompt):
           print("Image is censored")
           return None
       return myDict["output"][0]
+    except KeyError:
+      if myDict["message"] == "Server Error":
+        print("Server Error")
+      return None
     except IndexError:
       print(response.text)
       return None
@@ -110,6 +116,3 @@ async def fetchImage(request_id):
       print("Image is censored")
       return None
    return myDict["output"][0]
-
-if __name__ == "__main__":
-  imageQuery("giant painting on an exquisite wall in the middle of a grassland, there is a giant mansion in the background and its mysterious, shot on a cannon POV")
