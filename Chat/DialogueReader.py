@@ -4,13 +4,17 @@ This class is responsible for sending chat messages
 Calls to this class can be made from the public function sendMessage(bot, chat, message)
 """
 
+import asyncio
 from os import path
+import random
 from BotController import BotInitiator
 import logging
 
 from telegram import error
 
 class DialogueReader:
+
+    MAX_RETRIES = 5
 
     # Create a static variable to store the dialogues
     _dialogues = {}
@@ -69,17 +73,22 @@ class DialogueReader:
             logging.error("Error sending message to chat_id " + str(chat_id) + ": " + str(e))
 
     @classmethod
-    async def sendMessageByID(cls, bot, chat_id, message, reply_markup=None, raw=False, **kwargs):
-        #Use telegram api to send a message, additional arguments are given in the form of **{{key}=value}
-        if (message not in cls._dialogues):
-            print("Message " + message + " not found in dialogues.txt")
-        formattedText = cls.additionalProcessing(cls._dialogues[message].format(**kwargs))
+    async def sendMessageByID(cls, bot, chat_id, message, reply_markup=None, raw=False, exponential_backoff=1, **kwargs):
         try:
-            if raw:
-                return await bot.send_message(chat_id=chat_id, text=message, reply_markup=reply_markup)
-            return await bot.send_message(chat_id=chat_id, text=formattedText, reply_markup=reply_markup)
-        except error.Forbidden as e:
-            logging.error("Error sending message to chat_id " + str(chat_id) + ": " + str(e))
+            #Use telegram api to send a message, additional arguments are given in the form of **{{key}=value}
+            if (message not in cls._dialogues):
+                print("Message " + message + " not found in dialogues.txt")
+            formattedText = cls.additionalProcessing(cls._dialogues[message].format(**kwargs))
+            try:
+                if raw:
+                    return await bot.send_message(chat_id=chat_id, text=message, reply_markup=reply_markup)
+                return await bot.send_message(chat_id=chat_id, text=formattedText, reply_markup=reply_markup)
+            except error.Forbidden as e:
+                logging.error("Error sending message to chat_id " + str(chat_id) + ": " + str(e))
+        except error.TimedOut as e:
+            logging.error("Timeout error sending message to chat_id " + str(chat_id) + ": " + str(e))
+            await asyncio.sleep(2**random.randint(1, exponential_backoff))
+
     
     @staticmethod
     async def sendImageURLByID(bot, chat_id, imageURL, reply_markup=None):
