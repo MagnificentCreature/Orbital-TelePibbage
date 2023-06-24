@@ -111,6 +111,11 @@ async def take_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     #to save api calls, uncomment when ready to deploy
     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "PromptRecieved")
     imageURL = await ImageGenerator.imageQuery(prompt)
+    if imageURL[0].isdigit():
+        request_id, eta = imageURL.split(":")
+        await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "PromptTakingAwhile", **{"eta": eta})
+        await asyncio.sleep(int(eta))
+        imageURL = await ImageGenerator.fetchImage(request_id)
     if imageURL is None:
         await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "InvalidPrompt")
         return BotInitiator.PROMPTING_PHASE
