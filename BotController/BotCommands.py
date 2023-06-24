@@ -174,7 +174,6 @@ async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYP
         if not hasNext:
             await room.advanceState(context.bot)
             return BotInitiator.REVEAL_PHASE
-        context.user_data['has_voted'] = False
 
         return BotInitiator.LYING_PHASE
 
@@ -188,7 +187,7 @@ async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYP
     #                 print(f"Selected lie: {lie}")
 
     # await query.answer()  
-    return BotInitiator.REVEAL_PHASE  
+    return BotInitiator.VOTING_PHASE  
 
 # async def reveal_lies(update: Update, context: ContextTypes.DEFAULT_TYPE):
 #     room = RoomHandler.getRoom(context.user_data['roomCode'])

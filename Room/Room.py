@@ -215,6 +215,7 @@ class Room:
                 eachPlayer.setItem(Player.PlayerConstants.HAS_VOTED, True)
                 await eachPlayer.sendImageURL(bot, image_url)    
             else:
+                eachPlayer.setItem(Player.PlayerConstants.HAS_VOTED, False)
                 await eachPlayer.sendImageURL(bot, image_url, reply_markup=imageObj.getInlineKeyboard(eachPlayer.getUsername()))
         # if len(self._list_copy) <= 0:
         #     return False #Return false to indicate that there are no more images to send after
