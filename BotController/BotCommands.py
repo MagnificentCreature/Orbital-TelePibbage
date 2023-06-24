@@ -170,7 +170,7 @@ async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYP
     # checkItems returns True after everyone places voe for one image
     if await room.checkItems(Player.PlayerConstants.HAS_VOTED, context.bot, advance=False):
         #reveal
-        votingImage.showPlayersTricked()
+        # await votingImage.showPlayersTricked()
 
         # checks anymore images 
         hasNext = await room.broadcast_voting_image(context.bot)
