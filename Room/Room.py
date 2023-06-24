@@ -222,5 +222,16 @@ class Room:
 
     async def getVotingImage(self):
         return self._current_voting_image
+    
+    def getLeaderboard(self):
+        leaderboard = sorted(self._players, key=lambda player: player.getScore(), reverse=True)
+        message = "TelePibbage Leaderboard:\n"
+
+        for i, player in enumerate(leaderboard, start=1):
+            username = player.getUsername()
+            score = player.getScore()
+            message += f"{i}. {username}: {score} points\n"
+
+        return message
  
                         

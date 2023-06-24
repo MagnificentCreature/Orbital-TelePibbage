@@ -4,6 +4,7 @@ Handles user commands
 
 import asyncio
 import time
+import re
 
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton, Update
 from BotController import BotCommands
@@ -147,7 +148,7 @@ async def take_lie(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
-    data = query.data.split(':')
+    data = re.split(r"(?<!\\):", query.data)
     lie = data[1]
     lieAuthor = data[2]
     playerTricked = update.callback_query.from_user.username
@@ -163,8 +164,11 @@ async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYP
     # checkItems returns True after everyone places voe for one image
     if await room.checkItems(Player.PlayerConstants.HAS_VOTED, context.bot, advance=False):
         #reveal
-        votingImage.showPlayersTricked()
+        message = await votingImage.showPlayersTricked()
 
+        await room.broadcast(context.bot, message=message, raw=True)
+        # await context.bot.send_message(chat_id=update.callback_query.from_user.id, text=message)
+        # sendMessageByID(cls, bot, chat_id, message, reply_markup=None, raw=False)
         # checks anymore images 
         hasNext = await room.broadcast_voting_image(context.bot)
         if not hasNext:
@@ -186,10 +190,10 @@ async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYP
     # await query.answer()  
     return BotInitiator.REVEAL_PHASE  
 
-async def reveal_lies(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    room = RoomHandler.getRoom(context.user_data['roomCode'])
-    votingImage = await room.getVotingImage()
-    await votingImage.showPlayersTricked()
+# async def reveal_lies(update: Update, context: ContextTypes.DEFAULT_TYPE):
+#     room = RoomHandler.getRoom(context.user_data['roomCode'])
+#     votingImage = await room.getVotingImage()
+#     await votingImage.showPlayersTricked()
 
 async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "UnknownCommand")

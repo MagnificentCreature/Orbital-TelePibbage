@@ -47,6 +47,9 @@ class Player:
     def getScore(self):
         return self._score
     
+    def addScore(self, points):
+        self._score += points
+    
     def getUsername(self):
         return self._username
 

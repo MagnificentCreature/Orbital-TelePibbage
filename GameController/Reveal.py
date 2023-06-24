@@ -1,6 +1,6 @@
 async def beginPhase4(bot, room):
     await sendPhase4Messages(bot, room)
-    await room.broadCall(bot, revealNextImage)
+    await revealLeaderboard(bot, room)
 
 async def sendPhase4Messages(bot, room):
     await room.broadcast(bot, "Phase4p1")
@@ -34,3 +34,10 @@ async def revealNextImage(bot, room, player):
       # await room.broadcast(bot, message, raw=True)
       await bot.send_message(chat_id=player.getChatID(), text=message)
     # message = await image.getMessage(Player.PlayerConstants.NEXT_LIE)
+
+async def revealLeaderboard(bot, room):
+    leaderboardMsg = room.getLeaderboard()
+
+    leaderboardMsg += '\nThanks for playing guys!'
+
+    await room.broadcast(bot, leaderboardMsg, raw=True)
