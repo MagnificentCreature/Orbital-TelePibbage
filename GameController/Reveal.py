@@ -1,5 +1,8 @@
+import asyncio
+
 async def beginPhase4(bot, room):
     await sendPhase4Messages(bot, room)
+    await asyncio.sleep(3)
     await revealLeaderboard(bot, room)
 
 async def sendPhase4Messages(bot, room):

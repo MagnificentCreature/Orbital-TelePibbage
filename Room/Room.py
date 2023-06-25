@@ -226,7 +226,10 @@ class Room:
     
     def getLeaderboard(self):
         leaderboard = sorted(self._players, key=lambda player: player.getScore(), reverse=True)
-        message = "TelePibbage Leaderboard:\n"
+        message = f"☆☆☆☆☆☆{leaderboard[0]}☆☆☆☆☆☆\n"
+        message += "Congratulations!!\n\n"
+
+        message += "TelePibbage Leaderboard:\n"
 
         for i, player in enumerate(leaderboard, start=1):
             username = player.getUsername()
