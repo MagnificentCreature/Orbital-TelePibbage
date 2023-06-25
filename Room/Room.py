@@ -154,7 +154,6 @@ class Room:
                 self._state = Room.State.VOTING_STATE
             case Room.State.VOTING_STATE:
                 await Reveal.beginPhase4(bot, self)
-                print("GOING TO THE REVEAL STATE")
                 self._state = Room.State.REVEAL_STATE
             case Room.State.REVEAL_STATE:
                 print("Game Over")
@@ -219,6 +218,7 @@ class Room:
                 await eachPlayer.sendImageURL(bot, image_url, reply_markup=imageObj.getInlineKeyboard(eachPlayer.getUsername()))
         # if len(self._list_copy) <= 0:
         #     return False #Return false to indicate that there are no more images to send after
+        print("broadcasted image")
         return True
 
     async def getVotingImage(self):
