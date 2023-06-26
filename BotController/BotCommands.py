@@ -132,12 +132,13 @@ async def take_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data['prompt'] = prompt
     # Send the image URL in a separate task
     send_image_task = asyncio.create_task(DialogueReader.sendImageURLByID(context.bot, update.message.from_user.id, imageURL, caption="You generated: " + prompt))
-    check_items_task = asyncio.create_task(RoomHandler.checkItems(context.user_data['roomCode'], Player.PlayerConstants.PROMPT, context.bot))
 
     await RoomHandler.takeImage(context.user_data['roomCode'], update.message.from_user.username, prompt, imageURL)
 
     waitingID = await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "WaitingForItems", **{'item': "prompt"})     #TODO find a way to delete this message when the next phase starts
     await send_image_task
+    
+    check_items_task = asyncio.create_task(RoomHandler.checkItems(context.user_data['roomCode'], Player.PlayerConstants.PROMPT, context.bot))
     await check_items_task
     return BotInitiator.LYING_PHASE
 
@@ -182,9 +183,7 @@ async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYP
     # Flow contorl check if the player has already voted
     if context.user_data['has_voted']:
         return BotInitiator.VOTING_PHASE
-    
-    print(update.callback_query.from_user.username + " voted for " + update.callback_query.data)
-    
+        
     query = update.callback_query
     data = re.split(r"(?<!\\):", query.data)
     lie = data[1]

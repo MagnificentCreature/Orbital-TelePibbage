@@ -21,7 +21,7 @@ PAYLOAD_DATA_TEMPLATE_V4 = {
   "samples": "1",
   "num_inference_steps": "30",
   "safety_checker": "yes",
-  "enhance_prompt": "yes",
+  "enhance_prompt": "no",
   "seed": None,
   "guidance_scale": 7.5,
   "safety_checker": "yes",
@@ -88,14 +88,11 @@ async def imageQuery(prompt):
       myDict = json.loads(response.text)
       print(response.text)
       if myDict["status"] == "failure":
-         print("Failure")
          return None
       if myDict["status"] == "processing":
-        print("Image is processing")
         eta = math.ceil(float(myDict["eta"]))
         return str(myDict["id"]) + ":" + str(eta)
       if getImageHash(myDict["output"][0]) == CENSOR_HASH:
-          print("Image is censored")
           return None
       return myDict["output"][0]
     except KeyError:
@@ -124,6 +121,5 @@ async def fetchImage(request_id, retry_count = 0):
       await asyncio.sleep(EXTENDED_SLEEP)
       return await fetchImage(request_id, retry_count + 1)
    if getImageHash(myDict["output"][0]) == CENSOR_HASH:
-      print("Image is censored")
       return None
    return myDict["output"][0]

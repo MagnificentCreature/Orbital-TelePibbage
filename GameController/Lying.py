@@ -20,7 +20,7 @@ async def sendNextImage(bot, room, player):
         return False
     image = imageList.pop(random.randint(0, len(imageList) - 1))
     if image is None:
-        print("WTF LOL")
+        print("NO IMAGE WTF LOL")
     player.setItem(Player.PlayerConstants.NEXT_LIE, image) # fill second param with image
     await player.sendImageURL(bot, image.getImageURL())
     return True

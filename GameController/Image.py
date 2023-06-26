@@ -78,7 +78,6 @@ class Image:
         for correct_player in self.correct_players:
             message += f"Player who picked this prompt: @{correct_player}\n"
             message += f"{correct_player} gains 1000 points!\n"
-            print(correct_player)
             playerObj = PlayersManager.queryPlayer(correct_player)
             playerObj.addScore(1000)
 

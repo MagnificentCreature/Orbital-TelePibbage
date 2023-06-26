@@ -43,6 +43,7 @@ class Room:
         self._code = code
         self._host = host
         self._players = []
+        self._list_of_images = []
         self._state = Room.State.JOIN_STATE
 
     def getCode(self):
@@ -146,7 +147,6 @@ class Room:
             case Room.State.PROMPTING_STATE:
                 await Lying.beginPhase2(bot, self)
                 # TODO: Maybe delete the players usercontext['prompt']?
-                print("GOING TO THE LYING STATE")
                 self._state = Room.State.LYING_STATE
             case Room.State.LYING_STATE:
                 # TODO: Maybe delete the players usercontext['lies']?
@@ -200,7 +200,6 @@ class Room:
 
     async def broadcast_voting_image(self, bot):
         if len(self._list_copy) <= 0:
-            print("list is empty")
             return False 
 
         imageObj = self._list_copy.pop()
@@ -219,7 +218,6 @@ class Room:
                 await eachPlayer.sendImageURL(bot, image_url, reply_markup=imageObj.getInlineKeyboard(eachPlayer.getUsername()))
         # if len(self._list_copy) <= 0:
         #     return False #Return false to indicate that there are no more images to send after
-        print("broadcasted image")
         return True
 
     async def getVotingImage(self):

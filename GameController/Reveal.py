@@ -41,6 +41,6 @@ async def revealNextImage(bot, room, player):
 async def revealLeaderboard(bot, room):
     leaderboardMsg = room.getLeaderboard()
 
-    leaderboardMsg += '\nThanks for playing guys!'
+    leaderboardMsg += '\nThanks for playing everyone!'
 
     await room.broadcast(bot, leaderboardMsg, raw=True)

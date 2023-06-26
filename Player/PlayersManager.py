@@ -61,24 +61,3 @@ class PlayersManager:
     def queryPlayer(cls, username):
         # check if player is already in the dicitonary
         return cls._playerRecord[username]
-    
-    # # returns the room code a player is in if he is in one, else return -1
-    # def getRoom(username):
-    #     return username.getRoomCode()
-
-    # @classmethod
-    # def setImageURL(cls, username, imageURL):
-    #     playerObject = cls._playerRecord[username]
-    #     playerObject._imageURL = imageURL
-
-    # @classmethod
-    # def setPlayerPhase(cls, username, phase):
-    #     playerObject = cls._playerRecord[username]
-    #     print('calling playerobj')
-    #     playerObject.setPromptSent()
-    # @classmethod
-    # async def allSentPrompts(cls, bot):
-    #     for eachPlayer in cls._playerRecord: 
-    #         if eachPlayer.queryPhase != Player.LYING_PHASE:
-    #             return False
-    #     return True
