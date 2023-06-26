@@ -34,6 +34,10 @@ from GameController import Lying
 MIN_PROMPT_LENGTH = 3
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    print(update.message.from_user.username + " started the bot")
+    if (update.message.from_user.username is None):
+        update.reply_text("Please set a username before using this bot")
+        return BotInitiator.END
     await PlayersManager.recordNewPlayer(update.message.from_user.username, update.message.from_user.id, context.user_data)
     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "Welcome1")
     

@@ -19,7 +19,7 @@ PAYLOAD_DATA_TEMPLATE = {
   "seed": None,
   "guidance_scale": 7.5,
   "safety_checker": "yes",
-  "multi_lingual": "no",
+  "multi_lingual": "yes",
   "panorama": "no",
   "self_attention": "no",
   "upscale": "no",
