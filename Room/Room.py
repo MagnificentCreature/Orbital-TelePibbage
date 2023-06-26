@@ -156,7 +156,7 @@ class Room:
                 await Reveal.beginPhase4(bot, self)
                 self._state = Room.State.REVEAL_STATE
             case Room.State.REVEAL_STATE:
-                print("Game Over")
+                return
 
     async def startGame(self, bot):
         for eachPlayer in self._players:
@@ -237,5 +237,10 @@ class Room:
             message += f"{i}. {username}: {score} points\n"
 
         return message
+    
+    async def endGame(self, bot):
+        for player in self._players:
+            player.reset()
+            await player.sendMessage(bot, "Welcome2", reply_markup=BotInitiator.WelcomeKeyboard)
  
                         

@@ -181,25 +181,10 @@ async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYP
         hasNext = await room.broadcast_voting_image(context.bot)
         if not hasNext:
             await room.advanceState(context.bot)
-            return BotInitiator.REVEAL_PHASE
+            await RoomHandler.endGame(context.user_data['roomCode'], context.bot)
+            return BotInitiator.FRESH
 
-
-    # for imageObj in image_list:
-    #     if imageObj.getImageURL() == image_url:
-    #         for lie, lie_player in imageObj.getImageLies():
-
-    #             if lie_player == player:
-    #                 PlayersManager.addPoints(update.message.from_user.username)
-
-    #                 print(f"Selected lie: {lie}")
-
-    # await query.answer()  
     return BotInitiator.VOTING_PHASE  
-
-# async def reveal_lies(update: Update, context: ContextTypes.DEFAULT_TYPE):
-#     room = RoomHandler.getRoom(context.user_data['roomCode'])
-#     votingImage = await room.getVotingImage()
-#     await votingImage.showPlayersTricked()
 
 async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "UnknownCommand")

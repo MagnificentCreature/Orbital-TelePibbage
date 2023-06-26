@@ -103,6 +103,7 @@ def main() -> None:
         map_to_parent={
             WAITING_FOR_HOST: INROOM,
             INROOM: INROOM,
+            FRESH: FRESH,
         }
     )
 

@@ -30,7 +30,18 @@ class Player:
 
     def __str__(self):
         return self._username
-        
+                
+    def reset(self):
+        for itemKey in self.PlayerConstants.__members__.values():
+            try:
+                del self._user_data[itemKey.value]
+            except KeyError:
+                continue
+        self._user_data['in_game'] = False
+        self._user_data['roomCode'] = ""
+        self._score = 0
+
+
     def updateUserData(self, _user_data):
         # Initialise the user data
         # TODO make this a factory method
