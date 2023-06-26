@@ -173,10 +173,6 @@ async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYP
         message = await votingImage.showPlayersTricked()
 
         await room.broadcast(context.bot, message=message, raw=True)
-        # await context.bot.send_message(chat_id=update.callback_query.from_user.id, text=message)
-        # sendMessageByID(cls, bot, chat_id, message, reply_markup=None, raw=False)
-        # checks anymore images 
-        print('waiting')
         await asyncio.sleep(5)
         hasNext = await room.broadcast_voting_image(context.bot)
         if not hasNext:
