@@ -101,7 +101,6 @@ class DialogueReader:
             logging.error("Timeout error sending message to chat_id " + str(chat_id) + ": " + str(e))
             logging.info("Retrying with exponential backoff of " + str(2**exponential_backoff) + " seconds")
             return await cls.sendMessageByID(bot, chat_id, message, reply_markup=reply_markup, raw=raw, exponential_backoff=exponential_backoff+1, **kwargs)
-
     
     @classmethod
     async def sendImageURLByID(cls, bot, chat_id, imageURL, caption=None, exponential_backoff=1, reply_markup=None):

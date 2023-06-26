@@ -155,10 +155,9 @@ class Room:
                 self._state = Room.State.VOTING_STATE
             case Room.State.VOTING_STATE:
                 await Reveal.beginPhase4(bot, self)
-                print("GOING TO THE REVEAL STATE")
                 self._state = Room.State.REVEAL_STATE
             case Room.State.REVEAL_STATE:
-                print("Game Over")
+                return
 
     async def startGame(self, bot):
         for eachPlayer in self._players:
@@ -216,12 +215,33 @@ class Room:
                 eachPlayer.setItem(Player.PlayerConstants.HAS_VOTED, True)
                 await eachPlayer.sendImageURL(bot, image_url)    
             else:
+                eachPlayer.setItem(Player.PlayerConstants.HAS_VOTED, False)
                 await eachPlayer.sendImageURL(bot, image_url, reply_markup=imageObj.getInlineKeyboard(eachPlayer.getUsername()))
         # if len(self._list_copy) <= 0:
         #     return False #Return false to indicate that there are no more images to send after
+        print("broadcasted image")
         return True
 
     async def getVotingImage(self):
         return self._current_voting_image
+    
+    def getLeaderboard(self):
+        leaderboard = sorted(self._players, key=lambda player: player.getScore(), reverse=True)
+        message = f"☆☆☆☆☆{leaderboard[0]}☆☆☆☆☆\n"
+        message += "Congratulations!!\n\n"
+
+        message += "TelePibbage Leaderboard:\n"
+
+        for i, player in enumerate(leaderboard, start=1):
+            username = player.getUsername()
+            score = player.getScore()
+            message += f"{i}. {username}: {score} points\n"
+
+        return message
+    
+    async def endGame(self, bot):
+        for player in self._players:
+            player.reset()
+            await player.sendMessage(bot, "Welcome2", reply_markup=BotInitiator.WelcomeKeyboard)
  
                         

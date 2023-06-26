@@ -141,3 +141,12 @@ class RoomHandler:
     async def sendNextImage(cls, bot, roomCode, username):
         player = PlayersManager.queryPlayer(username)
         return await Lying.sendNextImage(bot, cls._rooms[roomCode], player)
+
+    '''
+    End game methods
+    '''
+    @classmethod
+    async def endGame(cls, roomCode, bot):
+        await cls._rooms[roomCode].endGame(bot)
+        del cls._rooms[roomCode]
+        return True

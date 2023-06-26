@@ -93,9 +93,11 @@ def main() -> None:
             ],
             VOTING_PHASE: [
                 CallbackQueryHandler(BotCommands.handle_vote_callback, pattern=VOTE_REGEX),
+                CallbackQueryHandler(BotCommands.create_room, pattern="^" + str(CREATE_ROOM) + "$"),
+                CallbackQueryHandler(BotCommands.join_room_start, pattern="^" + str(JOIN_ROOM) + "$"),
             ],
             REVEAL_PHASE: [
-                MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.reveal_lies),
+                # MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.reveal_lies),
                 MessageHandler(filters.COMMAND, BotCommands.unknown),
             ]
         },
@@ -103,6 +105,8 @@ def main() -> None:
         map_to_parent={
             WAITING_FOR_HOST: INROOM,
             INROOM: INROOM,
+            FRESH: FRESH,
+            ENTERCODE: ENTERCODE,
         }
     )
 

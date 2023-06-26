@@ -4,6 +4,7 @@ Handles user commands
 
 import asyncio
 import time
+import re
 
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton, Update
 from BotController import BotCommands
@@ -33,6 +34,10 @@ from GameController import Lying
 MIN_PROMPT_LENGTH = 3
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    print(update.message.from_user.username + " started the bot")
+    if (update.message.from_user.username is None):
+        update.reply_text("Please set a username before using this bot")
+        return BotInitiator.END
     await PlayersManager.recordNewPlayer(update.message.from_user.username, update.message.from_user.id, context.user_data)
     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "Welcome1")
     
@@ -167,8 +172,21 @@ async def take_lie(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # return BotInitiator.VOTING_PHASE
 
 async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    #Flow control to see if the user is in a game
+    try:
+        if not context.user_data['in_game']:
+            return BotInitiator.FRESH
+    except KeyError:
+        return BotInitiator.FRESH
+
+    # Flow contorl check if the player has already voted
+    if context.user_data['has_voted']:
+        return BotInitiator.VOTING_PHASE
+    
+    print(update.callback_query.from_user.username + " voted for " + update.callback_query.data)
+    
     query = update.callback_query
-    data = query.data.split(':')
+    data = re.split(r"(?<!\\):", query.data)
     lie = data[1]
     lieAuthor = data[2]
     playerTricked = update.callback_query.from_user.username
@@ -184,33 +202,17 @@ async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYP
     # checkItems returns True after everyone places voe for one image
     if await room.checkItems(Player.PlayerConstants.HAS_VOTED, context.bot, advance=False):
         #reveal
-        # await votingImage.showPlayersTricked()
+        message = await votingImage.showPlayersTricked()
 
-        # checks anymore images 
+        await room.broadcast(context.bot, message=message, raw=True)
+        await asyncio.sleep(5)
         hasNext = await room.broadcast_voting_image(context.bot)
         if not hasNext:
             await room.advanceState(context.bot)
-            return BotInitiator.REVEAL_PHASE
-        context.user_data['has_voted'] = False
+            await RoomHandler.endGame(context.user_data['roomCode'], context.bot)
+            return BotInitiator.FRESH
 
-        return BotInitiator.LYING_PHASE
-
-    # for imageObj in image_list:
-    #     if imageObj.getImageURL() == image_url:
-    #         for lie, lie_player in imageObj.getImageLies():
-
-    #             if lie_player == player:
-    #                 PlayersManager.addPoints(update.message.from_user.username)
-
-    #                 print(f"Selected lie: {lie}")
-
-    # await query.answer()  
-    return BotInitiator.REVEAL_PHASE  
-
-async def reveal_lies(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    room = RoomHandler.getRoom(context.user_data['roomCode'])
-    votingImage = await room.getVotingImage()
-    await votingImage.showPlayersTricked()
+    return BotInitiator.VOTING_PHASE  
 
 async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "UnknownCommand")
