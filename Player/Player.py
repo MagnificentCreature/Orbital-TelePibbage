@@ -6,7 +6,7 @@ Can later be linked to a database to keep track of (leaderboard/overall scores)
 from enum import Enum
 
 from Chat.DialogueReader import DialogueReader
-
+from telegram import InputMediaPhoto
 
 class Player:
     _username = ""
@@ -89,13 +89,6 @@ class Player:
     
     def setInGame(self):
         self._user_data['in_game'] = True
-
-    def getImageURL(self):
-        try:
-            return self._user_data['image']
-        except KeyError:
-            print("Player " + self._username + " has no imageURL key")
-            return False
     
     def setItem(self, itemKey, value):
         print("Setting item " + str(itemKey) + " to " + str(value))
@@ -121,6 +114,12 @@ class Player:
         except KeyError:
             del self._user_data[key.value]
 
+    async def queryMessagekey(self, messageKey):
+        try:
+            return self._user_data[messageKey] is not None
+        except KeyError:
+            return False
+
     # Methods to send messages
     async def editMessage(self, messageKey, message, newMessageKey=None, reply_markup=None):
         await self._user_data[messageKey].edit_text(text=DialogueReader.queryDialogue(message), reply_markup=reply_markup)
@@ -130,6 +129,11 @@ class Player:
 
     async def editMessage(self, messageKey, message, newMessageKey=None, reply_markup=None, **kwargs):
         await self._user_data[messageKey].edit_text(text=DialogueReader.queryDialogue(message, **kwargs), reply_markup=reply_markup)
+        if newMessageKey != None:
+            self._user_data[newMessageKey] = self._user_data.pop(messageKey)
+
+    async def editImageURL(self, messageKey, imageURL, newMessageKey=None, reply_markup=None):
+        await self._user_data[messageKey].edit_media(media=InputMediaPhoto(imageURL), reply_markup=reply_markup)
         if newMessageKey != None:
             self._user_data[newMessageKey] = self._user_data.pop(messageKey)
 

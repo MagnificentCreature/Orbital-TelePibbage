@@ -34,9 +34,8 @@ from GameController import Lying
 MIN_PROMPT_LENGTH = 3
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    print(update.message.from_user.username + " started the bot")
     if (update.message.from_user.username is None):
-        update.reply_text("Please set a username before using this bot")
+        await update.message.reply_text("Please set a username before using this bot")
         return BotInitiator.END
     await PlayersManager.recordNewPlayer(update.message.from_user.username, update.message.from_user.id, context.user_data)
     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "Welcome1")
@@ -58,7 +57,7 @@ async def join_room_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return BotInitiator.ENTERCODE
 
 async def join_room_code(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    room_code = update.message.text
+    room_code = str.upper(update.message.text)
     return await join_room(update, context, room_code)
 
 async def join_room(update: Update, context: ContextTypes.DEFAULT_TYPE, roomCode=None):
@@ -157,6 +156,7 @@ async def take_lie(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         if context.user_data['next_lie'] is not None:
             await context.user_data['next_lie'].insertLie(update.message.text, update.message.from_user.username)
+            await update.message.delete()
             if not await RoomHandler.sendNextImage(context.bot, context.user_data["roomCode"], update.message.from_user.username):
                 waitingID = await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "WaitingForItems", **{'item': "lie"})     #TODO find a way to delete this message when the next round starts
                 await RoomHandler.checkItems(context.user_data['roomCode'], Player.PlayerConstants.LIE, context.bot)

@@ -63,11 +63,11 @@ class DialogueReader:
     async def sendMessageByID(cls, bot, chat_id, message, reply_markup=None, raw=False, exponential_backoff=1):
         try:
             #Use telegram api to send a message
-            if (message not in cls._dialogues):
-                print("Message " + message + " not found in dialogues.txt")
             try:
                 if raw:
                     return await bot.send_message(chat_id=chat_id, text=message, reply_markup=reply_markup) 
+                if (message not in cls._dialogues):
+                    print("Message " + message + " not found in dialogues.txt")
                 formattedText = cls.additionalProcessing(cls._dialogues[message])
                 return await bot.send_message(chat_id=chat_id, text=formattedText, reply_markup=reply_markup)
             except error.Forbidden as e:
@@ -84,11 +84,11 @@ class DialogueReader:
     async def sendMessageByID(cls, bot, chat_id, message, reply_markup=None, raw=False, exponential_backoff=1, **kwargs):
         try:
             #Use telegram api to send a message, additional arguments are given in the form of **{{key}=value}
-            if (message not in cls._dialogues):
-                print("Message " + message + " not found in dialogues.txt")
             try:
                 if raw:
                     return await bot.send_message(chat_id=chat_id, text=message, reply_markup=reply_markup)
+                if (message not in cls._dialogues):
+                    print("Message " + message + " not found in dialogues.txt")
                 formattedText = cls.additionalProcessing(cls._dialogues[message].format(**kwargs))
                 return await bot.send_message(chat_id=chat_id, text=formattedText, reply_markup=reply_markup)
             except error.Forbidden as e:

@@ -21,7 +21,7 @@ StartingGame, Host @{host} has started the game! Get Ready!
 HostStartingGame, You are starting the game! Get Ready!
 # Game related dialogues
 Phase1p1, Ladies and gentlemen, boys and girls, welcome to the most exhilarating game show in town, TelePibbage! I am honored to be your host for today's thrilling competition of witty imagery and trickery.
-Phase1p2, This is the prompting phase! With the help of my backstage magic monkeys with paintbrushes, I can convert your words into whacky images, so let your imaginations run wild and send me your most hilarious prompts!
+Phase1p2, This is the prompting phase! With the help of my backstage magic monkeys with paintbrushes, I can convert your words into whacky images, so let your imaginations run wild and send me your most hilarious prompts!\n\nPS This button is for display purposes only\nPPS This process is expected to take a while, especially if another player is generating before you, pelase hold
 PromptRecieved, Prompt Recieved! Generating Image...
 WaitingForItems, Waiting for other players to send in their {item}s...
 Phase2p1, I see some of you have sent some REALLY creative images, now we will move on to the next phase. The **LYING PHASE**

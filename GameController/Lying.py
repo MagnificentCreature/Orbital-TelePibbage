@@ -2,6 +2,13 @@ import random
 
 from Player.Player import Player
 from Player.PlayersManager import PlayersManager
+from telegram import InlineKeyboardMarkup, InlineKeyboardButton
+
+lie_keyboard = InlineKeyboardMarkup([
+    [
+        InlineKeyboardButton(text="Enter Your Lie!", callback_data="NOTHING"),
+    ]
+])
 
 async def beginPhase2(bot, room):
     await sendPhase2Messages(bot, room)
@@ -12,9 +19,9 @@ async def sendPhase2Messages(bot, room):
     await room.broadcast(bot, "Phase2p2")
 
 async def sendNextImage(bot, room, player):
-    # TODO: Send the player the next image he should come up with a lie for
     imageList = await room.getRemainingImages(player)
     if len(imageList) <= 0:
+        player.deleteContext("LyingImage")
         player.deleteContext(Player.PlayerConstants.NEXT_LIE.value)
         player.setItem(Player.PlayerConstants.LIE, True)
         return False
@@ -22,5 +29,9 @@ async def sendNextImage(bot, room, player):
     if image is None:
         print("NO IMAGE WTF LOL")
     player.setItem(Player.PlayerConstants.NEXT_LIE, image) # fill second param with image
-    await player.sendImageURL(bot, image.getImageURL())
+    if not await player.queryMessagekey("LyingImage"):
+        await player.sendImageURL(bot, image.getImageURL(), messageKey="LyingImage", reply_markup=lie_keyboard)
+        return True
+    print("EDITING IMAGE")
+    await player.editImageURL("LyingImage", image.getImageURL(), reply_markup=lie_keyboard)
     return True
