@@ -146,6 +146,7 @@ class Room:
             case Room.State.PROMPTING_STATE:
                 await Lying.beginPhase2(bot, self)
                 # TODO: Maybe delete the players usercontext['prompt']?
+                print("GOING TO THE LYING STATE")
                 self._state = Room.State.LYING_STATE
             case Room.State.LYING_STATE:
                 # TODO: Maybe delete the players usercontext['lies']?

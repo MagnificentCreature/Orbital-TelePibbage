@@ -108,7 +108,7 @@ def main() -> None:
 
     # Add conversation handler with the states GENDER, PHOTO, LOCATION and BIO
     main_conv_handler = ConversationHandler(
-        entry_points=[CommandHandler("start", BotCommands.start, block=False)],
+        entry_points=[CommandHandler("start", BotCommands.start)],
         states={
             FRESH: [CommandHandler("start", BotCommands.start),
                     CallbackQueryHandler(BotCommands.create_room, pattern="^" + str(CREATE_ROOM) + "$"),

@@ -1,3 +1,4 @@
+import asyncio
 import requests
 import hashlib
 import json
@@ -67,6 +68,9 @@ headers = {
   'Content-Type': 'application/json'
 }
 
+MAX_RETRIES = 3
+EXTENDED_SLEEP = 10
+
 @staticmethod
 def getImageHash(imageUrl):
     response = requests.get(imageUrl)
@@ -105,13 +109,19 @@ async def imageQuery(prompt):
       return None
     
 @staticmethod
-async def fetchImage(request_id):
+async def fetchImage(request_id, retry_count = 0):
    payload_data = FETCH_PAYLOAD.copy()
    payload_data["request_id"] = request_id
    payload = json.dumps(payload_data)
    response = requests.request("POST", FETCH_URL, headers=headers, data=payload)
    myDict = json.loads(response.text)
    print(response.text)
+   if myDict["status"] == "processing":
+      if retry_count >= MAX_RETRIES:
+         print("Max retries exceeded")
+         return None
+      await asyncio.sleep(EXTENDED_SLEEP)
+      return await fetchImage(request_id, retry_count + 1)
    if getImageHash(myDict["output"][0]) == CENSOR_HASH:
       print("Image is censored")
       return None

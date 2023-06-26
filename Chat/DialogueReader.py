@@ -77,7 +77,7 @@ class DialogueReader:
                 print("FAILURE TO SEND, ABORTING")
                 return
             logging.error("Timeout error sending message to chat_id " + str(chat_id) + ": " + str(e))
-            return await bot.send_message(bot, chat_id, message, reply_markup, raw, exponential_backoff+1)
+            return await cls.sendMessageByID(bot, chat_id, message, reply_markup=reply_markup, raw=raw, exponential_backoff=exponential_backoff+1)
 
 
     @classmethod
@@ -100,12 +100,20 @@ class DialogueReader:
                 return
             logging.error("Timeout error sending message to chat_id " + str(chat_id) + ": " + str(e))
             logging.info("Retrying with exponential backoff of " + str(2**exponential_backoff) + " seconds")
-            return await bot.send_message(bot, chat_id, message, reply_markup, raw, exponential_backoff+1, **kwargs)
+            return await cls.sendMessageByID(bot, chat_id, message, reply_markup=reply_markup, raw=raw, exponential_backoff=exponential_backoff+1, **kwargs)
 
     
-    @staticmethod
-    async def sendImageURLByID(bot, chat_id, imageURL, reply_markup=None):
+    @classmethod
+    async def sendImageURLByID(cls, bot, chat_id, imageURL, caption=None, exponential_backoff=1, reply_markup=None):
         try:
-            return await bot.send_photo(chat_id=chat_id, photo=imageURL, reply_markup=reply_markup)
-        except error.Forbidden as e:
-            logging.error("Error sending message to chat_id " + str(chat_id) + ": " + str(e))
+            try:
+                return await bot.send_photo(chat_id=chat_id, photo=imageURL, reply_markup=reply_markup, caption=caption)
+            except error.Forbidden as e:
+                logging.error("Error sending message to chat_id " + str(chat_id) + ": " + str(e))
+        except error.TimedOut as e:
+            if exponential_backoff > cls.MAX_RETRIES:
+                print("FAILURE TO SEND, ABORTING")
+                return
+            logging.error("Timeout error sending message to chat_id " + str(chat_id) + ": " + str(e))
+            logging.info("Retrying with exponential backoff of " + str(2**exponential_backoff) + " seconds")
+            return await cls.sendImageURLByID(bot, chat_id, imageURL, reply_markup=reply_markup, exponential_backoff=exponential_backoff+1)

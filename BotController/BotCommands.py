@@ -104,33 +104,40 @@ async def take_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     #asyncio.wait_for(ImageGenerator.imageQuery(update.message).wait(), timeout=60)
 
     prompt = update.message.text
-    print("Taking prompt " + prompt)
     # check if prompt is less than 3 words
     if len(prompt.split(" ")) < MIN_PROMPT_LENGTH:
         await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "PromptFewWords")
         return BotInitiator.PROMPTING_PHASE
-    #to save api calls, uncomment when ready to deploy
+    
     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "PromptRecieved")
-    imageURL = await ImageGenerator.imageQuery(prompt)
+    
+    task = asyncio.create_task(ImageGenerator.imageQuery(prompt))
+    imageURL = await task
+
     if imageURL[0].isdigit():
         request_id, eta = imageURL.split(":")
         await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "PromptTakingAwhile", **{"eta": eta})
         await asyncio.sleep(int(eta))
         imageURL = await ImageGenerator.fetchImage(request_id)
+
     if imageURL is None:
         await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "InvalidPrompt")
         return BotInitiator.PROMPTING_PHASE
+
     context.user_data['prompt'] = prompt
+    # Send the image URL in a separate task
+    send_image_task = asyncio.create_task(DialogueReader.sendImageURLByID(context.bot, update.message.from_user.id, imageURL, caption="You generated: " + prompt))
+    check_items_task = asyncio.create_task(RoomHandler.checkItems(context.user_data['roomCode'], Player.PlayerConstants.PROMPT, context.bot))
+
     await RoomHandler.takeImage(context.user_data['roomCode'], update.message.from_user.username, prompt, imageURL)
-    await DialogueReader.sendImageURLByID(context.bot, update.message.from_user.id, imageURL)
 
     waitingID = await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "WaitingForItems", **{'item': "prompt"})     #TODO find a way to delete this message when the next phase starts
-    await context.bot.send_message(chat_id=update.effective_chat.id, text='The image you generated: ' + context.user_data['prompt'])
-    await RoomHandler.checkItems(context.user_data['roomCode'], Player.PlayerConstants.PROMPT, context.bot)
-
+    await send_image_task
+    await check_items_task
     return BotInitiator.LYING_PHASE
 
 async def take_lie(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    print("Taking lie " + update.message.text)
     #Check if the user is in a game
     if not context.user_data['in_game']:
         return BotInitiator.WAITING_FOR_HOST
@@ -150,6 +157,7 @@ async def take_lie(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 return BotInitiator.VOTING_PHASE
             return BotInitiator.LYING_PHASE
     except KeyError:
+        print("next_lie key error")
         return BotInitiator.LYING_PHASE
     
     # TODO: handle bad lies or failure to generate image
