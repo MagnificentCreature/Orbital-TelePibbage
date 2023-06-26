@@ -147,6 +147,13 @@ async def take_lie(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # return BotInitiator.VOTING_PHASE
 
 async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    #Flow control to see if the user is in a game
+    try:
+        if not context.user_data['in_game']:
+            return BotInitiator.FRESH
+    except KeyError:
+        return BotInitiator.FRESH
+
     # Flow contorl check if the player has already voted
     if context.user_data['has_voted']:
         return BotInitiator.VOTING_PHASE
