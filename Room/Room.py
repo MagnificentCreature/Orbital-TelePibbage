@@ -16,7 +16,7 @@ class Room:
     _host = None #player object
     _players = [] #contains list of player objects
     MAX_PLAYERS = 8
-    MIN_PLAYERS = 2
+    MIN_PLAYERS = 3
     _state = 0 # 0 = join state, 1 = game state
     _list_of_images = []
     _list_copy = None
@@ -205,7 +205,6 @@ class Room:
         imageObj = self._list_copy.pop()
         image_url = imageObj.getImageURL()
         author = imageObj.getAuthor()
-        # print('buttons '+ str(lie_buttons))
 
         self._current_voting_image = imageObj
 

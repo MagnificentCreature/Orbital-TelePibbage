@@ -130,9 +130,9 @@ class RoomHandler:
     Prompting Phase methods
     '''
     @classmethod
-    async def takeImage(cls, roomCode, username, prompt, imageURL):
+    async def takeImage(cls, roomCode, username, image):
         player = PlayersManager.queryPlayer(username)
-        await cls._rooms[roomCode].takeImage(player, Image(username, prompt, imageURL))
+        await cls._rooms[roomCode].takeImage(player, image)
 
     '''
     Lying Phase Methods

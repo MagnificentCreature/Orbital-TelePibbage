@@ -12,19 +12,32 @@ class Image:
     correct_players = []
     imageURL = "a" #store imageURL
     imageLies = {} #store imageLies as a dict:tuple of lie_author:(lie, [list of players who fell for the lie])
+    processingTime = 0 # 0 for image is made, else the number is the ETA
+    requestID = 0 # 0 for image is made, else the number is the requestID
 
-    def __init__(self, author, prompt, imageURL):
+    def __init__(self, author, prompt, imageURL, processingTime = 0, requestID = 0):
         self.author = author
         self.prompt = prompt
         self.imageURL = imageURL
         self.imageLies = {}
         self.correct_players = []
+        self.processingTime = processingTime
+        self.requestID = requestID
+
+    def getProcessing(self):
+        return self.processingTime
+    
+    def getRequestID(self):
+        return self.requestID
 
     def getImageURL(self):
         return self.imageURL
     
     def getAuthor(self):
         return self.author
+    
+    def getPrompt(self):
+        return self.prompt
 
     # for each image, add a tuple for lies given by other players
     async def insertLie(self, lie, lieAuthor):
