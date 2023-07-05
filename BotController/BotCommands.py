@@ -136,7 +136,7 @@ async def take_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     context.user_data['prompt'] = image.getPrompt()
     # Send the image URL in a separate task
-    send_image_task = asyncio.create_task(DialogueReader.sendImageURLByID(context.bot, update.message.from_user.id, image.getImageURL(), caption="You generated: " + prompt))
+    send_image_task = asyncio.create_task(DialogueReader.sendImageURLByID(context.bot, update.message.from_user.id, image.getImageURL(), caption="You generated: " + image.getPrompt()))
 
     await RoomHandler.takeImage(context.user_data['roomCode'], update.message.from_user.username, image)
 

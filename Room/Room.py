@@ -16,7 +16,7 @@ class Room:
     _host = None #player object
     _players = [] #contains list of player objects
     MAX_PLAYERS = 8
-    MIN_PLAYERS = 3
+    MIN_PLAYERS = 2
     _state = 0 # 0 = join state, 1 = game state
     _list_of_images = []
     _list_copy = None

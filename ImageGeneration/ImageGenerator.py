@@ -91,12 +91,12 @@ def randomImage(author):
   response = requests.request("POST", URL_V3, headers=headers, data=payload)
   myDict = json.loads(response.text)
   print(response.text)
-  return Image(author, myDict["prompt"], myDict["output"][0])
+  return Image(author, myDict["meta"]["prompt"], myDict["output"][0])
 
 @staticmethod
 def errorChecking(myDict, prompt, author):
   try:
-    if myDict["status"] == "failure":
+    if myDict["status"] == "failed":
         return None
     if myDict["status"] == "processing":
         eta = math.ceil(float(myDict["eta"]))
@@ -143,20 +143,20 @@ async def fetchImage(image, author, bot, retry_count = 0): #add async
 
   if myDict["status"] == "processing":
     if retry_count >= MAX_RETRIES:
-        player.sendMessage(bot, "MaxRetries")
+        await player.sendMessage(bot, "MaxRetries")
         return randomImage(author)
-    player.sendMessage(bot, "WaitingAgain", **{"retries": MAX_RETRIES - retry_count})
+    await player.sendMessage(bot, "WaitingAgain", **{"retries": MAX_RETRIES - retry_count})
     await asyncio.sleep(EXTENDED_SLEEP) #add await
     return await fetchImage(image, author, bot, retry_count + 1) #add await
   if getImageHash(myDict["output"][0]) == CENSOR_HASH:
     return None
   return Image(author, image.getPrompt(), myDict["output"][0])
 
-async def main():
+# async def main():
   # print("HI")
   # image = await imageQuery("Misty, realistic mist, I want you to imagine spiderman with guns and Barak Obama, with racecars but Masterpiece and Studio Quality and 6k and there is a jungle in the background, the jungle is green and lush and they are having an epic ANIME battle, shot on a canon MAX", "GAY")
   # if image.getProcessing() > 0:
   #   eta = image.getProcessing()
   #   await asyncio.sleep(eta/4)
   #   image = await fetchImage(image)
-  randomImage("gay")
+  # randomImage("gay")
