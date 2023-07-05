@@ -91,7 +91,6 @@ class Player:
         self._user_data['in_game'] = True
     
     def setItem(self, itemKey, value):
-        print("Setting item " + str(itemKey) + " to " + str(value))
         if itemKey not in Player.PlayerConstants.__members__.values():
             return False
         self._user_data[itemKey.value] = value

@@ -2,14 +2,23 @@ import asyncio
 import requests
 import hashlib
 import json
-import conf
+# import conf
 import math
 
-AI_API_TOKEN = conf.SD_API_TOKEN
+from GameController.Image import Image
+from Player.PlayersManager import PlayersManager
 
+# AI_API_TOKEN = conf.SD_API_TOKEN
+AI_API_TOKEN = "7vFwuHHVpUoOW5his0TrwewJP40w1WDeydVQTMMllgzHBzjvLl6kcrqHGfTR"
+
+URL_V3 = "https://stablediffusionapi.com/api/v3/text2img"
 URL = "https://stablediffusionapi.com/api/v4/dreambooth"
 FETCH_URL = "https://stablediffusionapi.com/api/v4/dreambooth/fetch"
 CENSOR_HASH = "e9c4a470ad900801f7de4f9402eb27af8a1cc00eac80d618ef16bac39fb27d33"
+
+MAX_RETRIES = 3
+MAX_TIME = 120
+EXTENDED_SLEEP = 10
 
 PAYLOAD_DATA_TEMPLATE_V4 = {
   "key": AI_API_TOKEN,
@@ -22,13 +31,13 @@ PAYLOAD_DATA_TEMPLATE_V4 = {
   "num_inference_steps": "30",
   "safety_checker": "yes",
   "enhance_prompt": "no",
-  "seed": None,
+  "seed": 1579799523,
   "guidance_scale": 7.5,
   "safety_checker": "yes",
   "multi_lingual": "yes",
   "panorama": "no",
   "self_attention": "no",
-  "upscale": "no",
+  "upscale": "yes",
   "embeddings_model": None,
   "lora_model": None,
   "tomesd": "yes",
@@ -45,81 +54,109 @@ FETCH_PAYLOAD = {
  "request_id": "your_request_id"
 }
 
-# PAYLOAD_DATA_TEMPLATE_V3 = {
-#   "key": AI_API_TOKEN,
-#   "prompt": "",
-#   "negative_prompt": None,
-#   "width": "512",
-#   "height": "512",
-#   "samples": "1",
-#   "num_inference_steps": "20",
-#   "seed": None,
-#   "guidance_scale": 7.5,
-#   "safety_checker": "yes",
-#   "multi_lingual": "no",
-#   "panorama": "no",
-#   "self_attention": "no",
-#   "upscale": "no",
-#   "embeddings_model": "embeddings_model_id",
-#   "webhook": None,
-#   "track_id": None
-# }
+PAYLOAD_DATA_TEMPLATE_V3 = {
+  "key": AI_API_TOKEN,
+  "prompt": "",
+  "negative_prompt": None,
+  "width": "512",
+  "height": "512",
+  "samples": "1",
+  "num_inference_steps": "30",
+  "seed": None,
+  "guidance_scale": 7.5,
+  "safety_checker": "yes",
+  "multi_lingual": "no",
+  "panorama": "no",
+  "self_attention": "no",
+  "upscale": "no",
+  "embeddings_model": "embeddings_model_id",
+  "webhook": None,
+  "track_id": None
+}
 
 headers = {
   'Content-Type': 'application/json'
 }
 
-MAX_RETRIES = 3
-EXTENDED_SLEEP = 10
 
 @staticmethod
 def getImageHash(imageUrl):
-    response = requests.get(imageUrl)
-    imageBytes = response.content
-    return hashlib.sha256(imageBytes).hexdigest()
+  response = requests.get(imageUrl)
+  imageBytes = response.content
+  return hashlib.sha256(imageBytes).hexdigest()
     
 @staticmethod
-async def imageQuery(prompt):
-    payload_data = PAYLOAD_DATA_TEMPLATE_V4.copy()
-    payload_data["prompt"] = prompt
-    payload = json.dumps(payload_data)
-    try:
-      response = requests.request("POST", URL, headers=headers, data=payload)
-      myDict = json.loads(response.text)
-      print(response.text)
-      if myDict["status"] == "failure":
-         return None
-      if myDict["status"] == "processing":
+def randomImage(author):
+  payload = json.dumps(PAYLOAD_DATA_TEMPLATE_V3)
+  response = requests.request("POST", URL_V3, headers=headers, data=payload)
+  myDict = json.loads(response.text)
+  print(response.text)
+  return Image(author, myDict["meta"]["prompt"], myDict["output"][0])
+
+@staticmethod
+def errorChecking(myDict, prompt, author):
+  try:
+    if myDict["status"] == "failed":
+        return None
+    if myDict["status"] == "processing":
         eta = math.ceil(float(myDict["eta"]))
-        return str(myDict["id"]) + ":" + str(eta)
-      if getImageHash(myDict["output"][0]) == CENSOR_HASH:
-          return None
-      return myDict["output"][0]
-    except KeyError:
-      if myDict["message"] == "Server Error":
-        print("Server Error")
-      return None
-    except IndexError:
-      print(response.text)
-      return None
-    except requests.exceptions.RequestException as e:
-      print("RequestException error " + e)
-      return None
+        if eta > MAX_TIME:
+            return None
+        return Image(author, prompt, "", processingTime=eta, requestID=myDict["id"])
+    if getImageHash(myDict["output"][0]) == CENSOR_HASH:
+        return None
+    return Image(author, prompt, myDict["output"][0])
+  except KeyError:
+    if myDict["message"] == "Server Error":
+      print("Server Error")
+    return None
+
+@staticmethod
+def sendHTTP(payload, url): 
+  try:
+    response = requests.request("POST", url, headers=headers, data=payload)
+    myDict = json.loads(response.text)
+    print(response.text)
+    return myDict
+  except IndexError:
+    return None
+  except requests.exceptions.RequestException as e:
+    print("RequestException error " + e)
+    return None
+
+@staticmethod
+async def imageQuery(prompt, author): #add async
+  payload_data = PAYLOAD_DATA_TEMPLATE_V4.copy()
+  payload_data["prompt"] = prompt
+  payload = json.dumps(payload_data)
+  myDict = sendHTTP(payload, URL)
+  return errorChecking(myDict, prompt, author)
     
 @staticmethod
-async def fetchImage(request_id, retry_count = 0):
-   payload_data = FETCH_PAYLOAD.copy()
-   payload_data["request_id"] = request_id
-   payload = json.dumps(payload_data)
-   response = requests.request("POST", FETCH_URL, headers=headers, data=payload)
-   myDict = json.loads(response.text)
-   print(response.text)
-   if myDict["status"] == "processing":
-      if retry_count >= MAX_RETRIES:
-         print("Max retries exceeded")
-         return None
-      await asyncio.sleep(EXTENDED_SLEEP)
-      return await fetchImage(request_id, retry_count + 1)
-   if getImageHash(myDict["output"][0]) == CENSOR_HASH:
-      return None
-   return myDict["output"][0]
+async def fetchImage(image, author, bot, retry_count = 0): #add async
+  payload_data = FETCH_PAYLOAD.copy()
+  payload_data["request_id"] = image.getRequestID()
+  payload = json.dumps(payload_data)
+  myDict = sendHTTP(payload, FETCH_URL)
+
+  player = PlayersManager.queryPlayer(author)
+
+  if myDict["status"] == "processing":
+    if retry_count >= MAX_RETRIES:
+        await player.sendMessage(bot, "MaxRetries")
+        return randomImage(author)
+    await player.sendMessage(bot, "WaitingAgain", **{"retries": MAX_RETRIES - retry_count})
+    await asyncio.sleep(EXTENDED_SLEEP) #add await
+    return await fetchImage(image, author, bot, retry_count + 1) #add await
+  if getImageHash(myDict["output"][0]) == CENSOR_HASH:
+    return None
+  return Image(author, image.getPrompt(), myDict["output"][0])
+
+# async def main():
+  # print("HI")
+  # image = await imageQuery("Misty, realistic mist, I want you to imagine spiderman with guns and Barak Obama, with racecars but Masterpiece and Studio Quality and 6k and there is a jungle in the background, the jungle is green and lush and they are having an epic ANIME battle, shot on a canon MAX", "GAY")
+  # if image.getProcessing() > 0:
+  #   eta = image.getProcessing()
+  #   await asyncio.sleep(eta/4)
+  #   image = await fetchImage(image)
+  # randomImage("gay")

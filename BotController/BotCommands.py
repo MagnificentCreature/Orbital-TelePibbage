@@ -20,10 +20,10 @@ from telegram.ext import (
 
 import sys
 from pathlib import Path
+sys.path.insert(1, str(Path(__file__).parent.parent.absolute()))
 
 from Player.Player import Player
 from Room.Room import Room
-sys.path.insert(1, str(Path(__file__).parent.parent.absolute()))
 from Chat.DialogueReader import DialogueReader
 from Room.RoomHandler import RoomHandler
 from Player.PlayersManager import PlayersManager
@@ -32,6 +32,7 @@ from BotController import BotInitiator
 from GameController import Lying
 
 MIN_PROMPT_LENGTH = 3
+MAX_PROMPT_LENGTH = 15
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if (update.message.from_user.username is None):
@@ -91,7 +92,7 @@ async def return_to_fresh(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def generate(update: Update, context: ContextTypes.DEFAULT_TYPE):
     prompt = (" ").join(update.message.text.split(" ")[1:]) #TODO logic flow if invalid prompt or no prompt
-    imageURL = await ImageGenerator.imageQuery(prompt) 
+    imageURL = await ImageGenerator.imageQuery(prompt, update.message.from_user.username) 
     print(update.message.from_user.username + "Generated Image: " + str(imageURL))
     await DialogueReader.sendImageURLByID(context.bot, update.message.from_user.id, imageURL)
 
@@ -110,29 +111,34 @@ async def take_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     prompt = update.message.text
     # check if prompt is less than 3 words
     if len(prompt.split(" ")) < MIN_PROMPT_LENGTH:
-        await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "PromptFewWords")
+        await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "PromptFewWords", **{"limit": MIN_PROMPT_LENGTH})
+        return BotInitiator.PROMPTING_PHASE
+    
+    # check if prompt exceeds limit
+    if len(prompt.split(" ")) > MAX_PROMPT_LENGTH:
+        await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "PromptManyWords", **{"limit": MAX_PROMPT_LENGTH})
         return BotInitiator.PROMPTING_PHASE
     
     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "PromptRecieved")
     
-    task = asyncio.create_task(ImageGenerator.imageQuery(prompt))
-    imageURL = await task
+    task = asyncio.create_task(ImageGenerator.imageQuery(prompt, update.message.from_user.username))
+    image = await task
 
-    if imageURL[0].isdigit():
-        request_id, eta = imageURL.split(":")
-        await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "PromptTakingAwhile", **{"eta": eta})
-        await asyncio.sleep(int(eta))
-        imageURL = await ImageGenerator.fetchImage(request_id)
-
-    if imageURL is None:
+    if image is None:
         await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "InvalidPrompt")
         return BotInitiator.PROMPTING_PHASE
 
-    context.user_data['prompt'] = prompt
-    # Send the image URL in a separate task
-    send_image_task = asyncio.create_task(DialogueReader.sendImageURLByID(context.bot, update.message.from_user.id, imageURL, caption="You generated: " + prompt))
+    if image.getProcessing() > 0:
+        eta = image.getProcessing()
+        await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "PromptTakingAwhile", **{"eta": eta})
+        await asyncio.sleep(eta)
+        image = await ImageGenerator.fetchImage(image, update.message.from_user.username, context.bot)
 
-    await RoomHandler.takeImage(context.user_data['roomCode'], update.message.from_user.username, prompt, imageURL)
+    context.user_data['prompt'] = image.getPrompt()
+    # Send the image URL in a separate task
+    send_image_task = asyncio.create_task(DialogueReader.sendImageURLByID(context.bot, update.message.from_user.id, image.getImageURL(), caption="You generated: " + image.getPrompt()))
+
+    await RoomHandler.takeImage(context.user_data['roomCode'], update.message.from_user.username, image)
 
     waitingID = await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "WaitingForItems", **{'item': "prompt"})     #TODO find a way to delete this message when the next phase starts
     await send_image_task

@@ -205,7 +205,6 @@ class Room:
         imageObj = self._list_copy.pop()
         image_url = imageObj.getImageURL()
         author = imageObj.getAuthor()
-        # print('buttons '+ str(lie_buttons))
 
         self._current_voting_image = imageObj
 
