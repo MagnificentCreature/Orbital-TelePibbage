@@ -22,7 +22,7 @@ EXTENDED_SLEEP = 10
 
 PAYLOAD_DATA_TEMPLATE_V4 = {
   "key": AI_API_TOKEN,
-  "model_id": "midjourney", #anything_v4 is another possible model_id
+  "model_id": "midjourney",
   "prompt": "",
   "negative_prompt": "",
   "width": "512",
@@ -31,23 +31,40 @@ PAYLOAD_DATA_TEMPLATE_V4 = {
   "num_inference_steps": "30",
   "safety_checker": "yes",
   "enhance_prompt": "no",
-  "seed": 1579799523,
+  "seed": "",
   "guidance_scale": 7.5,
-  "safety_checker": "yes",
-  "multi_lingual": "yes",
-  "panorama": "no",
-  "self_attention": "no",
-  "upscale": "yes",
-  "embeddings_model": None,
-  "lora_model": None,
-  "tomesd": "yes",
-  "use_karras_sigmas": "yes",
-  "vae": None,
-  "lora_strength": None,
-  "scheduler": "UniPCMultistepScheduler",
-  "webhook": None,
-  "track_id": None
+  "multi_lingual": "no",
+  "webhook": "",
+  "track_id": ""
 }
+
+# PAYLOAD_DATA_TEMPLATE_V4 = {
+#   "key": AI_API_TOKEN,
+#   "model_id": "midjourney", #anything_v4 is another possible model_id
+#   "prompt": "",
+#   "negative_prompt": "",
+#   "width": "512",
+#   "height": "512",
+#   "samples": "1",
+#   "num_inference_steps": "30",
+#   "safety_checker": "yes",
+#   "enhance_prompt": "no",
+#   "seed": None,
+#   "guidance_scale": 7.5,
+#   "safety_checker": "yes",
+#   "panorama": "no",
+#   "self_attention": "no",
+#   "upscale": "no",
+#   "embeddings_model": None,
+#   "lora_model": None,
+#   "tomesd": "yes",
+#   "use_karras_sigmas": "yes",
+#   "vae": None,
+#   "lora_strength": None,
+#   "scheduler": "DDPMScheduler",
+#   "webhook": None,
+#   "track_id": None
+# }
 
 FETCH_PAYLOAD = {
  "key": AI_API_TOKEN,
@@ -88,10 +105,8 @@ def getImageHash(imageUrl):
 @staticmethod
 def randomImage(author):
   payload = json.dumps(PAYLOAD_DATA_TEMPLATE_V3)
-  response = requests.request("POST", URL_V3, headers=headers, data=payload)
-  myDict = json.loads(response.text)
-  print(response.text)
-  return Image(author, myDict["meta"]["prompt"], myDict["output"][0])
+  myDict = sendHTTP(payload, URL_V3)
+  return errorChecking(myDict, myDict["meta"]["prompt"], author)
 
 @staticmethod
 def errorChecking(myDict, prompt, author):
@@ -133,7 +148,7 @@ async def imageQuery(prompt, author): #add async
   return errorChecking(myDict, prompt, author)
     
 @staticmethod
-async def fetchImage(image, author, bot, retry_count = 0): #add async
+async def fetchImage(image, author, bot=None, retry_count = 0): #add async
   payload_data = FETCH_PAYLOAD.copy()
   payload_data["request_id"] = image.getRequestID()
   payload = json.dumps(payload_data)
@@ -143,20 +158,24 @@ async def fetchImage(image, author, bot, retry_count = 0): #add async
 
   if myDict["status"] == "processing":
     if retry_count >= MAX_RETRIES:
-        await player.sendMessage(bot, "MaxRetries")
+        if bot is not None:
+          await player.sendMessage(bot, "MaxRetries")
         return randomImage(author)
-    await player.sendMessage(bot, "WaitingAgain", **{"retries": MAX_RETRIES - retry_count})
+    if bot is not None:
+      await player.sendMessage(bot, "WaitingAgain", **{"retries": MAX_RETRIES - retry_count})
     await asyncio.sleep(EXTENDED_SLEEP) #add await
     return await fetchImage(image, author, bot, retry_count + 1) #add await
   if getImageHash(myDict["output"][0]) == CENSOR_HASH:
     return None
   return Image(author, image.getPrompt(), myDict["output"][0])
 
-# async def main():
+async def main():
   # print("HI")
   # image = await imageQuery("Misty, realistic mist, I want you to imagine spiderman with guns and Barak Obama, with racecars but Masterpiece and Studio Quality and 6k and there is a jungle in the background, the jungle is green and lush and they are having an epic ANIME battle, shot on a canon MAX", "GAY")
-  # if image.getProcessing() > 0:
-  #   eta = image.getProcessing()
-  #   await asyncio.sleep(eta/4)
-  #   image = await fetchImage(image)
+  image = await imageQuery("hello im guy", "hi")
+  if image is not None and image.getProcessing() > 0:
+    eta = image.getProcessing()
+    await asyncio.sleep(eta/4)
+    image = await fetchImage(image, "hi")
+
   # randomImage("gay")

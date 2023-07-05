@@ -124,15 +124,15 @@ async def take_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     task = asyncio.create_task(ImageGenerator.imageQuery(prompt, update.message.from_user.username))
     image = await task
 
-    if image is None:
-        await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "InvalidPrompt")
-        return BotInitiator.PROMPTING_PHASE
-
-    if image.getProcessing() > 0:
+    if image is not None and image.getProcessing() > 0:
         eta = image.getProcessing()
         await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "PromptTakingAwhile", **{"eta": eta})
         await asyncio.sleep(eta)
-        image = await ImageGenerator.fetchImage(image, update.message.from_user.username, context.bot)
+        image = await ImageGenerator.fetchImage(image, update.message.from_user.username, bot=context.bot)
+
+    if image is None:
+        await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "InvalidPrompt")
+        return BotInitiator.PROMPTING_PHASE
 
     context.user_data['prompt'] = image.getPrompt()
     # Send the image URL in a separate task
@@ -140,8 +140,8 @@ async def take_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await RoomHandler.takeImage(context.user_data['roomCode'], update.message.from_user.username, image)
 
-    waitingID = await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "WaitingForItems", **{'item': "prompt"})     #TODO find a way to delete this message when the next phase starts
     await send_image_task
+    waitingID = await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "WaitingForItems", **{'item': "prompt"})     #TODO find a way to delete this message when the next phase starts
     
     check_items_task = asyncio.create_task(RoomHandler.checkItems(context.user_data['roomCode'], Player.PlayerConstants.PROMPT, context.bot))
     await check_items_task
@@ -174,9 +174,6 @@ async def take_lie(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     # TODO: handle bad lies or failure to generate image
     return BotInitiator.LYING_PHASE
-    # waitingID = await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "WaitingForItems", **{'item': "lie"})     #TODO find a way to delete this message when the next round starts
-    # await RoomHandler.checkItems(context.user_data['roomCode'], Player.PlayerConstants.LIE, context.bot)
-    # return BotInitiator.VOTING_PHASE
 
 async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     #Flow control to see if the user is in a game

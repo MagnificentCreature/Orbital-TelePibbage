@@ -45,5 +45,5 @@ InvalidPrompt, Image was censored for various reasons, try sending the same prom
 PromptFewWords, Prompt too short!\nYour prompt must be at least {limit} words long, try again!
 PromptManyWords, Prompt too long!\nYour prompt must be at most {limit} words long, try again!
 PromptTakingAwhile, Your prompt is taking a while to generate, please hold...\nEstimate time is {eta} seconds
-MaxRetries, Image generation took to long, automatically generating simpler image
-WaitingAgain, Image generatin is taking a while, waiting for another 10 seconds, {retries} retries left.
+MaxRetries, Image generation took to long, automatically generating simpler image.\nNote: If this does not produce an image, you are free to try again with a simpler prompt, however, it could be that Stable Diffusion is down.
+WaitingAgain, Image generation is taking a while, waiting for another 10 seconds, {retries} retries left.

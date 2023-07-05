@@ -11,6 +11,10 @@ from BotController import BotInitiator
 import logging
 
 from telegram import error
+from telegram import constants
+
+# Constant for 
+MARKDOWN = constants.ParseMode.MARKDOWN_V2
 
 class DialogueReader:
 
@@ -40,13 +44,16 @@ class DialogueReader:
     _dialogues_path = path.join(_dir_path, "dialogues.txt")
 
     # Read the dialogues from the file
-
     _dialogues = __read_dialogues(_dialogues_path)
 
     @staticmethod
     def additionalProcessing(inputString):
-        # Replace \n with newline
+        SPECIAL_CHARACTERS = ["_", "*", "[", "]", "(", ")", "~", "`", ">", "#", "+", "-", "=", "|", "{", "}", ".", "!"] # [".",">","!"]
+        # Replace new line characters with \n
         inputString = inputString.replace("\\n", "\n")
+        # Replace special characters with \<character> for telegram compliance
+        for eachItem in SPECIAL_CHARACTERS:
+            inputString = inputString.replace(eachItem, f"\{eachItem}")
         # capitalise the first letter
         inputString = inputString[0].upper() + inputString[1:]
         return inputString
@@ -60,16 +67,16 @@ class DialogueReader:
         return cls.additionalProcessing(cls._dialogues[key].format(**kwargs))
 
     @classmethod
-    async def sendMessageByID(cls, bot, chat_id, message, reply_markup=None, raw=False, exponential_backoff=1):
+    async def sendMessageByID(cls, bot, chat_id, message, reply_markup=None, raw=False, exponential_backoff=1, parse_mode=MARKDOWN):
         try:
             #Use telegram api to send a message
             try:
                 if raw:
-                    return await bot.send_message(chat_id=chat_id, text=message, reply_markup=reply_markup) 
+                    return await bot.send_message(chat_id=chat_id, text=message, reply_markup=reply_markup, parse_mode=parse_mode) 
                 if (message not in cls._dialogues):
                     print("Message " + message + " not found in dialogues.txt")
                 formattedText = cls.additionalProcessing(cls._dialogues[message])
-                return await bot.send_message(chat_id=chat_id, text=formattedText, reply_markup=reply_markup)
+                return await bot.send_message(chat_id=chat_id, text=formattedText, reply_markup=reply_markup, parse_mode=parse_mode)
             except error.Forbidden as e:
                 logging.error("Error sending message to chat_id " + str(chat_id) + ": " + str(e))
         except error.TimedOut as e:
@@ -77,20 +84,20 @@ class DialogueReader:
                 print("FAILURE TO SEND, ABORTING")
                 return
             logging.error("Timeout error sending message to chat_id " + str(chat_id) + ": " + str(e))
-            return await cls.sendMessageByID(bot, chat_id, message, reply_markup=reply_markup, raw=raw, exponential_backoff=exponential_backoff+1)
+            return await cls.sendMessageByID(bot, chat_id, message, reply_markup=reply_markup, raw=raw, exponential_backoff=exponential_backoff+1, parse_mode=parse_mode)
 
 
     @classmethod
-    async def sendMessageByID(cls, bot, chat_id, message, reply_markup=None, raw=False, exponential_backoff=1, **kwargs):
+    async def sendMessageByID(cls, bot, chat_id, message, reply_markup=None, raw=False, exponential_backoff=1, parse_mode=MARKDOWN, **kwargs):
         try:
             #Use telegram api to send a message, additional arguments are given in the form of **{{key}=value}
             try:
                 if raw:
-                    return await bot.send_message(chat_id=chat_id, text=message, reply_markup=reply_markup)
+                    return await bot.send_message(chat_id=chat_id, text=message, reply_markup=reply_markup, parse_mode=parse_mode)
                 if (message not in cls._dialogues):
                     print("Message " + message + " not found in dialogues.txt")
                 formattedText = cls.additionalProcessing(cls._dialogues[message].format(**kwargs))
-                return await bot.send_message(chat_id=chat_id, text=formattedText, reply_markup=reply_markup)
+                return await bot.send_message(chat_id=chat_id, text=formattedText, reply_markup=reply_markup, parse_mode=parse_mode)
             except error.Forbidden as e:
                 logging.error("Error sending message to chat_id " + str(chat_id) + ": " + str(e))
             await asyncio.sleep(2**random.randint(1, exponential_backoff))
@@ -100,13 +107,13 @@ class DialogueReader:
                 return
             logging.error("Timeout error sending message to chat_id " + str(chat_id) + ": " + str(e))
             logging.info("Retrying with exponential backoff of " + str(2**exponential_backoff) + " seconds")
-            return await cls.sendMessageByID(bot, chat_id, message, reply_markup=reply_markup, raw=raw, exponential_backoff=exponential_backoff+1, **kwargs)
+            return await cls.sendMessageByID(bot, chat_id, message, reply_markup=reply_markup, raw=raw, exponential_backoff=exponential_backoff+1, parse_mode=parse_mode, **kwargs)
     
     @classmethod
-    async def sendImageURLByID(cls, bot, chat_id, imageURL, caption=None, exponential_backoff=1, reply_markup=None):
+    async def sendImageURLByID(cls, bot, chat_id, imageURL, caption=None, exponential_backoff=1, reply_markup=None, parse_mode=MARKDOWN):
         try:
             try:
-                return await bot.send_photo(chat_id=chat_id, photo=imageURL, reply_markup=reply_markup, caption=caption)
+                return await bot.send_photo(chat_id=chat_id, photo=imageURL, reply_markup=reply_markup, caption=caption, parse_mode=parse_mode)
             except error.Forbidden as e:
                 logging.error("Error sending message to chat_id " + str(chat_id) + ": " + str(e))
         except error.TimedOut as e:
@@ -115,4 +122,4 @@ class DialogueReader:
                 return
             logging.error("Timeout error sending message to chat_id " + str(chat_id) + ": " + str(e))
             logging.info("Retrying with exponential backoff of " + str(2**exponential_backoff) + " seconds")
-            return await cls.sendImageURLByID(bot, chat_id, imageURL, reply_markup=reply_markup, exponential_backoff=exponential_backoff+1)
+            return await cls.sendImageURLByID(bot, chat_id, imageURL, reply_markup=reply_markup, exponential_backoff=exponential_backoff+1, parse_mode=parse_mode)
