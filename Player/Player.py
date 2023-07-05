@@ -120,19 +120,19 @@ class Player:
             return False
 
     # Methods to send messages
-    async def editMessage(self, messageKey, message, newMessageKey=None, reply_markup=None):
-        await self._user_data[messageKey].edit_text(text=DialogueReader.queryDialogue(message), reply_markup=reply_markup)
+    async def editMessage(self, messageKey, message, newMessageKey=None, reply_markup=None, parse_mode=DialogueReader.MARKDOWN):
+        await self._user_data[messageKey].edit_text(text=DialogueReader.queryDialogue(message), reply_markup=reply_markup, parse_mode=parse_mode)
         if newMessageKey != None:
             self._user_data[newMessageKey] = self._user_data.pop(messageKey)
 
 
-    async def editMessage(self, messageKey, message, newMessageKey=None, reply_markup=None, **kwargs):
-        await self._user_data[messageKey].edit_text(text=DialogueReader.queryDialogue(message, **kwargs), reply_markup=reply_markup)
+    async def editMessage(self, messageKey, message, newMessageKey=None, reply_markup=None, parse_mode=DialogueReader.MARKDOWN, **kwargs):
+        await self._user_data[messageKey].edit_text(text=DialogueReader.queryDialogue(message, **kwargs), reply_markup=reply_markup, parse_mode=parse_mode)
         if newMessageKey != None:
             self._user_data[newMessageKey] = self._user_data.pop(messageKey)
 
-    async def editImageURL(self, messageKey, imageURL, newMessageKey=None, reply_markup=None):
-        await self._user_data[messageKey].edit_media(media=InputMediaPhoto(imageURL), reply_markup=reply_markup)
+    async def editImageURL(self, messageKey, imageURL, newMessageKey=None, reply_markup=None, parse_mode=DialogueReader.MARKDOWN):
+        await self._user_data[messageKey].edit_media(media=InputMediaPhoto(imageURL), reply_markup=reply_markup, parse_mode=parse_mode)
         if newMessageKey != None:
             self._user_data[newMessageKey] = self._user_data.pop(messageKey)
 

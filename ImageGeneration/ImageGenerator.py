@@ -170,7 +170,6 @@ async def fetchImage(image, author, bot=None, retry_count = 0): #add async
   return Image(author, image.getPrompt(), myDict["output"][0])
 
 async def main():
-  # print("HI")
   # image = await imageQuery("Misty, realistic mist, I want you to imagine spiderman with guns and Barak Obama, with racecars but Masterpiece and Studio Quality and 6k and there is a jungle in the background, the jungle is green and lush and they are having an epic ANIME battle, shot on a canon MAX", "GAY")
   image = await imageQuery("hello im guy", "hi")
   if image is not None and image.getProcessing() > 0:

@@ -140,6 +140,7 @@ class Room:
         return True
     
     async def advanceState(self, bot):
+        await asyncio.sleep(2)
         match self._state:
             case Room.State.JOIN_STATE:
                 await Prompting.beginPhase1(bot, self)
@@ -224,8 +225,8 @@ class Room:
     
     def getLeaderboard(self):
         leaderboard = sorted(self._players, key=lambda player: player.getScore(), reverse=True)
-        message = f"☆☆☆☆☆{leaderboard[0]}☆☆☆☆☆\n"
-        message += "Congratulations!!\n\n"
+        message = f"*☆☆☆☆☆{leaderboard[0]}☆☆☆☆☆*\n"
+        message += "*Congratulations\!\!*\n\n"
 
         message += "TelePibbage Leaderboard:\n"
 

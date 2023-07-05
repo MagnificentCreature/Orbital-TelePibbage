@@ -75,18 +75,18 @@ class Image:
 
         # iterate through all lies
         for lieAuthor, (lie, playersTricked) in self.imageLies.items():
-            message += f"&@{lieAuthor}'s LIE: {lie}\n&"
+            message += f"*@{lieAuthor}'s LIE: {lie}\n*"
             lieAuthorObj = PlayersManager.queryPlayer(lieAuthor)
 
             playersTrickedString = ", @".join(playersTricked)
 
             if playersTrickedString == "":
-                message += "Nobody picked this prompt"    
+                message += "Nobody picked this lie\n"    
             else:    
                 message += f"Players who picked this prompt: @{playersTrickedString}\n"
                 # message += f"This was a LIE by {lieAuthor}\n"
             
-            message += f"{lieAuthor} gains {len(playersTricked) * 500} points!\n\n"
+            message += f"{lieAuthor} gains {len(playersTricked) * 500} points\!\n\n"
             lieAuthorObj.addScore(len(playersTricked) * 500)
 
         
@@ -94,7 +94,7 @@ class Image:
         # iterate through all players who got the right answer
         for correct_player in self.correct_players:
             message += f"Player who picked this prompt: @{correct_player}\n"
-            message += f"{correct_player} gains 1000 points!\n"
+            message += f"{correct_player} gains 1000 points\!\n"
             playerObj = PlayersManager.queryPlayer(correct_player)
             playerObj.addScore(1000)
 

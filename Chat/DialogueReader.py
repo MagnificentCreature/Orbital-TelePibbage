@@ -13,13 +13,13 @@ import logging
 from telegram import error
 from telegram import constants
 
-# Constant for 
-MARKDOWN = constants.ParseMode.MARKDOWN_V2
 
 class DialogueReader:
 
     MAX_RETRIES = 5
-
+    # Constant for 
+    MARKDOWN = constants.ParseMode.MARKDOWN_V2
+    
     # Create a static variable to store the dialogues
     _dialogues = {}
 
@@ -48,7 +48,7 @@ class DialogueReader:
 
     @staticmethod
     def additionalProcessing(inputString):
-        SPECIAL_CHARACTERS = ["_", "*", "[", "]", "(", ")", "~", "`", ">", "#", "+", "-", "=", "|", "{", "}", ".", "!"] # [".",">","!"]
+        SPECIAL_CHARACTERS = ["[", "]", "(", ")", "~", "`", ">", "#", "+", "-", "=", "|", "{", "}", ".", "!"] # [".",">","!"]
         # Replace new line characters with \n
         inputString = inputString.replace("\\n", "\n")
         # Replace special characters with \<character> for telegram compliance
@@ -84,6 +84,7 @@ class DialogueReader:
                 print("FAILURE TO SEND, ABORTING")
                 return
             logging.error("Timeout error sending message to chat_id " + str(chat_id) + ": " + str(e))
+            asyncio.sleep(2**random.randint(1, exponential_backoff))
             return await cls.sendMessageByID(bot, chat_id, message, reply_markup=reply_markup, raw=raw, exponential_backoff=exponential_backoff+1, parse_mode=parse_mode)
 
 
@@ -100,13 +101,13 @@ class DialogueReader:
                 return await bot.send_message(chat_id=chat_id, text=formattedText, reply_markup=reply_markup, parse_mode=parse_mode)
             except error.Forbidden as e:
                 logging.error("Error sending message to chat_id " + str(chat_id) + ": " + str(e))
-            await asyncio.sleep(2**random.randint(1, exponential_backoff))
         except error.TimedOut as e:
             if exponential_backoff > cls.MAX_RETRIES:
                 print("FAILURE TO SEND, ABORTING")
                 return
             logging.error("Timeout error sending message to chat_id " + str(chat_id) + ": " + str(e))
             logging.info("Retrying with exponential backoff of " + str(2**exponential_backoff) + " seconds")
+            await asyncio.sleep(2**random.randint(1, exponential_backoff))
             return await cls.sendMessageByID(bot, chat_id, message, reply_markup=reply_markup, raw=raw, exponential_backoff=exponential_backoff+1, parse_mode=parse_mode, **kwargs)
     
     @classmethod
@@ -122,4 +123,5 @@ class DialogueReader:
                 return
             logging.error("Timeout error sending message to chat_id " + str(chat_id) + ": " + str(e))
             logging.info("Retrying with exponential backoff of " + str(2**exponential_backoff) + " seconds")
+            asyncio.sleep(2**random.randint(1, exponential_backoff))
             return await cls.sendImageURLByID(bot, chat_id, imageURL, reply_markup=reply_markup, exponential_backoff=exponential_backoff+1, parse_mode=parse_mode)
