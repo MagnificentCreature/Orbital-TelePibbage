@@ -240,6 +240,15 @@ class Room:
     async def endGame(self, bot):
         for player in self._players:
             player.reset()
-            await player.sendMessage(bot, "Welcome2", reply_markup=BotInitiator.WelcomeKeyboard)
+            PlayAgainKeyboard = InlineKeyboardMarkup([
+                [
+                    InlineKeyboardButton(text="Create Room", callback_data=str(BotInitiator.CREATE_ROOM)),
+                    InlineKeyboardButton(text="Join Room", callback_data=str(BotInitiator.JOIN_ROOM)),
+                ],
+                [
+                    InlineKeyboardButton(text="Play with the same people", callback_data=f"{BotInitiator.PLAY_AGAIN}:{self._code}")
+                ]
+            ])
+            await player.sendMessage(bot, "Welcome3", reply_markup=PlayAgainKeyboard)
  
                         

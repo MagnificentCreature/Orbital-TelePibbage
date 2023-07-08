@@ -152,7 +152,6 @@ async def take_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return BotInitiator.LYING_PHASE
 
 async def take_lie(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    print("Taking lie " + update.message.text)
     #Check if the user is in a game
     if not context.user_data['in_game']:
         return BotInitiator.WAITING_FOR_HOST
@@ -211,7 +210,7 @@ async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYP
         message = await votingImage.showPlayersTricked()
 
         await room.broadcast(context.bot, message=message, raw=True, parse_mode=DialogueReader.MARKDOWN)
-        await asyncio.sleep(5)
+        await asyncio.sleep(2)
         hasNext = await room.broadcast_voting_image(context.bot)
         if not hasNext:
             await room.advanceState(context.bot)
@@ -219,6 +218,10 @@ async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYP
             return BotInitiator.FRESH
 
     return BotInitiator.VOTING_PHASE  
+
+async def play_again(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    oldRoomCode = update.callback_query.data.split(":")[1]
+    await RoomHandler.playAgain(context.bot, update.callback_query.from_user.username, oldRoomCode)
 
 async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "UnknownCommand")

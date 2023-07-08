@@ -1,6 +1,7 @@
 # Each line is an entry stored in the form of key, text 
 Welcome1, Welcome to Pibbage! If you're new here, check <Insert youtube video/website> for the rules!
 Welcome2, When you're ready, press "Create Room" to create a game lobby or "Join Room" then enter your Room Code to join a game!
+Welcome3, Hope you had a great game! You can press play again to play again with the same players or create/join another room!
 ReturningToStart, Returning to start
 # Room related dialogues
 CreateRoom1, Creating game room...

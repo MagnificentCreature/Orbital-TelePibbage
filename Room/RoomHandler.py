@@ -21,6 +21,7 @@ class RoomHandler:
     #hashset of rooms by their room code
     _rooms = {}
     _updateList = []
+    _old_to_new = {}
 
    #Static method that generates a random four alphabet room code
     @staticmethod
@@ -150,3 +151,9 @@ class RoomHandler:
         await cls._rooms[roomCode].endGame(bot)
         del cls._rooms[roomCode]
         return True
+    
+    @classmethod
+    def playAgain(cls, bot, username, oldRoomCode):
+        if oldRoomCode not in cls._old_to_new:
+            cls._old_to_new[oldRoomCode] = cls._rooms[oldRoomCode]
+        return cls._rooms[roomCode].playAgain()
