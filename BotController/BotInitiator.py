@@ -21,22 +21,22 @@ CREATE_ROOM, JOIN_ROOM, START_GAME = map(chr, range(3))
 # Entercode and In_room level commands
 RETURN_TO_FRESH = map(chr, range(3,4))
 # In_game level commands
-ENTER_PROMPT, ENTER_LIE, VOTE_LIE, VOTE_TRUTH = map(chr, range(4,8))
+ENTER_PROMPT, ENTER_LIE, VOTE = map(chr, range(4,7))
 # End game restart commands
-PLAY_AGAIN = map(chr, range(8,9))
+PLAY_AGAIN = map(chr, range(7,8))
 #Shortcut for Conversation Handler END
 END = ConversationHandler.END
 #VOTE REGEX
-VOTE_REGEX = r"v:[^:]+:[^:]+"
+VOTE_REGEX = fr"{VOTE}:[^:]+:[^:]+"
 #regex for PLAY_AGAIN:Four uppercase letters
-PLAY_AGAIN_REGEX = fr"{PLAY_AGAIN}:[A-Z]{4}"
+PLAY_AGAIN_REGEX = f"{PLAY_AGAIN}" + ":[A-Z]{4}"
 
 # for FRESH
 WelcomeKeyboard = InlineKeyboardMarkup([
     [
         InlineKeyboardButton(text="Create Room", callback_data=str(CREATE_ROOM)),
         InlineKeyboardButton(text="Join Room", callback_data=str(JOIN_ROOM)),
-    ],
+    ]
 ])
 
 # for Reentering Code
@@ -99,6 +99,7 @@ def main() -> None:
                 CallbackQueryHandler(BotCommands.handle_vote_callback, pattern=VOTE_REGEX),
                 CallbackQueryHandler(BotCommands.create_room, pattern="^" + str(CREATE_ROOM) + "$"),
                 CallbackQueryHandler(BotCommands.join_room_start, pattern="^" + str(JOIN_ROOM) + "$"),
+                CallbackQueryHandler(BotCommands.play_again, pattern=PLAY_AGAIN_REGEX),
             ],
             REVEAL_PHASE: [
                 # MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.reveal_lies),
@@ -131,7 +132,9 @@ def main() -> None:
                 FRESH_CALLBACK,
             ],
         },
-        fallbacks=[MessageHandler(filters.COMMAND, BotCommands.unknown)],
+        fallbacks=[
+                MessageHandler(filters.COMMAND, BotCommands.unknown),
+            ],
     )
 
     application.add_handler(main_conv_handler)

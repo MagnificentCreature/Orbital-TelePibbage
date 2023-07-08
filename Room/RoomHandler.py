@@ -21,7 +21,6 @@ class RoomHandler:
     #hashset of rooms by their room code
     _rooms = {}
     _updateList = []
-    _old_to_new = {}
 
    #Static method that generates a random four alphabet room code
     @staticmethod
@@ -71,12 +70,13 @@ class RoomHandler:
         return True
 
     @classmethod
-    async def generateRoom(cls, username, bot):
+    async def generateRoom(cls, username, bot, roomCode=None):
         host = PlayersManager.queryPlayer(username)
         #keep generating room codes while making sure there is no duplicate room codes
-        roomCode = cls.generateRoomCode()
-        while roomCode in cls._rooms:
+        if roomCode is None:
             roomCode = cls.generateRoomCode()
+            while roomCode in cls._rooms:
+                roomCode = cls.generateRoomCode()
 
         #create room and add to rooms list
         room = Room(roomCode, host)
@@ -153,7 +153,8 @@ class RoomHandler:
         return True
     
     @classmethod
-    def playAgain(cls, bot, username, oldRoomCode):
-        if oldRoomCode not in cls._old_to_new:
-            cls._old_to_new[oldRoomCode] = cls._rooms[oldRoomCode]
-        return cls._rooms[roomCode].playAgain()
+    async def playAgain(cls, bot, username, oldRoomCode):
+        if oldRoomCode not in cls._rooms:
+            cls.generateRoom(username, bot)
+        else:
+            cls.joinRoom(username, oldRoomCode, bot)

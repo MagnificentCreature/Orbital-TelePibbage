@@ -5,6 +5,7 @@ This class will store data about a given image and its associated lies
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton, Update
 import random
 from Player.PlayersManager import PlayersManager
+from BotController import BotInitiator
 import re
 class Image:
     author = "a" #store author
@@ -58,10 +59,10 @@ class Image:
             if lieAuthor == reciever:
                 continue
             formatted_lie = lie.replace(r":", r"\:")
-            lie_button = InlineKeyboardButton(lie, callback_data=f"v:{formatted_lie}:{lieAuthor}")
+            lie_button = InlineKeyboardButton(lie, callback_data=f"{BotInitiator.VOTE}:{formatted_lie}:{lieAuthor}")
             lie_buttons.append([lie_button])
         formatted_prompt = self.prompt.replace(r":", r"\:")
-        prompt_button = InlineKeyboardButton(self.prompt, callback_data=f"v:{formatted_prompt}:{self.author}")
+        prompt_button = InlineKeyboardButton(self.prompt, callback_data=f"{BotInitiator.VOTE}:{formatted_prompt}:{self.author}")
         lie_buttons.append([prompt_button])
         random.shuffle(lie_buttons)
 

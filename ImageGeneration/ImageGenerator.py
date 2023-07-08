@@ -106,6 +106,8 @@ def getImageHash(imageUrl):
 def randomImage(author):
   payload = json.dumps(PAYLOAD_DATA_TEMPLATE_V3)
   myDict = sendHTTP(payload, URL_V3)
+  if myDict["status"] == "failed":
+    return None
   return errorChecking(myDict, myDict["meta"]["prompt"], author)
 
 @staticmethod

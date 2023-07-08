@@ -246,7 +246,7 @@ class Room:
                     InlineKeyboardButton(text="Join Room", callback_data=str(BotInitiator.JOIN_ROOM)),
                 ],
                 [
-                    InlineKeyboardButton(text="Play with the same people", callback_data=f"{BotInitiator.PLAY_AGAIN}:{self._code}")
+                    InlineKeyboardButton(text="Play with the same people", callback_data=f"{str(BotInitiator.PLAY_AGAIN)}:{self._code}")
                 ]
             ])
             await player.sendMessage(bot, "Welcome3", reply_markup=PlayAgainKeyboard)
