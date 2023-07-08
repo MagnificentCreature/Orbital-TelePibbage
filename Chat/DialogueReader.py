@@ -111,10 +111,10 @@ class DialogueReader:
             return await cls.sendMessageByID(bot, chat_id, message, reply_markup=reply_markup, raw=raw, exponential_backoff=exponential_backoff+1, parse_mode=parse_mode, **kwargs)
     
     @classmethod
-    async def sendImageURLByID(cls, bot, chat_id, imageURL, caption=None, exponential_backoff=1, reply_markup=None, parse_mode=MARKDOWN):
+    async def sendImageURLByID(cls, bot, chat_id, imageURL, caption=None, exponential_backoff=1, reply_markup=None): # , parse_mode=MARKDOWN
         try:
             try:
-                return await bot.send_photo(chat_id=chat_id, photo=imageURL, reply_markup=reply_markup, caption=caption, parse_mode=parse_mode)
+                return await bot.send_photo(chat_id=chat_id, photo=imageURL, reply_markup=reply_markup, caption=caption) # , parse_mode=parse_mode
             except error.Forbidden as e:
                 logging.error("Error sending message to chat_id " + str(chat_id) + ": " + str(e))
         except error.TimedOut as e:
@@ -124,4 +124,4 @@ class DialogueReader:
             logging.error("Timeout error sending message to chat_id " + str(chat_id) + ": " + str(e))
             logging.info("Retrying with exponential backoff of " + str(2**exponential_backoff) + " seconds")
             asyncio.sleep(2**random.randint(1, exponential_backoff))
-            return await cls.sendImageURLByID(bot, chat_id, imageURL, reply_markup=reply_markup, exponential_backoff=exponential_backoff+1, parse_mode=parse_mode)
+            return await cls.sendImageURLByID(bot, chat_id, imageURL, reply_markup=reply_markup, exponential_backoff=exponential_backoff+1) # , parse_mode=parse_mode

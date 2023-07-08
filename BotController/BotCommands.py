@@ -54,7 +54,7 @@ async def create_room(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return BotInitiator.INROOM
 
 async def join_room_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.callback_query.edit_message_text(text=DialogueReader.queryDialogue("EnterCode"), reply_markup=BotInitiator.ReenterKeyboard)
+    await update.callback_query.edit_message_text(text=DialogueReader.queryDialogue("EnterCode"), reply_markup=BotInitiator.ReenterKeyboard, parse_mode=DialogueReader.MARKDOWN)
     return BotInitiator.ENTERCODE
 
 async def join_room_code(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -83,7 +83,7 @@ async def join_room(update: Update, context: ContextTypes.DEFAULT_TYPE, roomCode
 
 async def return_to_fresh(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if context.user_data['roomCode'] == "":
-        await update.callback_query.edit_message_text(text=DialogueReader.queryDialogue("ReturningToStart"))
+        await update.callback_query.edit_message_text(text=DialogueReader.queryDialogue("ReturningToStart"), parse_mode=DialogueReader.MARKDOWN)
     else:
         await update.callback_query.delete_message()
         await RoomHandler.leaveRoom(update.callback_query.from_user.username, context.bot)
@@ -109,6 +109,10 @@ async def take_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     #asyncio.wait_for(ImageGenerator.imageQuery(update.message).wait(), timeout=60)
 
     prompt = update.message.text
+    # SPECIAL_CHARACTERS = ["[", "]", "(", ")", "~", "`", ">", "#", "+", "-", "=", "|", "{", "}", ".", "*", "!"] # [".",">","!"]
+    # for eachItem in SPECIAL_CHARACTERS:
+    #     prompt =  prompt.replace(eachItem, f"\{eachItem}")
+
     # check if prompt is less than 3 words
     if len(prompt.split(" ")) < MIN_PROMPT_LENGTH:
         await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "PromptFewWords", **{"limit": MIN_PROMPT_LENGTH})
@@ -135,6 +139,7 @@ async def take_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return BotInitiator.PROMPTING_PHASE
 
     context.user_data['prompt'] = image.getPrompt()
+    print(image.getPrompt())
     # Send the image URL in a separate task
     send_image_task = asyncio.create_task(DialogueReader.sendImageURLByID(context.bot, update.message.from_user.id, image.getImageURL(), caption="You generated: " + image.getPrompt()))
 
