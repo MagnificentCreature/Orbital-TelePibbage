@@ -139,7 +139,6 @@ async def take_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return BotInitiator.PROMPTING_PHASE
 
     context.user_data['prompt'] = image.getPrompt()
-    print(image.getPrompt())
     # Send the image URL in a separate task
     send_image_task = asyncio.create_task(DialogueReader.sendImageURLByID(context.bot, update.message.from_user.id, image.getImageURL(), caption="You generated: " + image.getPrompt()))
 
