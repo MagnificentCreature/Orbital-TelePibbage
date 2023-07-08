@@ -155,6 +155,6 @@ class RoomHandler:
     @classmethod
     async def playAgain(cls, bot, username, oldRoomCode):
         if oldRoomCode not in cls._rooms:
-            cls.generateRoom(username, bot)
+            await cls.generateRoom(username, bot, oldRoomCode)
         else:
-            cls.joinRoom(username, oldRoomCode, bot)
+            await cls.joinRoom(username, oldRoomCode, bot)

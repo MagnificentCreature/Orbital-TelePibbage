@@ -222,6 +222,7 @@ async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYP
 async def play_again(update: Update, context: ContextTypes.DEFAULT_TYPE):
     oldRoomCode = update.callback_query.data.split(":")[1]
     await RoomHandler.playAgain(context.bot, update.callback_query.from_user.username, oldRoomCode)
+    return BotInitiator.INROOM
 
 async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "UnknownCommand")
