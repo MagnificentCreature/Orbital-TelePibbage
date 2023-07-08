@@ -45,6 +45,4 @@ async def revealLeaderboard(bot, room):
 
     leaderboardMsg += '\n*Thanks for playing everyone\!*'
 
-    print(leaderboardMsg)
-
     await room.broadcast(bot, leaderboardMsg, raw=True, parse_mode=DialogueReader.MARKDOWN)

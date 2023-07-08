@@ -70,12 +70,13 @@ class RoomHandler:
         return True
 
     @classmethod
-    async def generateRoom(cls, username, bot):
+    async def generateRoom(cls, username, bot, roomCode=None):
         host = PlayersManager.queryPlayer(username)
         #keep generating room codes while making sure there is no duplicate room codes
-        roomCode = cls.generateRoomCode()
-        while roomCode in cls._rooms:
+        if roomCode is None:
             roomCode = cls.generateRoomCode()
+            while roomCode in cls._rooms:
+                roomCode = cls.generateRoomCode()
 
         #create room and add to rooms list
         room = Room(roomCode, host)
@@ -150,3 +151,10 @@ class RoomHandler:
         await cls._rooms[roomCode].endGame(bot)
         del cls._rooms[roomCode]
         return True
+    
+    @classmethod
+    async def playAgain(cls, bot, username, oldRoomCode):
+        if oldRoomCode not in cls._rooms:
+            await cls.generateRoom(username, bot, oldRoomCode)
+        else:
+            await cls.joinRoom(username, oldRoomCode, bot)
