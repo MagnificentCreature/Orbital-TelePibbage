@@ -3,6 +3,7 @@ import random
 from Player.Player import Player
 from Player.PlayersManager import PlayersManager
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton
+from Chat.DialogueReader import DialogueReader
 
 lie_keyboard = InlineKeyboardMarkup([
     [
@@ -15,7 +16,7 @@ async def beginPhase2(bot, room):
     await room.broadCall(bot, sendNextImage)
 
 async def sendPhase2Messages(bot, room):
-    await room.broadcast(bot, "Phase2p1")
+    await room.broadcast(bot, "Phase2p1", parse_mode=DialogueReader.MARKDOWN)
     await room.broadcast(bot, "Phase2p2")
 
 async def sendNextImage(bot, room, player):

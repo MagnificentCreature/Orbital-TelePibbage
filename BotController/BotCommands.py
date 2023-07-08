@@ -54,7 +54,7 @@ async def create_room(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return BotInitiator.INROOM
 
 async def join_room_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.callback_query.edit_message_text(text=DialogueReader.queryDialogue("EnterCode"), reply_markup=BotInitiator.ReenterKeyboard, parse_mode=DialogueReader.MARKDOWN)
+    await update.callback_query.edit_message_text(text=DialogueReader.queryDialogue("EnterCode"), reply_markup=BotInitiator.ReenterKeyboard)
     return BotInitiator.ENTERCODE
 
 async def join_room_code(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -83,7 +83,7 @@ async def join_room(update: Update, context: ContextTypes.DEFAULT_TYPE, roomCode
 
 async def return_to_fresh(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if context.user_data['roomCode'] == "":
-        await update.callback_query.edit_message_text(text=DialogueReader.queryDialogue("ReturningToStart"), parse_mode=DialogueReader.MARKDOWN)
+        await update.callback_query.edit_message_text(text=DialogueReader.queryDialogue("ReturningToStart"))
     else:
         await update.callback_query.delete_message()
         await RoomHandler.leaveRoom(update.callback_query.from_user.username, context.bot)
@@ -211,7 +211,7 @@ async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYP
         #reveal
         message = await votingImage.showPlayersTricked()
 
-        await room.broadcast(context.bot, message=message, raw=True)
+        await room.broadcast(context.bot, message=message, raw=True, parse_mode=DialogueReader.MARKDOWN)
         await asyncio.sleep(5)
         hasNext = await room.broadcast_voting_image(context.bot)
         if not hasNext:

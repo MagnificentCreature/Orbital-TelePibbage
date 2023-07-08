@@ -61,9 +61,9 @@ class Room:
     def hasMinPlayers(self):
         return len(self._players) >= Room.MIN_PLAYERS
     
-    async def broadcast(self, bot, message, messageKey=None,reply_markup=None, raw=False, **kwargs):
+    async def broadcast(self, bot, message, messageKey=None,reply_markup=None, raw=False, parse_mode=None, **kwargs):
         for player in self._players:
-            await player.sendMessage(bot, message, messageKey, reply_markup, raw=raw, **kwargs)
+            await player.sendMessage(bot, message, messageKey, reply_markup, raw=raw, parse_mode=parse_mode,**kwargs)
 
     async def broadCall(self, bot, func):
         for player in self._players:
@@ -233,7 +233,7 @@ class Room:
         for i, player in enumerate(leaderboard, start=1):
             username = player.getUsername()
             score = player.getScore()
-            message += f"{i}. {username}: {score} points\n"
+            message += f"{i}\. {username}: {score} points\n"
 
         return message
     

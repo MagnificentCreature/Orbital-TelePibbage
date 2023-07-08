@@ -1,5 +1,7 @@
 import asyncio
 
+from Chat.DialogueReader import DialogueReader
+
 async def beginPhase4(bot, room):
     await sendPhase4Messages(bot, room)
     await asyncio.sleep(3)
@@ -43,4 +45,6 @@ async def revealLeaderboard(bot, room):
 
     leaderboardMsg += '\n*Thanks for playing everyone\!*'
 
-    await room.broadcast(bot, leaderboardMsg, raw=True)
+    print(leaderboardMsg)
+
+    await room.broadcast(bot, leaderboardMsg, raw=True, parse_mode=DialogueReader.MARKDOWN)
