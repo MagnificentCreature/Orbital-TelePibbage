@@ -38,18 +38,18 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if (update.message.from_user.username is None):
         await update.message.reply_text("Please set a username before using this bot")
         return BotInitiator.END
-    await PlayersManager.recordNewPlayer(update.message.from_user.username, update.message.from_user.id, context.user_data)
+    player = await PlayersManager.recordNewPlayer(update.message.from_user.username, update.message.from_user.id, context.user_data)
     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "Welcome1")
     
     if (context.args):
         roomCode = context.args[0]        
         return await join_room(update, context, roomCode)
     
-    await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "Welcome2", reply_markup=BotInitiator.WelcomeKeyboard)
+    await player.sendMessage(context.bot, "Welcome2", reply_markup=BotInitiator.WelcomeKeyboard)
     return BotInitiator.FRESH
 
 async def create_room(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await DialogueReader.sendMessageByID(context.bot, update.callback_query.from_user.id, "CreateRoom1")
+    await update.callback_query.edit_message_text(text=DialogueReader.queryDialogue("CreateRoom1"))
     await RoomHandler.generateRoom(update.callback_query.from_user.username, context.bot)
     return BotInitiator.INROOM
 
@@ -224,6 +224,7 @@ async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYP
     return BotInitiator.VOTING_PHASE  
 
 async def play_again(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.callback_query.edit_message_reply_markup(reply_markup=None)
     oldRoomCode = update.callback_query.data.split(":")[1]
     await RoomHandler.playAgain(context.bot, update.callback_query.from_user.username, oldRoomCode)
     return BotInitiator.INROOM

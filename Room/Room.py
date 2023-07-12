@@ -28,7 +28,7 @@ class Room:
     class State(Enum):
         JOIN_STATE, PROMPTING_STATE, LYING_STATE, VOTING_STATE, REVEAL_STATE = range(5)
     class Mode(Enum):
-        VANILLA, ARCADE = "vanilla", "arcade"
+        VANILLA, ARCADE = "Vanilla", "Arcade"
 
     def __init__(self, code, host):
         self._code = code
@@ -69,6 +69,12 @@ class Room:
             if player == self._host: 
                 s += " (Host)"
         return s
+
+    def get_other_member(self, member):
+        if member == self.Mode.ARCADE:
+            return self.Mode.VANILLA
+        else:
+            return self.Mode.ARCADE
 
     # Dialogue messages to send when adding player
     async def __joinRoomMessages(self, bot, player):
@@ -129,8 +135,9 @@ class Room:
             # if player is the host, make the next player the host
             self._host = self._players[1]
             # Send new host the host message
-            keyboard = BotInitiator.StartGameKeyboard.copy().keyboard[0][1].text = f"Change to {self._mode.value} Game Mode"
-            await self._host.editMessage("waiting_to_start", "StartGameOption", newMessageKey="start_game_option", reply_markup=keyboard)
+            keyboard = BotInitiator.StartGameButtons.copy()
+            keyboard[0][1].text = f"Change to {self._mode.value} Game Mode"
+            await self._host.editMessage("waiting_to_start", "StartGameOption", newMessageKey="start_game_option", reply_markup=InlineKeyboardMarkup(keyboard))
         self._players.remove(player)
         await self.__leaveRoomMessages()
         return True
@@ -168,16 +175,14 @@ class Room:
     
     async def changeMode(self):
         # change _mode to the other mode
-        if self._mode == Room.Mode.VANILLA:
-            self._mode = Room.Mode.ARCADE
-        else:
-            self._mode = Room.Mode.VANILLA
+        self._mode = self.get_other_member(self._mode)
         
         # send message to all players
         for eachPlayer in self._players:
             if self.isHost(eachPlayer):
-                keyboard = BotInitiator.StartGameKeyboard.copy().keyboard[0][1].text = f"Change to {self._mode.value} Game Mode"
-                await eachPlayer.editMessage("waiting_to_start", "StartGameOption", newMessageKey="start_game_option", reply_markup=keyboard)
+                keyboard = BotInitiator.StartGameButtons.copy()
+                keyboard[1][0] = InlineKeyboardButton(text=f"Change to {self.get_other_member(self._mode).value} Game Mode", callback_data=str(BotInitiator.CHANGE_MODE))
+                await eachPlayer.editMessage("start_game_option", "StartGameOption", reply_markup=InlineKeyboardMarkup(keyboard))
                 continue
             await eachPlayer.editMessage("waiting_to_start", "WaitingToStart", reply_markup=BotInitiator.WaitingKeyboard, parse_mode=DialogueReader.MARKDOWN, **{'gameMode':self._mode.value})
         return True

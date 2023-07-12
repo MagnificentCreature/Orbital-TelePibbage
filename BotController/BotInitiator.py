@@ -54,7 +54,7 @@ WaitingKeyboard = InlineKeyboardMarkup([
 ])
 
 # for Hosts INROOM
-StartGameKeyboard = InlineKeyboardMarkup([
+StartGameButtons = [
     [
         InlineKeyboardButton(text="Start Game", callback_data=str(START_GAME)),
     ],
@@ -64,7 +64,7 @@ StartGameKeyboard = InlineKeyboardMarkup([
     [
         InlineKeyboardButton(text="Back", callback_data=str(RETURN_TO_FRESH)),
     ],
-])
+]
 
 # for PROMPTING_PHASE
 # StartGameKeyboard = InlineKeyboardMarkup([

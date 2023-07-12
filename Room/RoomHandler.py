@@ -6,6 +6,8 @@ So keeping track of who is in which room is important, and each player can only 
 
 import asyncio
 import random
+
+from telegram import InlineKeyboardMarkup
 from Chat.DialogueReader import DialogueReader
 from GameController import Lying
 from GameController.Image import Image
@@ -66,7 +68,7 @@ class RoomHandler:
             return False
         
         #send start game message to player
-        await player.sendMessage(bot, "WaitingToStart", messageKey="waiting_to_start", reply_markup=BotInitiator.WaitingKeyboard, parse_mode=DialogueReader.MARKDOWN, **{'gameMode':self._mode.value})
+        await player.sendMessage(bot, "WaitingToStart", messageKey="waiting_to_start", reply_markup=BotInitiator.WaitingKeyboard, parse_mode=DialogueReader.MARKDOWN, **{'gameMode':room._mode.value})
         
         return True
 
@@ -89,7 +91,7 @@ class RoomHandler:
             return False
         
         # send start game message to host
-        await host.sendMessage(bot, "StartGameOption", messageKey="start_game_option", reply_markup=BotInitiator.StartGameKeyboard)
+        await host.sendMessage(bot, "StartGameOption", messageKey="start_game_option", reply_markup=InlineKeyboardMarkup(BotInitiator.StartGameButtons))
         
         return True
     
