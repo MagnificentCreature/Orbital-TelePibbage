@@ -19,11 +19,11 @@ BOT_TOKEN = conf.TELE_BOT_TOKEN
 # State definitions for fresh level commands
 CREATE_ROOM, JOIN_ROOM, START_GAME = map(chr, range(3))
 # Entercode and In_room level commands
-RETURN_TO_FRESH = map(chr, range(3,4))
+RETURN_TO_FRESH, CHANGE_MODE = map(chr, range(3,5))
 # In_game level commands
-ENTER_PROMPT, ENTER_LIE, VOTE = map(chr, range(4,7))
+ENTER_PROMPT, ENTER_LIE, VOTE = map(chr, range(5,8))
 # End game restart commands
-PLAY_AGAIN = map(chr, range(7,8))
+PLAY_AGAIN = map(chr, range(8,9))
 #Shortcut for Conversation Handler END
 END = ConversationHandler.END
 #VOTE REGEX
@@ -57,6 +57,9 @@ WaitingKeyboard = InlineKeyboardMarkup([
 StartGameKeyboard = InlineKeyboardMarkup([
     [
         InlineKeyboardButton(text="Start Game", callback_data=str(START_GAME)),
+    ],
+    [
+        InlineKeyboardButton(text="Change to Arcade Game Mode", callback_data=str(CHANGE_MODE)),
     ],
     [
         InlineKeyboardButton(text="Back", callback_data=str(RETURN_TO_FRESH)),
@@ -129,6 +132,7 @@ def main() -> None:
             ],
             INROOM: [
                 game_conv_handler,
+                CallbackQueryHandler(BotCommands.change_mode, pattern="^" + str(CHANGE_MODE) + "$"),
                 FRESH_CALLBACK,
             ],
         },

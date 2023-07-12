@@ -9,6 +9,7 @@ async def beginPhase4(bot, room):
 
 async def sendPhase4Messages(bot, room):
     await room.broadcast(bot, "Phase4p1")
+    await asyncio.sleep(2)
     await room.broadcast(bot, "Phase4p2")
 
 # async def revealNextImage(bot, room, player):

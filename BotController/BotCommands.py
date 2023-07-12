@@ -96,6 +96,10 @@ async def generate(update: Update, context: ContextTypes.DEFAULT_TYPE):
     print(update.message.from_user.username + "Generated Image: " + str(imageURL))
     await DialogueReader.sendImageURLByID(context.bot, update.message.from_user.id, imageURL)
 
+async def change_mode(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await RoomHandler.changeMode(update.callback_query.from_user.username, context.bot)
+    return BotInitiator.INROOM
+
 async def start_game(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not await RoomHandler.startGame(update.callback_query.from_user.username, context.bot):
         return BotInitiator.INROOM

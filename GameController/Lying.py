@@ -1,3 +1,4 @@
+import asyncio
 import random
 
 from Player.Player import Player
@@ -17,6 +18,7 @@ async def beginPhase2(bot, room):
 
 async def sendPhase2Messages(bot, room):
     await room.broadcast(bot, "Phase2p1", parse_mode=DialogueReader.MARKDOWN)
+    await asyncio.sleep(2)
     await room.broadcast(bot, "Phase2p2")
 
 async def sendNextImage(bot, room, player):

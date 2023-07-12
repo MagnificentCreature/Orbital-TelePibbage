@@ -6,6 +6,7 @@ So keeping track of who is in which room is important, and each player can only 
 
 import asyncio
 import random
+from Chat.DialogueReader import DialogueReader
 from GameController import Lying
 from GameController.Image import Image
 from BotController import BotInitiator
@@ -65,8 +66,8 @@ class RoomHandler:
             return False
         
         #send start game message to player
-        await player.sendMessage(bot, "WaitingToStart", messageKey="waiting_to_start", reply_markup=BotInitiator.WaitingKeyboard)
-
+        await player.sendMessage(bot, "WaitingToStart", messageKey="waiting_to_start", reply_markup=BotInitiator.WaitingKeyboard, parse_mode=DialogueReader.MARKDOWN, **{'gameMode':self._mode.value})
+        
         return True
 
     @classmethod
@@ -92,6 +93,24 @@ class RoomHandler:
         
         return True
     
+    @classmethod
+    async def changeMode(cls, username, bot):
+        player = PlayersManager.queryPlayer(username)
+        roomCode = player.getRoomCode()
+        
+        #check if player is in a room
+        if roomCode == "":
+            print("Player is not in a room, this could be a bug")
+            return False
+        
+        room = cls._rooms[roomCode]
+        #check if player is host
+        if not room.isHost(player):
+            await player.sendMessage(bot, "NotHost")
+            return False
+        
+        return await room.changeMode()
+
     @classmethod
     async def startGame(cls, username, bot):
         player = PlayersManager.queryPlayer(username)

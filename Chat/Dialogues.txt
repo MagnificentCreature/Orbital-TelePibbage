@@ -5,9 +5,9 @@ Welcome3, Hope you had a great game! You can press play again to play again with
 ReturningToStart, Returning to start
 # Room related dialogues
 CreateRoom1, Creating game room...
-RoomCode, You have successfully entered the game lobby.\nYour room code is {roomCode}
-Invite, Invite your friends to the room by sharing them this link: https://t.me/TelePibbageBot?start={roomCode}
-WaitingToStart, Waiting for host to start game...
+RoomCode, You have successfully entered the game lobby.\nYour room code is {roomCode}\nInvite your friends to the room by sharing them this link: https://t.me/TelePibbageBot?start={roomCode}
+ChangeMode, Host has changed game mode to {gameMode}.
+WaitingToStart, Waiting for host to start game\.\.\.\nYou will be playing *{gameMode} mode*
 ####WaitingToStart2, Meanwhile, try /generate <prompt> to try your hands at generating some fun images! 
 JoinRoom1, Joining game room {roomCode}...
 ###JoinRoom2, There are currently ({playerCount}/{maxPlayerCount}) players

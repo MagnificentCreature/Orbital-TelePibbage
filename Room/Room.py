@@ -5,6 +5,7 @@ from enum import Enum
 import asyncio
 from collections import deque
 from BotController import BotInitiator
+from Chat.DialogueReader import DialogueReader
 from GameController import Prompting, Lying, Voting, Reveal
 from GameController.Image import Image
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton, Update
@@ -17,27 +18,17 @@ class Room:
     _players = [] #contains list of player objects
     MAX_PLAYERS = 8
     MIN_PLAYERS = 2
+    _mode = None #game mode
     _state = 0 # 0 = join state, 1 = game state
     _list_of_images = []
     _list_copy = None
     _current_voting_image = None
-
-    # _list_of_images = [
-    #     Image("Author 1", "Prompt 1", "https://example.com/image1.jpg"),
-    #     Image("Author 2", "Prompt 2", "https://example.com/image2.jpg"),
-    #     Image("Author 3", "Prompt 3", "https://example.com/image3.jpg")
-    # ]
-
-    # # Insert some sample lies for testing
-    # _list_of_images[0].insertLie("Lie 1 by Player 1", "Player 1")
-    # _list_of_images[0].insertLie("Lie 2 by Player 2", "Player 2")
-    # _list_of_images[1].insertLie("Lie 3 by Player 1", "Player 1")
-    # _list_of_images[2].insertLie("Lie 4 by Player 2", "Player 2")
-
     _playerToRemainingImages = {} #dictionary of player to list of images they have yet to give lies for
     
     class State(Enum):
         JOIN_STATE, PROMPTING_STATE, LYING_STATE, VOTING_STATE, REVEAL_STATE = range(5)
+    class Mode(Enum):
+        VANILLA, ARCADE = "vanilla", "arcade"
 
     def __init__(self, code, host):
         self._code = code
@@ -45,6 +36,7 @@ class Room:
         self._players = []
         self._list_of_images = []
         self._state = Room.State.JOIN_STATE
+        self._mode = Room.Mode.VANILLA
 
     def getCode(self):
         return self._code
@@ -81,7 +73,7 @@ class Room:
     # Dialogue messages to send when adding player
     async def __joinRoomMessages(self, bot, player):
         await player.sendMessage(bot, "RoomCode", **{'roomCode':self.getCode()})
-        await player.sendMessage(bot, "Invite", **{'roomCode':self.getCode()})
+        # await player.sendMessage(bot, "GameMode", messageKey="game_mode", **{'gameMode':self._mode.value})
         # send message to player
         await player.sendMessage(bot, "LobbyList", messageKey="lobby_list", **{'playerCount':len(self._players), 'maxPlayerCount':str(self.MAX_PLAYERS), 'lobbyList':self.printPlayerList()})
         # edit everyones messages
@@ -118,7 +110,10 @@ class Room:
         # Add player to room
         self._players.append(player)
         player.joinRoom(self._code)
+        
+        # Send messages to player and other players
         await self.__joinRoomMessages(bot, player)
+
         return True
 
     # Remove player from room
@@ -133,14 +128,14 @@ class Room:
         if player == self._host:
             # if player is the host, make the next player the host
             self._host = self._players[1]
-            # Sesnd new host the host message
-            await self._host.editMessage("waiting_to_start", "StartGameOption", newMessageKey="start_game_option", reply_markup=BotInitiator.StartGameKeyboard)
+            # Send new host the host message
+            keyboard = BotInitiator.StartGameKeyboard.copy().keyboard[0][1].text = f"Change to {self._mode.value} Game Mode"
+            await self._host.editMessage("waiting_to_start", "StartGameOption", newMessageKey="start_game_option", reply_markup=keyboard)
         self._players.remove(player)
         await self.__leaveRoomMessages()
         return True
     
     async def advanceState(self, bot):
-        await asyncio.sleep(2)
         match self._state:
             case Room.State.JOIN_STATE:
                 await Prompting.beginPhase1(bot, self)
@@ -169,6 +164,22 @@ class Room:
             await eachPlayer.sendMessage(bot, "StartingGame", **{'host':self._host.getUsername()})
             await eachPlayer.startGame()
         await self.advanceState(bot)
+        return True
+    
+    async def changeMode(self):
+        # change _mode to the other mode
+        if self._mode == Room.Mode.VANILLA:
+            self._mode = Room.Mode.ARCADE
+        else:
+            self._mode = Room.Mode.VANILLA
+        
+        # send message to all players
+        for eachPlayer in self._players:
+            if self.isHost(eachPlayer):
+                keyboard = BotInitiator.StartGameKeyboard.copy().keyboard[0][1].text = f"Change to {self._mode.value} Game Mode"
+                await eachPlayer.editMessage("waiting_to_start", "StartGameOption", newMessageKey="start_game_option", reply_markup=keyboard)
+                continue
+            await eachPlayer.editMessage("waiting_to_start", "WaitingToStart", reply_markup=BotInitiator.WaitingKeyboard, parse_mode=DialogueReader.MARKDOWN, **{'gameMode':self._mode.value})
         return True
     
     #true if all have sent prompts(or other item) and proceeded to next phase
