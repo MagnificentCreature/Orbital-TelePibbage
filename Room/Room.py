@@ -53,6 +53,9 @@ class Room:
     def hasMinPlayers(self):
         return len(self._players) >= Room.MIN_PLAYERS
     
+    def getMode(self):
+        return self._mode
+    
     async def broadcast(self, bot, message, messageKey=None,reply_markup=None, raw=False, parse_mode=None, **kwargs):
         for player in self._players:
             await player.sendMessage(bot, message, messageKey, reply_markup, raw=raw, parse_mode=parse_mode,**kwargs)
@@ -137,7 +140,7 @@ class Room:
             # Send new host the host message
             keyboard = BotInitiator.StartGameButtons.copy()
             keyboard[0][1].text = f"Change to {self._mode.value} Game Mode"
-            await self._host.editMessage("waiting_to_start", "StartGameOption", newMessageKey="start_game_option", reply_markup=InlineKeyboardMarkup(keyboard))
+            await self._host.editMessage("waiting_to_start", "StartGameOption", newMessageKey="start_game_option", reply_markup=InlineKeyboardMarkup(keyboard), parse_mode=DialogueReader.MARKDOWN, **{'gameMode':self._mode.value})
         self._players.remove(player)
         await self.__leaveRoomMessages()
         return True
@@ -182,7 +185,7 @@ class Room:
             if self.isHost(eachPlayer):
                 keyboard = BotInitiator.StartGameButtons.copy()
                 keyboard[1][0] = InlineKeyboardButton(text=f"Change to {self.get_other_member(self._mode).value} Game Mode", callback_data=str(BotInitiator.CHANGE_MODE))
-                await eachPlayer.editMessage("start_game_option", "StartGameOption", reply_markup=InlineKeyboardMarkup(keyboard))
+                await eachPlayer.editMessage("start_game_option", "StartGameOption", reply_markup=InlineKeyboardMarkup(keyboard), parse_mode=DialogueReader.MARKDOWN, **{'gameMode':self._mode.value})
                 continue
             await eachPlayer.editMessage("waiting_to_start", "WaitingToStart", reply_markup=BotInitiator.WaitingKeyboard, parse_mode=DialogueReader.MARKDOWN, **{'gameMode':self._mode.value})
         return True

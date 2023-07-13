@@ -17,7 +17,7 @@ EnterCode, Enter room code. Room codes take the form of four uppercase letters
 NewHost, You are now the host, press Start Game to start the game!
 LobbyList, Players in the lobby ({playerCount}/{maxPlayerCount}):{lobbyList}
 #Start Game dialogue
-StartGameOption, You are the host!\nWhen all players are ready, start the game!
+StartGameOption, You are the host\.\nWhen all players are ready, start the game\!\nYou will be playing *{gameMode} Mode*
 StartingGame, Host @{host} has started the game! Get Ready!
 HostStartingGame, You are starting the game! Get Ready!
 # Game related dialogues

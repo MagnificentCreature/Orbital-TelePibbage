@@ -68,7 +68,7 @@ class RoomHandler:
             return False
         
         #send start game message to player
-        await player.sendMessage(bot, "WaitingToStart", messageKey="waiting_to_start", reply_markup=BotInitiator.WaitingKeyboard, parse_mode=DialogueReader.MARKDOWN, **{'gameMode':room._mode.value})
+        await player.sendMessage(bot, "WaitingToStart", messageKey="waiting_to_start", reply_markup=BotInitiator.WaitingKeyboard, parse_mode=DialogueReader.MARKDOWN, **{'gameMode':room.getMode().value})
         
         return True
 
@@ -91,7 +91,7 @@ class RoomHandler:
             return False
         
         # send start game message to host
-        await host.sendMessage(bot, "StartGameOption", messageKey="start_game_option", reply_markup=InlineKeyboardMarkup(BotInitiator.StartGameButtons))
+        await host.sendMessage(bot, "StartGameOption", messageKey="start_game_option", reply_markup=InlineKeyboardMarkup(BotInitiator.StartGameButtons), parse_mode=DialogueReader.MARKDOWN, **{'gameMode':room.getMode().value})
         
         return True
     
