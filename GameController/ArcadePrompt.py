@@ -39,15 +39,15 @@ def process_dataframe(df):
     return data
 
 def get_random_dict(data, banned=None):
-    total_score = sum(header[1] for header in data.keys() if header[0] != banned)
+    total_score = sum(score for (header, score) in data.keys() if header != banned)
     random_value = random.uniform(0, total_score)
     current_sum = 0
-    for header, items in data.items():
+    for (header, score), items in data.items():
         if header == banned:
             continue
-        current_sum += header[1]
+        current_sum += score
         if random_value <= current_sum:
-            return {header: items}
+            return {(header, score) : items}
     return None
 
 def get_random_subgroup(data, banned=None):
@@ -121,15 +121,16 @@ if __name__ == "__main__":
     data = process_dataframe(df)
 
     word_list = get_random_word_list()
-    prompt_user(word_list)
+    choosen_word1 = prompt_user(word_list)
 
     curated_word_dict = get_random_elements_dict(data)
-    choosen_word = prompt_user(list(curated_word_dict.keys()))
+    choosen_word2 = prompt_user(list(curated_word_dict.keys()))
+    print(curated_word_dict[choosen_word2])
 
-    curated_word_list2 = get_random_elements(data, num_elements=5, banned=curated_word_dict[choosen_word])
+    curated_word_list2 = get_random_elements(data, num_elements=5, banned=curated_word_dict[choosen_word2])
     curated_word_list2.append(get_random_word())
-    prompt_user(curated_word_list2)
+    choosen_word3 = prompt_user(curated_word_list2)
 
-    
+    print("Final prompt is:" + choosen_word1 + ", " + choosen_word2 + ", " + choosen_word3)
     
 
