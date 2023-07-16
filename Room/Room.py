@@ -6,7 +6,7 @@ import asyncio
 from collections import deque
 from BotController import BotInitiator
 from Chat.DialogueReader import DialogueReader
-from GameController import Prompting, Lying, Voting, Reveal
+from GameController import ArcadePrompt, Prompting, Lying, Voting, Reveal
 from GameController.Image import Image
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton, Update
 
@@ -26,7 +26,7 @@ class Room:
     _playerToRemainingImages = {} #dictionary of player to list of images they have yet to give lies for
     
     class State(Enum):
-        JOIN_STATE, PROMPTING_STATE, LYING_STATE, VOTING_STATE, REVEAL_STATE = range(5)
+        JOIN_STATE, PROMPTING_STATE, LYING_STATE, VOTING_STATE, REVEAL_STATE, ARCADE_GEN_STATE, CAPTION_STATE, BATTLE_STATE = range(8)
     class Mode(Enum):
         VANILLA, ARCADE = "Vanilla", "Arcade"
 
@@ -146,24 +146,32 @@ class Room:
         return True
     
     async def advanceState(self, bot):
-        match self._state:
-            case Room.State.JOIN_STATE:
-                await Prompting.beginPhase1(bot, self)
-                self._state = Room.State.PROMPTING_STATE
-            case Room.State.PROMPTING_STATE:
-                await Lying.beginPhase2(bot, self)
-                # TODO: Maybe delete the players usercontext['prompt']?
-                self._state = Room.State.LYING_STATE
-            case Room.State.LYING_STATE:
-                # TODO: Maybe delete the players usercontext['lies']?
-                self._list_copy = self._list_of_images.copy() # TODO: Move this into VotingPhase3
-                await Voting.beginPhase3(bot, self)
-                self._state = Room.State.VOTING_STATE
-            case Room.State.VOTING_STATE:
-                await Reveal.beginPhase4(bot, self)
-                self._state = Room.State.REVEAL_STATE
-            case Room.State.REVEAL_STATE:
-                return
+        if self._mode == Room.Mode.VANILLA:
+            match self._state:
+                case Room.State.JOIN_STATE:
+                    await Prompting.beginPhase1(bot, self)
+                    self._state = Room.State.PROMPTING_STATE
+                case Room.State.PROMPTING_STATE:
+                    await Lying.beginPhase2(bot, self)
+                    # TODO: Maybe delete the players usercontext['prompt']?
+                    self._state = Room.State.LYING_STATE
+                case Room.State.LYING_STATE:
+                    # TODO: Maybe delete the players usercontext['lies']?
+                    self._list_copy = self._list_of_images.copy() # TODO: Move this into VotingPhase3
+                    await Voting.beginPhase3(bot, self)
+                    self._state = Room.State.VOTING_STATE
+                case Room.State.VOTING_STATE:
+                    await Reveal.beginPhase4(bot, self)
+                    self._state = Room.State.REVEAL_STATE
+                # case Room.State.REVEAL_STATE:
+                #     return
+        elif self._mode == Room.Mode.ARCADE:
+            match self._state:
+                case Room.State.JOIN_STATE:
+                    await ArcadePrompt.beginPhase1(bot, self)
+                    self._state = Room.State.ARCADE_GEN_STATE
+                case Room.State.PROMPTING_STATE:
+                    await Lying.beginPhase2(bot, self)
 
     async def startGame(self, bot):
         for eachPlayer in self._players:

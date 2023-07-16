@@ -33,8 +33,8 @@ async def sendNextImage(bot, room, player):
         print("NO IMAGE WTF LOL")
     player.setItem(Player.PlayerConstants.NEXT_LIE, image) # fill second param with image
     if not await player.queryMessagekey("LyingImage"):
-        await player.sendImageURL(bot, image.getImageURL(), messageKey="LyingImage", reply_markup=lie_keyboard)
+        await player.sendImageURL(bot, image.getImageURL(), messageKey="LyingImage") # , reply_markup=lie_keyboard
         return True
     print("EDITING IMAGE")
-    await player.editImageURL("LyingImage", image.getImageURL(), reply_markup=lie_keyboard)
+    await player.editImageURL("LyingImage", image.getImageURL()) # , reply_markup=lie_keyboard
     return True

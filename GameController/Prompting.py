@@ -15,4 +15,4 @@ async def beginPhase1(bot, room):
 async def sendPhase1Messages(bot, room):
     await room.broadcast(bot, "Phase1p1")
     await asyncio.sleep(2)
-    await room.broadcast(bot, "Phase1p2", reply_markup=prompt_keyboard, parse_mode=DialogueReader.MARKDOWN)
+    await room.broadcast(bot, "Phase1p2", parse_mode=DialogueReader.MARKDOWN) # , reply_markup=prompt_keyboard

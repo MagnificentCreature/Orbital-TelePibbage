@@ -1,11 +1,26 @@
+import asyncio
 import pandas as pd
 import random
 from random_word import Wordnik
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 PROMPT_POOL = 'Assets\PromptsGenerationPool.csv'
 PREPOSITIONS = 'Assets\Preposition.csv'
 MIN_CORPUS_COUNT = 10000
 WORDNIK_API_KEY = "zqai8u9e5pi2p1ia43ee0359w7loishvhyoll5k06hk5j3ges"
+ROW_SIZE = 3
+
+_generation_data = None
+_prepositions = None
+
+@staticmethod
+def initlisation():
+    global _generation_data
+    global _prepositions
+    _generation_data = process_generation_poll(pd.read_csv(PROMPT_POOL))
+    _prepositions = process_prepositions()
+
+initlisation()
 
 @staticmethod
 def process_generation_poll(df):
@@ -131,15 +146,52 @@ def comma_seperated_output(str1, str2, str3):
     return f"{str1}, {str2}, {str3}"
 
 def randomize_strings(str1, str2, str3):
-    prepositions = process_prepositions()
+    # prepositions = process_prepositions()
     strings = [str1, str2, str3]
     random.shuffle(strings)
     result = ""
     for i in range(len(strings) - 1):
-        result += strings[i] + " " +  random.choice(prepositions) + " "
+        result += strings[i] + " " +  random.choice(_prepositions) + " "
     result += strings[-1]
     return result
     # return f"{strings[0]} {random.choice(prepositions)} {strings[1]} + {random.choice(prepositions)} + {strings[2]}"
+
+async def sendPhase1Messages(bot, room):
+    await room.broadcast(bot, "ArcadePhase1p1")
+    await asyncio.sleep(2)
+    await room.broadcast(bot, "ArcadePhase1p2")
+    await asyncio.sleep(2)
+
+def make_keyboard(word_list):
+    keyboard = []
+    for i in range(0, len(word_list), ROW_SIZE):
+        row = []
+        for j in range(ROW_SIZE):
+            if i+j < len(word_list):
+                row.append(InlineKeyboardButton(word_list[i+j], callback_data=str(i+j)))
+        keyboard.append(row)
+    return InlineKeyboardMarkup(keyboard)    
+
+async def sendPhase2Messages(bot, room, player):
+    curated_word_dict = get_random_elements_dict(_generation_data)
+    player.sendMessage("ArcadePhase2p1")
+
+async def beginPhase1(bot, room):
+    asyncio.create_task(sendPhase1Messages(bot, room))
+    # df = pd.read_csv(PROMPT_POOL)
+    # data = process_generation_poll(df)
+
+    curated_word_dict = get_random_elements_dict(_generation_data)
+    choosen_word1 = prompt_user(list(curated_word_dict.keys()))
+
+    word_list = get_random_word_list()
+    choosen_word2 = prompt_user(word_list)
+
+    curated_word_list2 = get_random_elements(_generation_data, num_elements=5, banned=curated_word_dict[choosen_word1])
+    choosen_word3 = prompt_user(curated_word_list2)
+
+    print("Comma seperated prompt is: " + choosen_word1 + ", " + choosen_word2 + ", " + choosen_word3)
+    print("Randomized prompt is: " + randomize_strings(choosen_word1, choosen_word2, choosen_word3))
 
 if __name__ == "__main__":
     df = pd.read_csv(PROMPT_POOL)
