@@ -29,7 +29,7 @@ from Room.RoomHandler import RoomHandler
 from Player.PlayersManager import PlayersManager
 from ImageGeneration import ImageGenerator
 from BotController import BotInitiator
-from GameController import Lying
+from GameController import ArcadeGen, Lying
 
 MIN_PROMPT_LENGTH = 3
 MAX_PROMPT_LENGTH = 15
@@ -103,7 +103,10 @@ async def change_mode(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def start_game(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not await RoomHandler.startGame(update.callback_query.from_user.username, context.bot):
         return BotInitiator.INROOM
-    return BotInitiator.PROMPTING_PHASE
+    if RoomHandler.getGameMode(context.user_data['roomCode']) == Room.Mode.VANILLA:
+        return BotInitiator.PROMPTING_PHASE
+    elif RoomHandler.getGameMode(context.user_data['roomCode']) == Room.Mode.ARCADE:
+        return BotInitiator.ARCADE_GEN_PHASE
 
 async def take_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     #Check if the user is in a game
@@ -111,6 +114,12 @@ async def take_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return BotInitiator.WAITING_FOR_HOST
     # TODO: handle bad prompts or failure to generate image
     #asyncio.wait_for(ImageGenerator.imageQuery(update.message).wait(), timeout=60)
+
+    # check if the room is in the prompting state
+    if not await RoomHandler.checkState(context.user_data['roomCode'], Room.State.PROMPTING_STATE):
+        # TODO Handle the phase error
+        print("Error: Not in prompting phase")
+        return BotInitiator.PROMPTING_PHASE
 
     prompt = update.message.text
     # SPECIAL_CHARACTERS = ["[", "]", "(", ")", "~", "`", ">", "#", "+", "-", "=", "|", "{", "}", ".", "*", "!"] # [".",">","!"]
@@ -144,7 +153,7 @@ async def take_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     context.user_data['prompt'] = image.getPrompt()
     # Send the image URL in a separate task
-    send_image_task = asyncio.create_task(DialogueReader.sendImageURLByID(context.bot, update.message.from_user.id, image.getImageURL(), caption="You generated: " + image.getPrompt()))
+    send_image_task = asyncio.create_task(DialogueReader.sendImageURLByID(context.bot, update.message.from_user.id, image.getImageURL(), caption="You generated: " + image.getPrompt()), raw=True)
 
     await RoomHandler.takeImage(context.user_data['roomCode'], update.message.from_user.username, image)
 
@@ -222,6 +231,74 @@ async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYP
             return BotInitiator.FRESH
 
     return BotInitiator.VOTING_PHASE  
+
+async def handle_arcade_gen(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    #Check if the user is in a game
+    if not context.user_data['in_game']:
+        return BotInitiator.WAITING_FOR_HOST
+    
+    # check if the room is in the arcade gen state
+    if not await RoomHandler.checkState(context.user_data['roomCode'], Room.State.ARCADE_GEN_STATE):
+        # TODO Handle the phase error
+        print("Error: Not in arcade gen phase")
+        return BotInitiator.ARCADE_GEN_PHASE
+    
+    query = update.callback_query
+    data = re.split(r"(?<!\\):", query.data)
+    prompt_string1 = data[1]
+    if len(data) > 2:
+        banned_category = data[2]
+    else:
+        banned_category = None
+        
+    if "arcade_gen_string" in context.user_data:
+        context.user_data["arcade_gen_string"] += [prompt_string1]
+    else:
+        context.user_data["arcade_gen_string"] = [prompt_string1]
+    await ArcadeGen.recievePickedWord(update.callback_query.from_user.username, context.user_data["arcade_gen_string"], banned=banned_category)
+    return BotInitiator.ARCADE_GEN_PHASE
+
+async def handle_arcade_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    #Check if the user is in a game
+    if not context.user_data['in_game']:
+        return BotInitiator.WAITING_FOR_HOST
+
+    # check if the room is in the prompting state
+    if not await RoomHandler.checkState(context.user_data['roomCode'], Room.State.ARCADE_GEN_STATE):
+        # TODO Handle the phase error
+        print("Error: Not in arcade gen phase")
+        return BotInitiator.ARCADE_GEN_PHASE
+
+    query = update.callback_query
+    data = re.split(r"(?<!\\):", query.data)
+    prompt = context.user_data["arcade_prompt_list"][int(data[1])]
+    
+    await DialogueReader.sendMessageByID(context.bot, update.callback_query.from_user.id, "ArcadePhase1p7")
+    
+    task = asyncio.create_task(ImageGenerator.imageQuery(prompt, update.callback_query.from_user.username))
+    image = await task
+
+    if image is not None and image.getProcessing() > 0:
+        eta = image.getProcessing()
+        await DialogueReader.sendMessageByID(context.bot, update.callback_query.from_user.id, "PromptTakingAwhile", **{"eta": eta})
+        await asyncio.sleep(eta)
+        image = await ImageGenerator.fetchImage(image, update.callback_query.from_user.username, bot=context.bot)
+
+    # TODO: Find better way to handle case where even backup image fails (and thus returns none)
+    # if image is None:
+    #     await DialogueReader.sendMessageByID(context.bot, update.callback_query.from_user.id, "InvalidPrompt")
+    #     return BotInitiator.ARCADE_GEN_PHASE
+
+    # We do not send the image immidiately, as we want to wait for the other player to send their captions
+
+    waitingTask = asyncio.create_task(DialogueReader.sendMessageByID(context.bot, update.callback_query.from_user.id, "WaitingForItems", **{'item': "prompt"}))
+    context.user_data['prompt'] = image.getPrompt()
+    await RoomHandler.takeImage(context.user_data['roomCode'], update.callback_query.from_user.username, image)
+    await waitingTask
+    
+    check_items_task = asyncio.create_task(RoomHandler.checkItems(context.user_data['roomCode'], Player.PlayerConstants.PROMPT, context.bot))
+    await check_items_task
+    return BotInitiator.CAPTION_PHASE
 
 async def play_again(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.callback_query.edit_message_reply_markup(reply_markup=None)

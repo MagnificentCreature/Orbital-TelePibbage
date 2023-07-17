@@ -21,15 +21,18 @@ CREATE_ROOM, JOIN_ROOM, START_GAME = map(chr, range(3))
 # Entercode and In_room level commands
 RETURN_TO_FRESH, CHANGE_MODE = map(chr, range(3,5))
 # In_game level commands
-ENTER_PROMPT, ENTER_LIE, VOTE = map(chr, range(5,8))
+SEND_PROMPT, SEND_LIE, VOTE, SEND_ARCADE_WORD, SEND_ARCADE_PROMPT = map(chr, range(5,10))
 # End game restart commands
-PLAY_AGAIN = map(chr, range(8,9))
+PLAY_AGAIN = map(chr, range(10,11))
 #Shortcut for Conversation Handler END
 END = ConversationHandler.END
 #VOTE REGEX
 VOTE_REGEX = fr"{VOTE}:[^:]+:[^:]+"
 #regex for PLAY_AGAIN:Four uppercase letters
 PLAY_AGAIN_REGEX = f"{PLAY_AGAIN}" + ":[A-Z]{4}"
+SEND_ARCADE_WORD_REGEX = f"{SEND_ARCADE_WORD}:.*"
+SEND_ARCADE_PROMPT_REGEX = f"{SEND_ARCADE_PROMPT}:.*"
+
 
 # for FRESH
 WelcomeKeyboard = InlineKeyboardMarkup([
@@ -69,7 +72,7 @@ StartGameButtons = [
 # for PROMPTING_PHASE
 # StartGameKeyboard = InlineKeyboardMarkup([
 #     [
-#         InlineKeyboardButton(text="Enter Prompt", callback_data=str(ENTER_PROMPT)),
+#         InlineKeyboardButton(text="Enter Prompt", callback_data=str(SEND_PROMPT)),
 #     ],
 # ])
 
@@ -78,7 +81,7 @@ logging.basicConfig(
     level=logging.INFO
 )
 
-FRESH, ENTERCODE, INROOM, WAITING_FOR_HOST, PROMPTING_PHASE, LYING_PHASE, VOTING_PHASE, REVEAL_PHASE = range(8)
+FRESH, ENTERCODE, INROOM, WAITING_FOR_HOST, PROMPTING_PHASE, LYING_PHASE, VOTING_PHASE, REVEAL_PHASE, ARCADE_GEN_PHASE, CAPTION_PHASE, BATTLE_PHASE = range(11)
 #Shortcut for returning to FRESH
 FRESH_CALLBACK = CallbackQueryHandler(BotCommands.return_to_fresh, pattern="^" + str(RETURN_TO_FRESH) + "$")
 
@@ -90,6 +93,7 @@ def main() -> None:
         entry_points=[
                 CallbackQueryHandler(BotCommands.start_game, pattern="^" + str(START_GAME) + "$"),
                 MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.take_prompt),
+                CallbackQueryHandler(BotCommands.handle_arcade_gen, pattern=SEND_ARCADE_WORD_REGEX),
             ],
         states={
             PROMPTING_PHASE: [
@@ -107,7 +111,18 @@ def main() -> None:
             REVEAL_PHASE: [
                 # MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.reveal_lies),
                 MessageHandler(filters.COMMAND, BotCommands.unknown),
-            ]
+            ], 
+            ARCADE_GEN_PHASE: [
+                CallbackQueryHandler(BotCommands.handle_arcade_gen, pattern=SEND_ARCADE_WORD_REGEX),
+                CallbackQueryHandler(BotCommands.handle_arcade_prompt, pattern=SEND_ARCADE_PROMPT_REGEX),
+            ],
+            CAPTION_PHASE: [
+
+            ],
+            BATTLE_PHASE: [
+
+            ],
+
         },
         fallbacks=[MessageHandler(filters.COMMAND, BotCommands.unknown)],
         map_to_parent={

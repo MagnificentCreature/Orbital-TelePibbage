@@ -19,6 +19,7 @@ class Player:
         LIE = "lie"
         NEXT_LIE = "next_lie"
         HAS_VOTED = "has_voted"
+        ARCADE_PROMPT_LIST = "arcade_prompt_list"
     
     def __init__(self, username, chatID=0, _user_data={}, score=0, sentPrompt=False):
         self._username = username

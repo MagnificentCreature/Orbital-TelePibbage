@@ -31,9 +31,15 @@ Phase3p1, It's time to unravel the truth\. In the *VOTING PHASE*, I will present
 Phase3p2, Your task is to examine all prompts and vote for the prompt you believe to be the real one. Let's get started!
 Phase4p1, Now that the liars have been exposed and the real prompts have been revealed, let's see who has triumphed in this thrilling journey!
 Phase4p2, Annnnd the WINNER is......
-ArcadePhase1p1, Bonjour, mes amis! Welcome to the worlds finest museum of the AI arts, my name is Pierre, I am the curator. I am in a little predicament, you see, my art got pirated(copy-pasted) by some disgusting looking monkeys and now my museum is empty...
+ArcadePhase1p1, Bonjour, mes amis! Welcome to the worlds finest museum of the AI arts, my name is Pierre, I am the curator. I am in a little predicament, you see, my art got pirated(copy-pasted) by some bored looking apes and now my museum is in peril...
 ArcadePhase1p2, Have some sympathy ya, moi beautiful art pieces do not come cheap. So, I'll need talented AIrtists such as yourselves to help to fill my museum with the finest art. But worry not my friend, it will be a fun and easy process, I will even reward the best AIrtists with an imaginary prize!
-ArcadePhase1p3, Bellow you will see some random words I pulled out of my magic hat, find one that fancies your imagination and send it to me, I will convert it into a beautiful piece of art for you to hang in my museum!
+ArcadePhase1p3, Bellow you will see some magic words I pulled out of my magic hat, find one that fancies your imagination and send it to me, I will convert it into a beautiful piece of art for you to hang in my museum!
+ArcadePhase1p4, Perfect, now pick another enchated word...
+ArcadePhase1p5, Last word, something that will elevate your work into a masterpiece.
+ArcadePhase1p6, Now some finishing touches, to tie the cryptic spell all together
+ArcadePhase1p7, YES! Ooo I can feel the potential in this one, now let me take those words into my magic hat and see what I can pull out... this might take a while... let me go prepare the canvas...
+ArcadePhase2p1, Your masterpiece is almost ready! But before that, I appear to have lost the labels on some of my other images in the museum. Rather than going through the trouble of finding them, I'll just ask you to make up new labels for me!
+ArcadePhase2p2, I'm sure a connoisseur such as yourself can perfectly capture its creators intent and can "cook" something that will "knock the shoes out of" the wider audience and blow its creators mind? hmm?
 # Error Messages 
 InGame, Error to {action} room, perhaps you are already in another game
 AlreadyInRoom, You are already in this room!

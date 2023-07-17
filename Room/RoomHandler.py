@@ -148,6 +148,10 @@ class RoomHandler:
     def getRoom(cls, roomCode):
         return cls._rooms[roomCode]  
     
+    @classmethod
+    def getGameMode(cls, roomCode):
+        return cls._rooms[roomCode].getMode()
+    
     '''
     Prompting Phase methods
     '''

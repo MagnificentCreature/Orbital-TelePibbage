@@ -142,9 +142,11 @@ def sendHTTP(payload, url):
     return None
 
 @staticmethod
-async def imageQuery(prompt, author): #add async
+async def imageQuery(prompt, author, safe=True): #add async
   payload_data = PAYLOAD_DATA_TEMPLATE_V4.copy()
   payload_data["prompt"] = prompt
+  if not safe:
+    payload_data["safety_checker"] = "no"
   payload = json.dumps(payload_data)
   myDict = sendHTTP(payload, URL)
   return errorChecking(myDict, prompt, author)

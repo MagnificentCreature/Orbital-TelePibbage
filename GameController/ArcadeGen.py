@@ -4,23 +4,18 @@ import random
 from random_word import Wordnik
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
+from BotController import BotInitiator
+from Player.Player import Player
+from Player.PlayersManager import PlayersManager
+
 PROMPT_POOL = 'Assets\PromptsGenerationPool.csv'
 PREPOSITIONS = 'Assets\Preposition.csv'
 MIN_CORPUS_COUNT = 10000
 WORDNIK_API_KEY = "zqai8u9e5pi2p1ia43ee0359w7loishvhyoll5k06hk5j3ges"
-ROW_SIZE = 3
+ROW_SIZE = 2
 
 _generation_data = None
 _prepositions = None
-
-@staticmethod
-def initlisation():
-    global _generation_data
-    global _prepositions
-    _generation_data = process_generation_poll(pd.read_csv(PROMPT_POOL))
-    _prepositions = process_prepositions()
-
-initlisation()
 
 @staticmethod
 def process_generation_poll(df):
@@ -62,6 +57,14 @@ def process_prepositions():
         data = prepositions[0].split(',')
     return data
 
+@staticmethod
+def initlisation():
+    global _generation_data
+    global _prepositions
+    _generation_data = process_generation_poll(pd.read_csv(PROMPT_POOL))
+    _prepositions = process_prepositions()
+
+initlisation()
 
 def get_random_dict(data, banned=None):
     total_score = sum(score for (header, score) in data.keys() if header != banned)
@@ -112,6 +115,8 @@ def get_random_elements_dict(data, num_elements=6, banned=None):
     for _ in range(num_elements):
         random_element = get_random_element(data, banned)
         random_elements[random_element[1]] = random_element[0]
+    if len(random_elements) < num_elements:
+        print("WTF IS GOING ON HERE")
     return random_elements
 
 wordnik_service = Wordnik(api_key=WORDNIK_API_KEY)
@@ -145,53 +150,92 @@ def prompt_user(word_list):
 def comma_seperated_output(str1, str2, str3):
     return f"{str1}, {str2}, {str3}"
 
-def randomize_strings(str1, str2, str3):
+def randomise_strings(*strings):
     # prepositions = process_prepositions()
-    strings = [str1, str2, str3]
+    strings = list(strings)
     random.shuffle(strings)
     result = ""
     for i in range(len(strings) - 1):
         result += strings[i] + " " +  random.choice(_prepositions) + " "
     result += strings[-1]
     return result
-    # return f"{strings[0]} {random.choice(prepositions)} {strings[1]} + {random.choice(prepositions)} + {strings[2]}"
 
 async def sendPhase1Messages(bot, room):
     await room.broadcast(bot, "ArcadePhase1p1")
-    await asyncio.sleep(2)
+    await asyncio.sleep(3)
     await room.broadcast(bot, "ArcadePhase1p2")
-    await asyncio.sleep(2)
+    await asyncio.sleep(3)
+    await room.broadCall(bot, sendRandomElements)
 
-def make_keyboard(word_list):
+def make_keyboard(word_list, row_size=ROW_SIZE, final_keyboard=False):
     keyboard = []
-    for i in range(0, len(word_list), ROW_SIZE):
-        row = []
-        for j in range(ROW_SIZE):
-            if i+j < len(word_list):
-                row.append(InlineKeyboardButton(word_list[i+j], callback_data=str(i+j)))
-        keyboard.append(row)
+    if isinstance(word_list, dict):
+        # enumerate through dictionary
+        for i, (word, header) in enumerate(word_list.items()):
+            if i % row_size == 0:
+                keyboard.append([])
+            keyboard[-1].append(InlineKeyboardButton(word, callback_data=f"{BotInitiator.SEND_ARCADE_WORD}:{word}:{header}"))
+        return InlineKeyboardMarkup(keyboard)
+    
+    for i, word in enumerate(word_list):
+        if i % row_size == 0:
+            row = []
+            keyboard.append(row)
+        if final_keyboard:
+            row.append(InlineKeyboardButton(word, callback_data=f"{BotInitiator.SEND_ARCADE_PROMPT}:{i}"))
+        else:
+            row.append(InlineKeyboardButton(word, callback_data=f"{BotInitiator.SEND_ARCADE_WORD}:{word}"))
     return InlineKeyboardMarkup(keyboard)    
 
-async def sendPhase2Messages(bot, room, player):
+# Function to be used to under room broadCall to send a specified list to the player
+# This function is used in the send phase 1 messages
+async def sendRandomElements(bot, room, player):
     curated_word_dict = get_random_elements_dict(_generation_data)
-    player.sendMessage("ArcadePhase2p1")
+    await player.sendMessage(bot, "ArcadePhase1p3", messageKey="arcade_prompting", reply_markup=make_keyboard(curated_word_dict))
+
+# Function to be used to under room broadCall to send a specified list to the player
+# This function is not actually being used
+async def sendRandomWords(bot, room, player):
+    await player.sendMessage(bot, "ArcadePhase1p3", messageKey="arcade_prompting", reply_markup=make_keyboard(get_random_word_list()))
+
+# Returns false when there are still more words to be picked
+# Returns true when all the words are picked
+async def recievePickedWord(username, wordList, banned=None):
+    player = PlayersManager.queryPlayer(username)
+    match len(wordList):
+        case 1:
+            await player.editMessage("arcade_prompting", "ArcadePhase1p4", reply_markup=make_keyboard(get_random_word_list())) #TODO change wordlist out
+        case 2:
+            curated_word_list2 = get_random_elements(_generation_data, num_elements=3, banned=banned)
+            curated_word_list2.extend(get_random_word_list(length=3))
+            await player.editMessage("arcade_prompting", "ArcadePhase1p5", reply_markup=make_keyboard(curated_word_list2))
+        case 3:
+            # sets the player arcade_gen_string to the comma seperated output
+            final_list = [f"{wordList[0]}, {wordList[1]}, {wordList[2]}", 
+                          randomise_strings(*wordList), 
+                          randomise_strings(*wordList)]
+            player.setItem(Player.PlayerConstants.ARCADE_PROMPT_LIST, final_list)
+            await player.editMessage("arcade_prompting", "ArcadePhase1p6", reply_markup=make_keyboard(final_list, row_size=1, final_keyboard=True))
+        case _:
+            print(wordList)
+            print("Error: Invalid number of words recieved in recievePickedWord")
 
 async def beginPhase1(bot, room):
     asyncio.create_task(sendPhase1Messages(bot, room))
     # df = pd.read_csv(PROMPT_POOL)
     # data = process_generation_poll(df)
 
-    curated_word_dict = get_random_elements_dict(_generation_data)
-    choosen_word1 = prompt_user(list(curated_word_dict.keys()))
+    # curated_word_dict = get_random_elements_dict(_generation_data)
+    # choosen_word1 = prompt_user(list(curated_word_dict.keys()))
 
-    word_list = get_random_word_list()
-    choosen_word2 = prompt_user(word_list)
+    # word_list = get_random_word_list()
+    # choosen_word2 = prompt_user(word_list)
 
-    curated_word_list2 = get_random_elements(_generation_data, num_elements=5, banned=curated_word_dict[choosen_word1])
-    choosen_word3 = prompt_user(curated_word_list2)
+    # curated_word_list2 = get_random_elements(_generation_data, num_elements=5, banned=curated_word_dict[choosen_word1])
+    # choosen_word3 = prompt_user(curated_word_list2)
 
-    print("Comma seperated prompt is: " + choosen_word1 + ", " + choosen_word2 + ", " + choosen_word3)
-    print("Randomized prompt is: " + randomize_strings(choosen_word1, choosen_word2, choosen_word3))
+    # print("Comma seperated prompt is: " + choosen_word1 + ", " + choosen_word2 + ", " + choosen_word3)
+    # print("Randomized prompt is: " + randomise_strings(choosen_word1, choosen_word2, choosen_word3))
 
 if __name__ == "__main__":
     df = pd.read_csv(PROMPT_POOL)
@@ -209,7 +253,7 @@ if __name__ == "__main__":
     choosen_word3 = prompt_user(curated_word_list2)
 
     print("Comma seperated prompt is: " + choosen_word1 + ", " + choosen_word2 + ", " + choosen_word3)
-    print("Random preposition prompt is: " + randomize_strings(choosen_word1, choosen_word2, choosen_word3))
-    print("Random preposition prompt is: " + randomize_strings(choosen_word1, choosen_word2, choosen_word3))
+    print("Random preposition prompt is: " + randomise_strings(choosen_word1, choosen_word2, choosen_word3))
+    print("Random preposition prompt is: " + randomise_strings(choosen_word1, choosen_word2, choosen_word3))
 
 

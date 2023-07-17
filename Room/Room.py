@@ -4,9 +4,10 @@ Class that holds data about rooms
 from enum import Enum
 import asyncio
 from collections import deque
+import random
 from BotController import BotInitiator
 from Chat.DialogueReader import DialogueReader
-from GameController import ArcadePrompt, Prompting, Lying, Voting, Reveal
+from GameController import ArcadeGen, Prompting, Lying, Voting, Reveal
 from GameController.Image import Image
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton, Update
 
@@ -16,6 +17,7 @@ class Room:
     _code = ""
     _host = None #player object
     _players = [] #contains list of player objects
+    _shuffled_players = [] #contains list of player objects but shuffled for arcade mode
     MAX_PLAYERS = 8
     MIN_PLAYERS = 2
     _mode = None #game mode
@@ -168,12 +170,15 @@ class Room:
         elif self._mode == Room.Mode.ARCADE:
             match self._state:
                 case Room.State.JOIN_STATE:
-                    await ArcadePrompt.beginPhase1(bot, self)
+                    await ArcadeGen.beginPhase1(bot, self)
                     self._state = Room.State.ARCADE_GEN_STATE
-                case Room.State.PROMPTING_STATE:
-                    await Lying.beginPhase2(bot, self)
+                case Room.State.ARCADE_GEN_STATE:
+                    # await Lying.beginPhase2(bot, self)
+                    self._state = Room.State.CAPTION_STATE
+
 
     async def startGame(self, bot):
+        self._shuffled_players = random.shuffle(self._players.copy())
         for eachPlayer in self._players:
             self._playerToRemainingImages[eachPlayer] = []
             if eachPlayer == self._host:
@@ -203,7 +208,7 @@ class Room:
         for playerObj in self._players: 
             if not playerObj.querySentItem(item):
                 return False
-        # At this point all players have sent prompts, advance state
+        # At this point all players have sent prompts, advance state (unless in the case of lie, where we wait for players to send all their lies)
         if advance:
             await self.advanceState(bot)
         return True
@@ -218,10 +223,17 @@ class Room:
         if self._state != Room.State.PROMPTING_STATE:
             return False
         self._list_of_images.append(image)
-        for eachPlayer in self._players:
-            if eachPlayer == player:
-                continue
-            self._playerToRemainingImages[eachPlayer].append(image) 
+        if self._mode == Room.Mode.VANILLA:
+            for eachPlayer in enumerate(self._players):
+                if eachPlayer == player:
+                    continue
+                self._playerToRemainingImages[eachPlayer].append(image) 
+        elif self._mode == Room.Mode.ARCADE:
+            max_range = min(len(self._players) - 1, 3)
+            player_index = self._shuffled_players.index(player)
+            for i in range(1, max_range + 1):
+                next_player = self._shuffled_players[(player_index + i) % max_range]
+                self._playerToRemainingImages[next_player].append(image)
 
     async def getRemainingImages(self, player):
         return self._playerToRemainingImages[player]                      

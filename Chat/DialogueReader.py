@@ -66,26 +66,26 @@ class DialogueReader:
     def queryDialogue(cls, key, **kwargs):
         return cls.additionalProcessing(cls._dialogues[key].format(**kwargs))
 
-    @classmethod
-    async def sendMessageByID(cls, bot, chat_id, message, reply_markup=None, raw=False, exponential_backoff=1, parse_mode=None):
-        try:
-            #Use telegram api to send a message
-            try:
-                if raw:
-                    return await bot.send_message(chat_id=chat_id, text=message, reply_markup=reply_markup, parse_mode=parse_mode) 
-                if (message not in cls._dialogues):
-                    print("Message " + message + " not found in dialogues.txt")
-                formattedText = cls.additionalProcessing(cls._dialogues[message])
-                return await bot.send_message(chat_id=chat_id, text=formattedText, reply_markup=reply_markup, parse_mode=parse_mode)
-            except error.Forbidden as e:
-                logging.error("Error sending message to chat_id " + str(chat_id) + ": " + str(e))
-        except error.TimedOut as e:
-            if exponential_backoff > cls.MAX_RETRIES:
-                print("FAILURE TO SEND, ABORTING")
-                return
-            logging.error("Timeout error sending message to chat_id " + str(chat_id) + ": " + str(e))
-            asyncio.sleep(2**random.randint(1, exponential_backoff))
-            return await cls.sendMessageByID(bot, chat_id, message, reply_markup=reply_markup, raw=raw, exponential_backoff=exponential_backoff+1, parse_mode=parse_mode)
+    # @classmethod
+    # async def sendMessageByID(cls, bot, chat_id, message, reply_markup=None, raw=False, exponential_backoff=1, parse_mode=None):
+    #     try:
+    #         #Use telegram api to send a message
+    #         try:
+    #             if raw:
+    #                 return await bot.send_message(chat_id=chat_id, text=message, reply_markup=reply_markup, parse_mode=parse_mode) 
+    #             if (message not in cls._dialogues):
+    #                 print("Message " + message + " not found in dialogues.txt")
+    #             formattedText = cls.additionalProcessing(cls._dialogues[message])
+    #             return await bot.send_message(chat_id=chat_id, text=formattedText, reply_markup=reply_markup, parse_mode=parse_mode)
+    #         except error.Forbidden as e:
+    #             logging.error("Error sending message to chat_id " + str(chat_id) + ": " + str(e))
+    #     except error.TimedOut as e:
+    #         if exponential_backoff > cls.MAX_RETRIES:
+    #             print("FAILURE TO SEND, ABORTING")
+    #             return
+    #         logging.error("Timeout error sending message to chat_id " + str(chat_id) + ": " + str(e))
+    #         asyncio.sleep(2**random.randint(1, exponential_backoff))
+    #         return await cls.sendMessageByID(bot, chat_id, message, reply_markup=reply_markup, raw=raw, exponential_backoff=exponential_backoff+1, parse_mode=parse_mode)
 
 
     @classmethod
@@ -97,7 +97,10 @@ class DialogueReader:
                     return await bot.send_message(chat_id=chat_id, text=message, reply_markup=reply_markup, parse_mode=parse_mode)
                 if (message not in cls._dialogues):
                     print("Message " + message + " not found in dialogues.txt")
-                formattedText = cls.additionalProcessing(cls._dialogues[message].format(**kwargs))
+                if len(kwargs) != 0:
+                    formattedText = cls.additionalProcessing(cls._dialogues[message].format(**kwargs))
+                else:
+                     formattedText = cls.additionalProcessing(cls._dialogues[message])
                 return await bot.send_message(chat_id=chat_id, text=formattedText, reply_markup=reply_markup, parse_mode=parse_mode)
             except error.Forbidden as e:
                 logging.error("Error sending message to chat_id " + str(chat_id) + ": " + str(e))
@@ -111,10 +114,18 @@ class DialogueReader:
             return await cls.sendMessageByID(bot, chat_id, message, reply_markup=reply_markup, raw=raw, exponential_backoff=exponential_backoff+1, parse_mode=parse_mode, **kwargs)
     
     @classmethod
-    async def sendImageURLByID(cls, bot, chat_id, imageURL, caption=None, exponential_backoff=1, reply_markup=None, parse_mode=None):
+    async def sendImageURLByID(cls, bot, chat_id, imageURL, caption=None, exponential_backoff=1, reply_markup=None, raw=False, parse_mode=None, **kwargs):
         try:
             try:
-                return await bot.send_photo(chat_id=chat_id, photo=imageURL, reply_markup=reply_markup, caption=caption, parse_mode=parse_mode)
+                if raw:
+                    return await bot.send_photo(chat_id=chat_id, photo=imageURL, reply_markup=reply_markup, caption=caption, parse_mode=parse_mode)
+                if (caption not in cls._dialogues):
+                    print("Message " + caption + " not found in dialogues.txt")
+                if len(kwargs) != 0:
+                    formattedText = cls.additionalProcessing(cls._dialogues[caption].format(**kwargs))
+                else:
+                    formattedText = cls.additionalProcessing(cls._dialogues[caption])
+                return await bot.send_photo(chat_id=chat_id, photo=imageURL, reply_markup=reply_markup, caption=formattedText, parse_mode=parse_mode)
             except error.Forbidden as e:
                 logging.error("Error sending message to chat_id " + str(chat_id) + ": " + str(e))
         except error.TimedOut as e:
@@ -124,4 +135,4 @@ class DialogueReader:
             logging.error("Timeout error sending message to chat_id " + str(chat_id) + ": " + str(e))
             logging.info("Retrying with exponential backoff of " + str(2**exponential_backoff) + " seconds")
             asyncio.sleep(2**random.randint(1, exponential_backoff))
-            return await cls.sendImageURLByID(bot, chat_id, imageURL, reply_markup=reply_markup, exponential_backoff=exponential_backoff+1, parse_mode=parse_mode)
+            return await cls.sendImageURLByID(bot, chat_id, imageURL, caption=caption, exponential_backoff=exponential_backoff+1,reply_markup=reply_markup, raw=raw, parse_mode=parse_mode, **kwargs)
