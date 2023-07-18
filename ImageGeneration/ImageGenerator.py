@@ -19,6 +19,7 @@ CENSOR_HASH = "e9c4a470ad900801f7de4f9402eb27af8a1cc00eac80d618ef16bac39fb27d33"
 MAX_RETRIES = 3
 MAX_TIME = 120
 EXTENDED_SLEEP = 10
+ARCADE_EXTENDED_SLEEP = 15
 
 PAYLOAD_DATA_TEMPLATE_V4 = {
   "key": AI_API_TOKEN,
@@ -142,7 +143,7 @@ def sendHTTP(payload, url):
     return None
 
 @staticmethod
-async def imageQuery(prompt, author, safe=True): #add async
+async def imageQuery(prompt, author, safe=True):
   payload_data = PAYLOAD_DATA_TEMPLATE_V4.copy()
   payload_data["prompt"] = prompt
   if not safe:
@@ -152,7 +153,7 @@ async def imageQuery(prompt, author, safe=True): #add async
   return errorChecking(myDict, prompt, author)
     
 @staticmethod
-async def fetchImage(image, author, bot=None, retry_count = 0): #add async
+async def fetchImage(image, author, bot=None, retry_count = 0, arcade=False):
   payload_data = FETCH_PAYLOAD.copy()
   payload_data["request_id"] = image.getRequestID()
   payload = json.dumps(payload_data)
@@ -164,10 +165,15 @@ async def fetchImage(image, author, bot=None, retry_count = 0): #add async
     if retry_count >= MAX_RETRIES:
         if bot is not None:
           await player.sendMessage(bot, "MaxRetries")
+        if arcade:
+          return None
         return randomImage(author)
     if bot is not None:
       await player.sendMessage(bot, "WaitingAgain", **{"retries": MAX_RETRIES - retry_count})
-    await asyncio.sleep(EXTENDED_SLEEP) #add await
+    if arcade:
+      await asyncio.sleep(ARCADE_EXTENDED_SLEEP) 
+    else:
+      await asyncio.sleep(EXTENDED_SLEEP) 
     return await fetchImage(image, author, bot, retry_count + 1) #add await
   if getImageHash(myDict["output"][0]) == CENSOR_HASH:
     return None
@@ -184,4 +190,3 @@ async def fetchImage(image, author, bot=None, retry_count = 0): #add async
 
 # if __name__ == "__main__":
 #   asyncio.run(imageQuery("", "hi"))
-  

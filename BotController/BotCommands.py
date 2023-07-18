@@ -309,12 +309,16 @@ async def handle_arcade_prompt(update: Update, context: ContextTypes.DEFAULT_TYP
         eta = image.getProcessing()
         await DialogueReader.sendMessageByID(context.bot, update.callback_query.from_user.id, "PromptTakingAwhile", **{"eta": eta})
         await asyncio.sleep(eta)
-        image = await ImageGenerator.fetchImage(image, update.callback_query.from_user.username, bot=context.bot)
+        image = await ImageGenerator.fetchImage(image, update.callback_query.from_user.username, bot=context.bot, arcade=True)
 
     # TODO: Find better way to handle case where even backup image fails (and thus returns none). NOTE Userdata prompt is set early
-    # if image is None:
-    #     await DialogueReader.sendMessageByID(context.bot, update.callback_query.from_user.id, "InvalidPrompt")
-    #     return BotInitiator.ARCADE_GEN_PHASE
+    if image is None:
+        del context.user_data['prompt']
+        del context.user_data['arcade_prompt_list']
+        del context.user_data['arcade_gen_string']
+        await DialogueReader.sendMessageByID(context.bot, update.callback_query.from_user.id, "PromptFailed")
+        await ArcadeGen.sendRandomElements(context.bot, None, PlayersManager.queryPlayer(update.callback_query.from_user.username))
+        return BotInitiator.ARCADE_GEN_PHASE
 
     # We do not send the image immidiately, as we want to wait for the other player to send their captions
 
@@ -326,6 +330,33 @@ async def handle_arcade_prompt(update: Update, context: ContextTypes.DEFAULT_TYP
     check_items_task = asyncio.create_task(RoomHandler.checkItems(context.user_data['roomCode'], Player.PlayerConstants.PROMPT, context.bot))
     await check_items_task
     return BotInitiator.CAPTION_PHASE
+
+async def take_caption(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    #Check if the user is in a game
+    if not context.user_data['in_game']:
+        return BotInitiator.WAITING_FOR_HOST
+    
+    # check if the room is in the lying state
+    if not await RoomHandler.checkState(context.user_data['roomCode'], Room.State.CAPTION_STATE):
+        # TODO Handle the phase error
+        print("Error: Not in caption phase")
+        return BotInitiator.CAPTION_PHASE
+    
+    try:
+        if context.user_data['next_caption'] is not None:
+            await context.user_data['next_caption'].insertLie(update.message.text, update.message.from_user.username)
+            await update.message.delete()
+            if not await RoomHandler.sendNextImage(context.bot, context.user_data["roomCode"], update.message.from_user.username):
+                waitingID = await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "WaitingForItems", **{'item': "lie"})     #TODO find a way to delete this message when the next round starts
+                await RoomHandler.checkItems(context.user_data['roomCode'], Player.PlayerConstants.LIE, context.bot)
+                return BotInitiator.VOTING_PHASE
+            return BotInitiator.LYING_PHASE
+    except KeyError:
+        print("next_caption key error")
+        return BotInitiator.LYING_PHASE
+    
+    # TODO: handle bad lies or failure to generate image
+    return BotInitiator.LYING_PHASE
 
 async def play_again(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.callback_query.edit_message_reply_markup(reply_markup=None)

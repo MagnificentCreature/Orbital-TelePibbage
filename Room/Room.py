@@ -179,7 +179,7 @@ class Room:
                     await ArcadeGen.beginPhase1(bot, self)
                     self._state = Room.State.ARCADE_GEN_STATE
                 case Room.State.ARCADE_GEN_STATE:
-                    # await Lying.beginPhase2(bot, self)
+                    await Lying.beginPhase2(bot, self)
                     self._state = Room.State.CAPTION_STATE
         self._advancing = False
 
