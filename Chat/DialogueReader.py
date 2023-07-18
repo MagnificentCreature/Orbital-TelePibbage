@@ -117,7 +117,7 @@ class DialogueReader:
     async def sendImageURLByID(cls, bot, chat_id, imageURL, caption=None, exponential_backoff=1, reply_markup=None, raw=False, parse_mode=None, **kwargs):
         try:
             try:
-                if raw:
+                if raw or caption is None:
                     return await bot.send_photo(chat_id=chat_id, photo=imageURL, reply_markup=reply_markup, caption=caption, parse_mode=parse_mode)
                 if (caption not in cls._dialogues):
                     print("Message " + caption + " not found in dialogues.txt")

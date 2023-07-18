@@ -26,6 +26,7 @@ class Room:
     _list_copy = None
     _current_voting_image = None
     _playerToRemainingImages = {} #dictionary of player to list of images they have yet to give lies for
+    _advancing = False #boolean to check if game is advancing to next state, for flow control
     
     class State(Enum):
         JOIN_STATE, PROMPTING_STATE, LYING_STATE, VOTING_STATE, REVEAL_STATE, ARCADE_GEN_STATE, CAPTION_STATE, BATTLE_STATE = range(8)
@@ -39,6 +40,7 @@ class Room:
         self._list_of_images = []
         self._state = Room.State.JOIN_STATE
         self._mode = Room.Mode.VANILLA
+        self._advancing = False
 
     def getCode(self):
         return self._code
@@ -148,6 +150,10 @@ class Room:
         return True
     
     async def advanceState(self, bot):
+        if not self._advancing:
+            self._advancing = True
+        else:
+            return
         if self._mode == Room.Mode.VANILLA:
             match self._state:
                 case Room.State.JOIN_STATE:
@@ -175,6 +181,7 @@ class Room:
                 case Room.State.ARCADE_GEN_STATE:
                     # await Lying.beginPhase2(bot, self)
                     self._state = Room.State.CAPTION_STATE
+        self._advancing = False
 
 
     async def startGame(self, bot):
@@ -224,7 +231,7 @@ class Room:
             return False
         self._list_of_images.append(image)
         if self._mode == Room.Mode.VANILLA:
-            for eachPlayer in enumerate(self._players):
+            for eachPlayer in self._players:
                 if eachPlayer == player:
                     continue
                 self._playerToRemainingImages[eachPlayer].append(image) 

@@ -81,23 +81,23 @@ logging.basicConfig(
     level=logging.INFO
 )
 
-FRESH, ENTERCODE, INROOM, WAITING_FOR_HOST, PROMPTING_PHASE, LYING_PHASE, VOTING_PHASE, REVEAL_PHASE, ARCADE_GEN_PHASE, CAPTION_PHASE, BATTLE_PHASE = range(11)
+FRESH, ENTERCODE, INROOM, WAITING_FOR_HOST, PROMPTING_PHASE, LYING_PHASE, VOTING_PHASE, REVEAL_PHASE, ARCADE_GEN_PHASE, CAPTION_PHASE, BATTLE_PHASE, NESTED_FRESH = range(12)
 #Shortcut for returning to FRESH
 FRESH_CALLBACK = CallbackQueryHandler(BotCommands.return_to_fresh, pattern="^" + str(RETURN_TO_FRESH) + "$")
 
 def main() -> None:
-    application = ApplicationBuilder().token(BOT_TOKEN).build()
+    application = ApplicationBuilder().token(BOT_TOKEN).read_timeout(30).write_timeout(30).build()
     
     # In game conversation handler
     game_conv_handler = ConversationHandler(
         entry_points=[
                 CallbackQueryHandler(BotCommands.start_game, pattern="^" + str(START_GAME) + "$"),
-                MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.take_prompt),
+                MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.take_prompt, block=False),
                 CallbackQueryHandler(BotCommands.handle_arcade_gen, pattern=SEND_ARCADE_WORD_REGEX),
             ],
         states={
             PROMPTING_PHASE: [
-                MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.take_prompt),
+                MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.take_prompt, block=False),
             ],
             LYING_PHASE: [
                 MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.take_lie),
@@ -122,16 +122,15 @@ def main() -> None:
             BATTLE_PHASE: [
 
             ],
-
         },
         fallbacks=[MessageHandler(filters.COMMAND, BotCommands.unknown)],
         map_to_parent={
+            FRESH: FRESH,
+            NESTED_FRESH: FRESH,
             WAITING_FOR_HOST: INROOM,
             INROOM: INROOM,
-            FRESH: FRESH,
             ENTERCODE: ENTERCODE,
-        }
-    )
+        })
 
     # Add conversation handler with the states GENDER, PHOTO, LOCATION and BIO
     main_conv_handler = ConversationHandler(
@@ -154,7 +153,7 @@ def main() -> None:
         fallbacks=[
                 MessageHandler(filters.COMMAND, BotCommands.unknown),
             ],
-    )
+    block=False)
 
     application.add_handler(main_conv_handler)
 

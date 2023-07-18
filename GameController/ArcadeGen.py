@@ -167,14 +167,14 @@ async def sendPhase1Messages(bot, room):
     await asyncio.sleep(3)
     await room.broadCall(bot, sendRandomElements)
 
-def make_keyboard(word_list, row_size=ROW_SIZE, final_keyboard=False):
+def make_keyboard(word_list, number=1, row_size=ROW_SIZE, final_keyboard=False):
     keyboard = []
     if isinstance(word_list, dict):
         # enumerate through dictionary
         for i, (word, header) in enumerate(word_list.items()):
             if i % row_size == 0:
                 keyboard.append([])
-            keyboard[-1].append(InlineKeyboardButton(word, callback_data=f"{BotInitiator.SEND_ARCADE_WORD}:{word}:{header}"))
+            keyboard[-1].append(InlineKeyboardButton(word, callback_data=f"{BotInitiator.SEND_ARCADE_WORD}:{word}:{number}:{header}"))
         return InlineKeyboardMarkup(keyboard)
     
     for i, word in enumerate(word_list):
@@ -184,19 +184,19 @@ def make_keyboard(word_list, row_size=ROW_SIZE, final_keyboard=False):
         if final_keyboard:
             row.append(InlineKeyboardButton(word, callback_data=f"{BotInitiator.SEND_ARCADE_PROMPT}:{i}"))
         else:
-            row.append(InlineKeyboardButton(word, callback_data=f"{BotInitiator.SEND_ARCADE_WORD}:{word}"))
+            row.append(InlineKeyboardButton(word, callback_data=f"{BotInitiator.SEND_ARCADE_WORD}:{word}:{number}"))
     return InlineKeyboardMarkup(keyboard)    
 
 # Function to be used to under room broadCall to send a specified list to the player
 # This function is used in the send phase 1 messages
 async def sendRandomElements(bot, room, player):
     curated_word_dict = get_random_elements_dict(_generation_data)
-    await player.sendMessage(bot, "ArcadePhase1p3", messageKey="arcade_prompting", reply_markup=make_keyboard(curated_word_dict))
+    await player.sendMessage(bot, "ArcadePhase1p3", messageKey="arcade_prompting", reply_markup=make_keyboard(curated_word_dict, 1))
 
 # Function to be used to under room broadCall to send a specified list to the player
 # This function is not actually being used
 async def sendRandomWords(bot, room, player):
-    await player.sendMessage(bot, "ArcadePhase1p3", messageKey="arcade_prompting", reply_markup=make_keyboard(get_random_word_list()))
+    await player.sendMessage(bot, "ArcadePhase1p3", messageKey="arcade_prompting", reply_markup=make_keyboard(get_random_word_list(), 1))
 
 # Returns false when there are still more words to be picked
 # Returns true when all the words are picked
@@ -204,11 +204,11 @@ async def recievePickedWord(username, wordList, banned=None):
     player = PlayersManager.queryPlayer(username)
     match len(wordList):
         case 1:
-            await player.editMessage("arcade_prompting", "ArcadePhase1p4", reply_markup=make_keyboard(get_random_word_list())) #TODO change wordlist out
+            await player.editMessage("arcade_prompting", "ArcadePhase1p4", reply_markup=make_keyboard(get_random_word_list(), len(wordList) + 1)) #TODO change wordlist out
         case 2:
             curated_word_list2 = get_random_elements(_generation_data, num_elements=3, banned=banned)
             curated_word_list2.extend(get_random_word_list(length=3))
-            await player.editMessage("arcade_prompting", "ArcadePhase1p5", reply_markup=make_keyboard(curated_word_list2))
+            await player.editMessage("arcade_prompting", "ArcadePhase1p5", reply_markup=make_keyboard(curated_word_list2, len(wordList) + 1))
         case 3:
             # sets the player arcade_gen_string to the comma seperated output
             final_list = [f"{wordList[0]}, {wordList[1]}, {wordList[2]}", 

@@ -2,34 +2,34 @@
 (3) Grayscale,(1) Art Movements,(1) Small to Large,(1) Styles,(1) Realism,(1)  Film,(1)  Game
 white,abstract expressionist art style,super-resolution microscopy,ambient lighting,classical realism,2001 A Space Odyssey,Age of Empires
 black,art deco style,microscopy,backlighting,contemporary realism,A Beautiful Mind,Alan Wake
-light gray,art nouveau style,macro lens,black light,fantastic realism,A Clockwork Orange,Animal Crossing
-dark gray,avant-garde art style,pinhole lens,bright lighting,hyper realistic,Adaptation,Assassin's Creed
-(2) Colors,baroque art style,first person view,bright-dark contrast lighting,magic realism,Aladdin,Baldur's Gate
-maroon,bauhaus art style,wide angle lens,campfire lighting,photorealistic,Alice in Wonderland,Batman: Arkham Knight
-red,color field art style,ultra-wide angle lens,candlelight,realistic,Amelie,Battlefield
-orange,conceptual art style,fisheye lens,cinematic lighting,(1) Post-Realism,American Graffiti,Bayonetta
-yellow,constructivism art style,telephoto lens,colorful lighting,abstract,Apocalypse Now,Beyond Good & Evil
-lime,cubism art style,panorama,contre-jour lighting,acidwave,Arrival,BioShock
-green,dada art style,360 panorama,cross lighting,aura,Back to the Future,Borderlands
-cyan,expressionism art style,tilt-shift lens,dark lighting,brutalism,Bambi,Call of Duty
-teal,fauvism art style,telescope view,daylight,chakra,Beauty and the Beast,Castlevania
-blue,fresco art style,drone view,diffused lighting,cubism,Being John Malkovich,Celeste
-indigo,futurism art style,aerial,dramatic lighting,cyberpunk,Birdman,Chrono Trigger
-purple,harlem renaissance art style,from above,early morning lighting,cyborgism,Blade Runner,Contra
-violet,impressionism art style,satellite imagery,fill lighting,dark fantasy,Brave,Crusader Kings
-brown,installation art style,(1) Other Terms,film noir lighting,dreamlike,Brazil,Dark Cloud
-(1) Colors (dark),land art style,backlit,fluorescent lighting,forestpunk,Captain America,Dark Souls
-dark-maroon,minimalism art style,blurry,golden hour sunlight,fractalpunk,Citizen Kane,Dead Space
-dark-red,neo-impressionism art style,bokeh,hard lighting,futurism,City of God,Deus Ex
-dark-orange,op art style,depth of field,hazy lighting,futuristic,Dark Knight,Devil May Cry
-dark-yellow,pop art style,grainy,high-key lighting,glo-fi,Django Unchained,Diablo
-dark-lime,post-impressionism art style,hazy,incandescent lighting,nanopunk,Doctor Strange,Dishonored
-dark-green,precisionism art style,high contrast,key lighting,psychedelic,Dogville,Doom
-dark-cyan,psychedelic art style,high-speed photography,low-key lighting,psychedelica,Drive,Doom Eternal
-dark-teal,street art style,ICM,mid-day lighting,rainbowcore,Dune,Dota 2
-dark-blue,suprematism art style,long exposure,moody lighting,sci-fi,Enemy,Dragon Quest XI
-dark-indigo,surrealism art style,low light,morning light,shpongle,Enter the Void,Dreamcast
-dark-purple,symbolism art style,motion blur,neon lighting,sparklecore,Eraserhead,Driver San Francisco
+light gray,art nouveau style,macro lens,black light,fantastic realism,A Clockwork Orange,Angry Birds
+dark gray,avant-garde art style,pinhole lens,bright lighting,hyper realistic,Adaptation,Animal Crossing
+(2) Colors,baroque art style,first person view,bright-dark contrast lighting,magic realism,Aladdin,Among Us
+maroon,bauhaus art style,wide angle lens,campfire lighting,photorealistic,Alice in Wonderland,Assassin's Creed
+red,color field art style,ultra-wide angle lens,candlelight,realistic,Amelie,Batman: Arkham Knight
+orange,conceptual art style,fisheye lens,cinematic lighting,(1) Post-Realism,American Graffiti,Battlefield
+yellow,constructivism art style,telephoto lens,colorful lighting,abstract,Apocalypse Now,Bayonetta
+lime,cubism art style,panorama,contre-jour lighting,acidwave,Arrival,Beyond Good & Evil
+green,dada art style,360 panorama,cross lighting,aura,Back to the Future,BioShock
+cyan,expressionism art style,tilt-shift lens,dark lighting,brutalism,Bambi,Borderlands
+teal,fauvism art style,telescope view,daylight,chakra,Beauty and the Beast,Call of Duty
+blue,fresco art style,drone view,diffused lighting,cubism,Being John Malkovich,Castlevania
+indigo,futurism art style,aerial,dramatic lighting,cyberpunk,Birdman,Celeste
+purple,harlem renaissance art style,from above,early morning lighting,cyborgism,Blade Runner,Chrono Trigger
+violet,impressionism art style,satellite imagery,fill lighting,dark fantasy,Brave,Clash Of Clans
+brown,installation art style,(1) Other Terms,film noir lighting,dreamlike,Brazil,Contra
+(1) Colors (dark),land art style,backlit,fluorescent lighting,forestpunk,Captain America,Crusader Kings
+dark-maroon,minimalism art style,blurry,golden hour sunlight,fractalpunk,Citizen Kane,Dark Cloud
+dark-red,neo-impressionism art style,bokeh,hard lighting,futurism,City of God,Dark Souls
+dark-orange,op art style,depth of field,hazy lighting,futuristic,Dark Knight,Dead Space
+dark-yellow,pop art style,grainy,high-key lighting,glo-fi,Django Unchained,Deus Ex
+dark-lime,post-impressionism art style,hazy,incandescent lighting,nanopunk,Doctor Strange,Devil May Cry
+dark-green,precisionism art style,high contrast,key lighting,psychedelic,Dogville,Diablo
+dark-cyan,psychedelic art style,high-speed photography,low-key lighting,psychedelica,Drive,Dishonored
+dark-teal,street art style,ICM,mid-day lighting,rainbowcore,Dune,Doom Eternal
+dark-blue,suprematism art style,long exposure,moody lighting,sci-fi,Enemy,Dota 2
+dark-indigo,surrealism art style,low light,morning light,shpongle,Enter the Void,Dragon Quest XI
+dark-purple,symbolism art style,motion blur,neon lighting,sparklecore,Eraserhead,Dreamcast
 dark-violet,(1) Flat Output,night photography,night lighting,steampunk,Eternal Sunshine Of The Spotless Mind,Duck Hunt
 dark-brown,3D rendering,shallow depth of field,overhead lighting,surreal,Fantasia,EarthBound
 (1) Colors (light),animation,sharp,party lighting,synthwave,Fargo,Elden Ring
@@ -43,13 +43,13 @@ light-cyan,comic book,,sunset lighting,simple,Inglourious Basterds,Final Fantasy
 light-teal,digital art,,twilight lighting,(1) Details: Complex,Interstellar,Fire Emblem
 light-blue,flyer,,volumetric lighting,asymmetrical,Iron Man,Fortnite
 light-indigo,greeting card,,(1) Types,bling,It,Forza Horizon
-light-purple,icon,,ambient light,camouflage,Jurassic Park,Gears of War
-light-violet,IKEA guide,,backlight,chaotic,Kill Bill,Ghost of Tsushima
-light-brown,illustration,,bioluminescence,chart,La La Land,God of War
-(2) Styles,infographic,,black light bulb,complex,Labyrinth,GoldenEye 007
-black and white,instruction manual,,candle flame,deep dream,Life of Pi,Gran Turismo
-complementary color,lettering,,candle light,detailed,Mad Max Fury Road,Grand Theft Auto
-cool color,logo,,car headlight,diagram,Metropolis,GTA San Andreas
+light-purple,icon,,ambient light,camouflage,Jurassic Park,Fruit Ninja
+light-violet,IKEA guide,,backlight,chaotic,Kill Bill,Gears of War
+light-brown,illustration,,bioluminescence,chart,La La Land,Ghost of Tsushima
+(2) Styles,infographic,,black light bulb,complex,Labyrinth,God of War
+black and white,instruction manual,,candle flame,deep dream,Life of Pi,GoldenEye 007
+complementary color,lettering,,candle light,detailed,Mad Max Fury Road,Gran Turismo
+cool color,logo,,car headlight,diagram,Metropolis,Grand Theft Auto
 dark color,magazine,,christmas lights,dreamcore,Momento,Half Life
 dichromatism color,map,,crepuscular rays,fractal,Neon Demon,Halo
 faded color,mosaic,,daylight,glassmorphism,Oblivion,Human Fall Flat
@@ -100,42 +100,42 @@ tie-dye color,illuminated manuscript,,,raylectron,The Truman Show,Sonic the Hedg
 35mm film color,ink drawing,,,unreal engine,Thor: Ragnarok,Super Mario 64
 agfacolor color,linocut,,,vector graphic,TRON,Super Mario Bros.
 ambrotype color,marker drawing,,,zbrush,Up,Super Mario Odyssey
-bokeh color,monoprint,,,(1) Rendering: Reflections,Wall-E,Super Mario World
-calotype color,mosaic,,,ray tracing reflections,What Dreams May Come,Super Smash Bros.
-chromatic aberration color,paper cutouts,,,lumen reflections,Who Framed Roger Rabbit,Team Fortress 2
-collodion glass plate color,pastel,,,screen space reflections,,Tekken 3
-cyanotype color,pattern drawing,,,diffraction grating,,Terraria
-daguerreotype color,pencil drawing,,,(1) Rendering: Properties,,Tetris
-depth map color,pointillism,,,transparent,,The Binding of Isaac
-expired film color,pop-up book,,,textured,,The Elder Scrolls IV: Oblivion
-expired polaroid,quilling,,,rough,,The Elder Scrolls V Skyrim
-film negative color,scherenschnitte,,,matte,,The Last of Us Part II
-fujifilm digital,screen printing,,,(1) Time,,The Legend of Zelda Majora's Mask
-hyperspectral imaging color,silkscreen,,,1930s style,,The Legend of Zelda Ocarina of Time
-instax color,stencil,,,1950s style,,The Legend of Zelda Breath of the Wild
-kodachrome color,stencil art,,,1960s style,,The Legend of Zelda The Wind Waker
-kodak gold 200 film color,stipple,,,1970s style,,The Long Dark
-lomography color,storybook illustration,,,1980s style,,The Walking Dead
-night vision color,tangle patterns,,,1990s style,,The Witcher 2: Assassins of Kings
-photogram color,tarot card,,,Stone Age,,The Witcher 3
-polaroid color,trading card,,,Bronze Age,,Tom Clancy's Rainbow Six Siege
-sepia photograph color,typography,,,Iron Age,,Tom Clancy's The Division 2
-tintype color,ukiyo-e,,,Ancient Greece,,Tomb Raider
-tri-x 400 tx color,wood engraving,,,Ancient Rome,,Tony Hawk's Pro Skater
-ultraviolet color,woodcut,,,Persian Empire,,Total War: Warhammer
-vignette color,zentangle,,,Byzantine Empire,,Transistor
-vintage film color,zine,,,Renaissance Humanism,,Trials Rising
-,(1) Flat Output: Painting,,,Protestant Reformation,,Uncharted
-,acrylic painting,,,European Renaissance,,"Warhammer 40,000 Dawn of War"
-,airbrush painting,,,Enlightenment,,Wii Fit
-,casein painting,,,Industrial Revolution,,Wii Play
-,cave painting,,,Age of Imperialism,,Wii Sports
-,chiaroscuro painting,,,Victorian Era,,World of Goo
-,collage painting,,,World War I,,Worms World Party
-,color field painting,,,Great Depression,,Xenoblade Chronicles
-,digital painting,,,World War II,,Yakuza
-,encaustic painting,,,antique,,Your Doodles are Bugged
-,fresco painting,,,medieval,,Zynga Poker
+bokeh color,monoprint,,,(1) Rendering: Reflections,Wall-E,Super Smash Bros.
+calotype color,mosaic,,,ray tracing reflections,What Dreams May Come,Team Fortress 2
+chromatic aberration color,paper cutouts,,,lumen reflections,Who Framed Roger Rabbit,Tekken 3
+collodion glass plate color,pastel,,,screen space reflections,,Terraria
+cyanotype color,pattern drawing,,,diffraction grating,,Tetris
+daguerreotype color,pencil drawing,,,(1) Rendering: Properties,,The Binding of Isaac
+depth map color,pointillism,,,transparent,,The Elder Scrolls
+expired film color,pop-up book,,,textured,,The Last of Us Part II
+expired polaroid,quilling,,,rough,,The Legend of Zelda
+film negative color,scherenschnitte,,,matte,,The Long Dark
+fujifilm digital,screen printing,,,(1) Time,,The Walking Dead
+hyperspectral imaging color,silkscreen,,,1930s style,,The Witcher
+instax color,stencil,,,1950s style,,Tom Clancy's Rainbow Six Siege
+kodachrome color,stencil art,,,1960s style,,Tomb Raider
+kodak gold 200 film color,stipple,,,1970s style,,Tony Hawk's Pro Skater
+lomography color,storybook illustration,,,1980s style,,Total War: Warhammer
+night vision color,tangle patterns,,,1990s style,,Transistor
+photogram color,tarot card,,,Stone Age,,Trials Rising
+polaroid color,trading card,,,Bronze Age,,Uncharted
+sepia photograph color,typography,,,Iron Age,,"Warhammer 40,000 Dawn of War"
+tintype color,ukiyo-e,,,Ancient Greece,,Wii Sports
+tri-x 400 tx color,wood engraving,,,Ancient Rome,,World of Goo
+ultraviolet color,woodcut,,,Persian Empire,,Worms World Party
+vignette color,zentangle,,,Byzantine Empire,,Xenoblade Chronicles
+vintage film color,zine,,,Renaissance Humanism,,Yakuza
+,(1) Flat Output: Painting,,,Protestant Reformation,,Your Doodles are Bugged
+,acrylic painting,,,European Renaissance,,Zynga Poker
+,airbrush painting,,,Enlightenment,,
+,casein painting,,,Industrial Revolution,,
+,cave painting,,,Age of Imperialism,,
+,chiaroscuro painting,,,Victorian Era,,
+,collage painting,,,World War I,,
+,color field painting,,,Great Depression,,
+,digital painting,,,World War II,,
+,encaustic painting,,,antique,,
+,fresco painting,,,medieval,,
 ,glass painting,,,modern,,
 ,glitter painting,,,retro,,
 ,gouache painting,,,victorian,,

@@ -15,11 +15,13 @@ class Player:
     _user_data = None
     
     class PlayerConstants(Enum):
+        PRESSING_BUTTON = "pressing_button"
         PROMPT = "prompt"
         LIE = "lie"
         NEXT_LIE = "next_lie"
         HAS_VOTED = "has_voted"
         ARCADE_PROMPT_LIST = "arcade_prompt_list"
+        ARCADE_GEN_STRING = "arcade_gen_string"
     
     def __init__(self, username, chatID=0, _user_data={}, score=0, sentPrompt=False):
         self._username = username
@@ -125,7 +127,6 @@ class Player:
         await self._user_data[messageKey].edit_text(text=DialogueReader.queryDialogue(message), reply_markup=reply_markup, parse_mode=parse_mode)
         if newMessageKey != None:
             self._user_data[newMessageKey] = self._user_data.pop(messageKey)
-
 
     async def editMessage(self, messageKey, message, newMessageKey=None, reply_markup=None, parse_mode=None, **kwargs):
         await self._user_data[messageKey].edit_text(text=DialogueReader.queryDialogue(message, **kwargs), reply_markup=reply_markup, parse_mode=parse_mode)

@@ -3,6 +3,8 @@ Handles user commands
 """
 
 import asyncio
+from functools import wraps
+import random
 import time
 import re
 
@@ -33,6 +35,19 @@ from GameController import ArcadeGen, Lying
 
 MIN_PROMPT_LENGTH = 3
 MAX_PROMPT_LENGTH = 15
+
+def button_stall_decorator(func):
+    @wraps(func)
+    async def wrapper(update, context, *args, **kwargs):
+        await asyncio.sleep(0.5)
+        if context.user_data.get("pressing_button", False):
+            return
+        print(update.callback_query.from_user.username + " Pressing: " + str(context.user_data.get("pressing_button")))
+        context.user_data["pressing_button"] = True
+        result = await func(update, context, *args, **kwargs)
+        context.user_data["pressing_button"] = False
+        return result
+    return wrapper
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if (update.message.from_user.username is None):
@@ -153,7 +168,7 @@ async def take_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     context.user_data['prompt'] = image.getPrompt()
     # Send the image URL in a separate task
-    send_image_task = asyncio.create_task(DialogueReader.sendImageURLByID(context.bot, update.message.from_user.id, image.getImageURL(), caption="You generated: " + image.getPrompt()), raw=True)
+    send_image_task = asyncio.create_task(DialogueReader.sendImageURLByID(context.bot, update.message.from_user.id, image.getImageURL(), caption="You generated: " + image.getPrompt(), raw=True))
 
     await RoomHandler.takeImage(context.user_data['roomCode'], update.message.from_user.username, image)
 
@@ -191,6 +206,7 @@ async def take_lie(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # TODO: handle bad lies or failure to generate image
     return BotInitiator.LYING_PHASE
 
+@button_stall_decorator
 async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     #Flow control to see if the user is in a game
     try:
@@ -217,7 +233,7 @@ async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYP
     context.user_data['has_voted'] = True
     await DialogueReader.sendMessageByID(context.bot, update.callback_query.from_user.id, "WaitingForItems", **{'item': "vote"})     #TODO find a way to delete this message when the next round starts    
     
-    # checkItems returns True after everyone places voe for one image
+    # checkItems returns True after everyone places vote for one image
     if await room.checkItems(Player.PlayerConstants.HAS_VOTED, context.bot, advance=False):
         #reveal
         message = await votingImage.showPlayersTricked()
@@ -228,10 +244,12 @@ async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYP
         if not hasNext:
             await room.advanceState(context.bot)
             await RoomHandler.endGame(context.user_data['roomCode'], context.bot)
-            return BotInitiator.FRESH
+            # return BotInitiator.VOTING_PHASE
+            return BotInitiator.NESTED_FRESH
 
     return BotInitiator.VOTING_PHASE  
 
+@button_stall_decorator
 async def handle_arcade_gen(update: Update, context: ContextTypes.DEFAULT_TYPE):
     #Check if the user is in a game
     if not context.user_data['in_game']:
@@ -246,18 +264,24 @@ async def handle_arcade_gen(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     data = re.split(r"(?<!\\):", query.data)
     prompt_string1 = data[1]
-    if len(data) > 2:
-        banned_category = data[2]
+    number = data[2]
+    if len(data) > 3:
+        banned_category = data[3]
     else:
         banned_category = None
         
-    if "arcade_gen_string" in context.user_data:
-        context.user_data["arcade_gen_string"] += [prompt_string1]
-    else:
+    if "arcade_gen_string" not in context.user_data:
         context.user_data["arcade_gen_string"] = [prompt_string1]
+        print("STING" + str(context.user_data["arcade_gen_string"]))
+    elif len(context.user_data["arcade_gen_string"]) < int(number):
+        context.user_data["arcade_gen_string"] += [prompt_string1]
+        print("STING2" + str(context.user_data["arcade_gen_string"]))
+    else:
+        return
     await ArcadeGen.recievePickedWord(update.callback_query.from_user.username, context.user_data["arcade_gen_string"], banned=banned_category)
     return BotInitiator.ARCADE_GEN_PHASE
 
+@button_stall_decorator
 async def handle_arcade_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     #Check if the user is in a game
     if not context.user_data['in_game']:
@@ -272,10 +296,13 @@ async def handle_arcade_prompt(update: Update, context: ContextTypes.DEFAULT_TYP
     query = update.callback_query
     data = re.split(r"(?<!\\):", query.data)
     prompt = context.user_data["arcade_prompt_list"][int(data[1])]
+    if context.user_data.get("prompt", False):
+        return
+    context.user_data['prompt'] = prompt
     
     await DialogueReader.sendMessageByID(context.bot, update.callback_query.from_user.id, "ArcadePhase1p7")
     
-    task = asyncio.create_task(ImageGenerator.imageQuery(prompt, update.callback_query.from_user.username))
+    task = asyncio.create_task(ImageGenerator.imageQuery(prompt, update.callback_query.from_user.username, safe=False))
     image = await task
 
     if image is not None and image.getProcessing() > 0:
@@ -284,7 +311,7 @@ async def handle_arcade_prompt(update: Update, context: ContextTypes.DEFAULT_TYP
         await asyncio.sleep(eta)
         image = await ImageGenerator.fetchImage(image, update.callback_query.from_user.username, bot=context.bot)
 
-    # TODO: Find better way to handle case where even backup image fails (and thus returns none)
+    # TODO: Find better way to handle case where even backup image fails (and thus returns none). NOTE Userdata prompt is set early
     # if image is None:
     #     await DialogueReader.sendMessageByID(context.bot, update.callback_query.from_user.id, "InvalidPrompt")
     #     return BotInitiator.ARCADE_GEN_PHASE
