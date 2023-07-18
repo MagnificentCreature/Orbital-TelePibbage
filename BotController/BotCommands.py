@@ -48,6 +48,15 @@ def button_stall_decorator(func):
         return result
     return wrapper
 
+def check_in_game_decorator(func):
+    @wraps(func)
+    async def wrapper(update, context, *args, **kwargs):
+        #Check if the user is in a game
+        if not context.user_data['in_game']:
+            return BotInitiator.WAITING_FOR_HOST
+        return await func(update, context, *args, **kwargs)
+    return wrapper
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if (update.message.from_user.username is None):
         await update.message.reply_text("Please set a username before using this bot")
@@ -123,10 +132,8 @@ async def start_game(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif RoomHandler.getGameMode(context.user_data['roomCode']) == Room.Mode.ARCADE:
         return BotInitiator.ARCADE_GEN_PHASE
 
+@check_in_game_decorator
 async def take_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    #Check if the user is in a game
-    if not context.user_data['in_game']:
-        return BotInitiator.WAITING_FOR_HOST
     # TODO: handle bad prompts or failure to generate image
     #asyncio.wait_for(ImageGenerator.imageQuery(update.message).wait(), timeout=60)
 
@@ -179,11 +186,8 @@ async def take_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await check_items_task
     return BotInitiator.LYING_PHASE
 
-async def take_lie(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    #Check if the user is in a game
-    if not context.user_data['in_game']:
-        return BotInitiator.WAITING_FOR_HOST
-    
+@check_in_game_decorator
+async def take_lie(update: Update, context: ContextTypes.DEFAULT_TYPE):    
     # check if the room is in the lying state
     if not await RoomHandler.checkState(context.user_data['roomCode'], Room.State.LYING_STATE):
         # TODO Handle the phase error
@@ -221,8 +225,7 @@ async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYP
         
     query = update.callback_query
     data = re.split(r"(?<!\\):", query.data)
-    lie = data[1]
-    lieAuthor = data[2]
+    lieAuthor = data[1]
     playerTricked = update.callback_query.from_user.username
 
     room = RoomHandler.getRoom(context.user_data['roomCode'])
@@ -249,11 +252,8 @@ async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYP
     return BotInitiator.VOTING_PHASE  
 
 @button_stall_decorator
+@check_in_game_decorator
 async def handle_arcade_gen(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    #Check if the user is in a game
-    if not context.user_data['in_game']:
-        return BotInitiator.WAITING_FOR_HOST
-    
     # check if the room is in the arcade gen state
     if not await RoomHandler.checkState(context.user_data['roomCode'], Room.State.ARCADE_GEN_STATE):
         # TODO Handle the phase error
@@ -279,11 +279,8 @@ async def handle_arcade_gen(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return BotInitiator.ARCADE_GEN_PHASE
 
 @button_stall_decorator
+@check_in_game_decorator
 async def handle_arcade_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    #Check if the user is in a game
-    if not context.user_data['in_game']:
-        return BotInitiator.WAITING_FOR_HOST
-
     # check if the room is in the prompting state
     if not await RoomHandler.checkState(context.user_data['roomCode'], Room.State.ARCADE_GEN_STATE):
         # TODO Handle the phase error
@@ -331,11 +328,8 @@ async def handle_arcade_prompt(update: Update, context: ContextTypes.DEFAULT_TYP
     
     return BotInitiator.CAPTION_PHASE
 
+@check_in_game_decorator
 async def take_caption(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    #Check if the user is in a game
-    if not context.user_data['in_game']:
-        return BotInitiator.WAITING_FOR_HOST
-    
     # check if the room is in the lying state
     if not await RoomHandler.checkState(context.user_data['roomCode'], Room.State.CAPTION_STATE):
         # TODO Handle the phase error
@@ -357,6 +351,25 @@ async def take_caption(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     # TODO: handle bad lies or failure to generate image
     return BotInitiator.CAPTION_PHASE
+
+@button_stall_decorator
+@check_in_game_decorator
+async def handle_pick(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    # Flow contorl check if the player has already clicked
+    update.callback_query.edit_message_reply_markup(reply_markup=None)
+        
+    query = update.callback_query
+    data = re.split(r"(?<!\\):", query.data)
+    captionAuthor = data[1]
+    caption = update.callback_query.message.text
+
+    #modify the image object to include the caption
+
+    #produce the image
+
+    #send the new image to the player
+
+    return BotInitiator.BATTLE_PHASE
 
 async def play_again(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.callback_query.edit_message_reply_markup(reply_markup=None)

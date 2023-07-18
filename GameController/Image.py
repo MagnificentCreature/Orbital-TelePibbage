@@ -8,10 +8,10 @@ from Player.PlayersManager import PlayersManager
 from BotController import BotInitiator
 import re
 class Image:
-    author = "a" #store author
-    prompt = "a"
+    author = "" #store author
+    prompt = ""
     correct_players = []
-    imageURL = "a" #store imageURL
+    imageURL = "" #store imageURL
     imageCaptions = [] #store imageCaptions as a list of tuples: (caption, username)
     imageLies = {} #store imageLies as a dict:tuple of lie_author:(lie, [list of players who fell for the lie])
     processingTime = 0 # 0 for image is made, else the number is the ETA
@@ -62,11 +62,9 @@ class Image:
         for lieAuthor, (lie, _playerTricked) in self.imageLies.items():
             if lieAuthor == reciever:
                 continue
-            formatted_lie = lie.replace(r":", r"\:")
-            lie_button = InlineKeyboardButton(lie, callback_data=f"{BotInitiator.VOTE}:{formatted_lie}:{lieAuthor}")
+            lie_button = InlineKeyboardButton(lie, callback_data=f"{BotInitiator.VOTE}:{lieAuthor}")
             lie_buttons.append([lie_button])
-        formatted_prompt = self.prompt.replace(r":", r"\:")
-        prompt_button = InlineKeyboardButton(self.prompt, callback_data=f"{BotInitiator.VOTE}:{formatted_prompt}:{self.author}")
+        prompt_button = InlineKeyboardButton(self.prompt, callback_data=f"{BotInitiator.VOTE}:{self.author}")
         lie_buttons.append([prompt_button])
         random.shuffle(lie_buttons)
 
@@ -74,6 +72,14 @@ class Image:
         # self.imageLies[self.author] = (self.prompt, [])
 
         return InlineKeyboardMarkup(lie_buttons)
+    
+    def getCaptionKeyboard(self):
+        caption_buttons = []
+        for caption, _author in self.imageCaptions:
+            caption_button = InlineKeyboardButton(caption, callback_data=f"{BotInitiator.CAPTION}:{_author}")
+            caption_buttons.append([caption_button])
+        # random.shuffle(caption_buttons)
+        return InlineKeyboardMarkup(caption_buttons)
     
     async def showPlayersTricked(self):
         SPECIAL_CHARACTERS = ["[", "]", "(", ")", "~", "`", ">", "#", "+", "-", "=", "|", "{", "}", ".", "!", "*"] # [".",">","!"]        

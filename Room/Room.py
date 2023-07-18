@@ -7,11 +7,12 @@ from collections import deque
 import random
 from BotController import BotInitiator
 from Chat.DialogueReader import DialogueReader
-from GameController import ArcadeGen, Caption, Prompting, Lying, Voting, Reveal
+from GameController import ArcadeGen, Caption, CaptionSelection, Prompting, Lying, Voting, Reveal
 from GameController.Image import Image
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton, Update
 
 from Player.Player import Player
+from Player.PlayersManager import PlayersManager
 
 class Room:
     _code = ""
@@ -29,7 +30,7 @@ class Room:
     _advancing = False #boolean to check if game is advancing to next state, for flow control
     
     class State(Enum):
-        JOIN_STATE, PROMPTING_STATE, LYING_STATE, VOTING_STATE, REVEAL_STATE, ARCADE_GEN_STATE, CAPTION_STATE, BATTLE_STATE = range(8)
+        JOIN_STATE, PROMPTING_STATE, LYING_STATE, VOTING_STATE, REVEAL_STATE, ARCADE_GEN_STATE, CAPTION_STATE, CAPTION_SELECTION_STATE, BATTLE_STATE = range(9)
     class Mode(Enum):
         VANILLA, ARCADE = "Vanilla", "Arcade"
 
@@ -182,6 +183,9 @@ class Room:
                 case Room.State.ARCADE_GEN_STATE:
                     await Caption.beginPhase2(bot, self)
                     self._state = Room.State.CAPTION_STATE
+                case Room.State.CAPTION_STATE:
+                    await CaptionSelection.beginPhase3(bot, self)
+                    self._state = Room.State.CAPTION_SELECTION_STATE
         self._advancing = False
 
 
@@ -271,6 +275,12 @@ class Room:
 
     async def getVotingImage(self):
         return self._current_voting_image
+    
+    async def broadcast_image_captions(self, bot):
+        for image in self._list_of_images:
+            image_url = image.getImageURL()
+            author = image.getAuthor()
+            PlayersManager.queryPlayer(author).sendImageURL(bot, image_url, reply_markup=image.getCaptionKeyboard())
     
     def getLeaderboard(self):
         leaderboard = sorted(self._players, key=lambda player: player.getScore(), reverse=True)

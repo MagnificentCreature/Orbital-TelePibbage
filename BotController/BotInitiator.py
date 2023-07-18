@@ -21,18 +21,19 @@ CREATE_ROOM, JOIN_ROOM, START_GAME = map(chr, range(3))
 # Entercode and In_room level commands
 RETURN_TO_FRESH, CHANGE_MODE = map(chr, range(3,5))
 # In_game level commands
-SEND_PROMPT, SEND_LIE, VOTE, SEND_ARCADE_WORD, SEND_ARCADE_PROMPT = map(chr, range(5,10))
+SEND_PROMPT, SEND_LIE, VOTE = map(chr, range(5,8))
+SEND_ARCADE_WORD, SEND_ARCADE_PROMPT, CAPTION = map(chr, range(8,11))
 # End game restart commands
-PLAY_AGAIN = map(chr, range(10,11))
+PLAY_AGAIN = map(chr, range(11,12))
 #Shortcut for Conversation Handler END
 END = ConversationHandler.END
 #VOTE REGEX
-VOTE_REGEX = fr"{VOTE}:[^:]+:[^:]+"
+VOTE_REGEX = fr"{VOTE}:[^:]+"
 #regex for PLAY_AGAIN:Four uppercase letters
 PLAY_AGAIN_REGEX = f"{PLAY_AGAIN}" + ":[A-Z]{4}"
 SEND_ARCADE_WORD_REGEX = f"{SEND_ARCADE_WORD}:.*"
 SEND_ARCADE_PROMPT_REGEX = f"{SEND_ARCADE_PROMPT}:.*"
-
+CAPTION_REGEX = fr"{CAPTION}:[^:]+"
 
 # for FRESH
 WelcomeKeyboard = InlineKeyboardMarkup([
@@ -118,6 +119,9 @@ def main() -> None:
             ],
             CAPTION_PHASE: [
                 MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.take_caption),
+            ],
+            PICKING_PHASE: [
+                CallbackQueryHandler(BotCommands.handle_pick, pattern=CAPTION_REGEX),
             ],
             BATTLE_PHASE: [
 

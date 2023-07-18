@@ -25,6 +25,7 @@ class Player:
         SENT_ARCADE_PROMPT = "sent_arcade_prompt"
         NEXT_CAPTION = "next_caption"
         CAPTION = "caption"
+        HAS_PICKED = "has_picked"
     
     def __init__(self, username, chatID=0, _user_data={}, score=0):
         self._username = username
