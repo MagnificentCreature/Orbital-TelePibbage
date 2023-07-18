@@ -12,6 +12,7 @@ class Image:
     prompt = "a"
     correct_players = []
     imageURL = "a" #store imageURL
+    imageCaptions = [] #store imageCaptions as a list of tuples: (caption, username)
     imageLies = {} #store imageLies as a dict:tuple of lie_author:(lie, [list of players who fell for the lie])
     processingTime = 0 # 0 for image is made, else the number is the ETA
     requestID = 0 # 0 for image is made, else the number is the requestID
@@ -44,6 +45,9 @@ class Image:
     async def insertLie(self, lie, lieAuthor):
         # self.imageLies.append((lie, username, []))
         self.imageLies[lieAuthor] = (str(lie), [])
+
+    async def insertCaption(self, caption, captionAuthor):
+        self.imageCaptions.append((caption, captionAuthor))
 
     async def addPlayersTricked(self, lieAuthor, playerTricked):
         if lieAuthor == self.author:

@@ -114,8 +114,13 @@ def get_random_elements_dict(data, num_elements=6, banned=None):
     random_elements = {}
     for _ in range(num_elements):
         random_element = get_random_element(data, banned)
+        if random_element[0] is None or random_element[1] is None:
+            print(random_element)
+            print("HMMMMMMMMMMMMMMMMMMMM")
         random_elements[random_element[1]] = random_element[0]
     if len(random_elements) < num_elements:
+        print(random_elements)
+        print(random_element)
         print("WTF IS GOING ON HERE")
     return random_elements
 

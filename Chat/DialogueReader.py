@@ -58,12 +58,16 @@ class DialogueReader:
         inputString = inputString[0].upper() + inputString[1:]
         return inputString
     
-    @classmethod
-    def queryDialogue(cls, key):
-        return cls.additionalProcessing(cls._dialogues[key])
+    # @classmethod
+    # def queryDialogue(cls, key):
+    #     return cls.additionalProcessing(cls._dialogues[key])
     
     @classmethod
     def queryDialogue(cls, key, **kwargs):
+        if key is None:
+            return None
+        if len(kwargs) == 0:
+            return cls.additionalProcessing(cls._dialogues[key])
         return cls.additionalProcessing(cls._dialogues[key].format(**kwargs))
 
     # @classmethod
@@ -84,7 +88,7 @@ class DialogueReader:
     #             print("FAILURE TO SEND, ABORTING")
     #             return
     #         logging.error("Timeout error sending message to chat_id " + str(chat_id) + ": " + str(e))
-    #         asyncio.sleep(2**random.randint(1, exponential_backoff))
+    #         await asyncio.sleep(2**random.randint(1, exponential_backoff))
     #         return await cls.sendMessageByID(bot, chat_id, message, reply_markup=reply_markup, raw=raw, exponential_backoff=exponential_backoff+1, parse_mode=parse_mode)
 
 
@@ -134,5 +138,5 @@ class DialogueReader:
                 return
             logging.error("Timeout error sending message to chat_id " + str(chat_id) + ": " + str(e))
             logging.info("Retrying with exponential backoff of " + str(2**exponential_backoff) + " seconds")
-            asyncio.sleep(2**random.randint(1, exponential_backoff))
+            await asyncio.sleep(2**random.randint(1, exponential_backoff))
             return await cls.sendImageURLByID(bot, chat_id, imageURL, caption=caption, exponential_backoff=exponential_backoff+1,reply_markup=reply_markup, raw=raw, parse_mode=parse_mode, **kwargs)

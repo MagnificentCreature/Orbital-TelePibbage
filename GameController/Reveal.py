@@ -12,21 +12,6 @@ async def sendPhase4Messages(bot, room):
     await asyncio.sleep(2)
     await room.broadcast(bot, "Phase4p2")
 
-# async def revealNextImage(bot, room, player):
-#     # TODO: Send the player the next image he should come up with a lie for
-#     imageList = await room.getImageListCopy() #This function should return a COPY of the image list
-    
-#     # Pop one form the image list and reveal it to the players
-#     imageObj = imageList.pop()
-
-#     player.sendImageURL(bot, imageObj.getImageURL())
-
-#     message = imageObj.showPlayersTricked()
-#     # player.sendMessage(bot, message)
-#     await room.broadcast(bot, message, raw=True)
-#     # await bot.send_message(chat_id=player.getChatID(), text=message)
-#     # message = await image.getMessage(Player.PlayerConstants.NEXT_LIE)
-
 async def revealNextImage(bot, room, player):
     # TODO: Send the player the next image he should come up with a lie for
     imageList = await room.getImageListCopy() #This function should return a COPY of the image list
@@ -38,7 +23,7 @@ async def revealNextImage(bot, room, player):
       message = imageObj.showPlayersTricked()
       # player.sendMessage(bot, message)
       # await room.broadcast(bot, message, raw=True)
-      await bot.send_message(chat_id=player.getChatID(), text=message)
+      await player.send_message(bot, message, raw=True) #unsafe method?
     # message = await image.getMessage(Player.PlayerConstants.NEXT_LIE)
 
 async def revealLeaderboard(bot, room):

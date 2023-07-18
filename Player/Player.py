@@ -22,10 +22,11 @@ class Player:
         HAS_VOTED = "has_voted"
         ARCADE_PROMPT_LIST = "arcade_prompt_list"
         ARCADE_GEN_STRING = "arcade_gen_string"
+        SENT_ARCADE_PROMPT = "sent_arcade_prompt"
         NEXT_CAPTION = "next_caption"
         CAPTION = "caption"
     
-    def __init__(self, username, chatID=0, _user_data={}, score=0, sentPrompt=False):
+    def __init__(self, username, chatID=0, _user_data={}, score=0):
         self._username = username
         self._chatID = chatID
         self._score = score
@@ -68,9 +69,6 @@ class Player:
     
     def getUsername(self):
         return self._username
-
-    def getChatID(self):
-        return self._chatID
     
     def inRoom(self):
         return self._user_data['roomCode'] != ""
@@ -125,18 +123,18 @@ class Player:
             return False
 
     # Methods to send messages
-    async def editMessage(self, messageKey, message, newMessageKey=None, reply_markup=None, parse_mode=None):
-        await self._user_data[messageKey].edit_text(text=DialogueReader.queryDialogue(message), reply_markup=reply_markup, parse_mode=parse_mode)
-        if newMessageKey != None:
-            self._user_data[newMessageKey] = self._user_data.pop(messageKey)
+    # async def editMessage(self, messageKey, message, newMessageKey=None, reply_markup=None, parse_mode=None):
+    #     await self._user_data[messageKey].edit_text(text=DialogueReader.queryDialogue(message), reply_markup=reply_markup, parse_mode=parse_mode)
+    #     if newMessageKey != None:
+    #         self._user_data[newMessageKey] = self._user_data.pop(messageKey)
 
     async def editMessage(self, messageKey, message, newMessageKey=None, reply_markup=None, parse_mode=None, **kwargs):
         await self._user_data[messageKey].edit_text(text=DialogueReader.queryDialogue(message, **kwargs), reply_markup=reply_markup, parse_mode=parse_mode)
         if newMessageKey != None:
             self._user_data[newMessageKey] = self._user_data.pop(messageKey)
 
-    async def editImageURL(self, messageKey, imageURL, newMessageKey=None, reply_markup=None, parse_mode=None):
-        await self._user_data[messageKey].edit_media(media=InputMediaPhoto(imageURL), reply_markup=reply_markup, parse_mode=parse_mode)
+    async def editImageURL(self, messageKey, imageURL, newMessageKey=None, reply_markup=None, parse_mode=None, caption=None, **kwargs):
+        await self._user_data[messageKey].edit_media(media=InputMediaPhoto(imageURL, caption=DialogueReader.queryDialogue(caption, **kwargs)), reply_markup=reply_markup, parse_mode=parse_mode)
         if newMessageKey != None:
             self._user_data[newMessageKey] = self._user_data.pop(messageKey)
 
@@ -144,18 +142,18 @@ class Player:
         await self._user_data[messageKey].delete()
         del self._user_data[messageKey]
 
-    # Including a message key will store the message's ID in the user_data which can be editted later
-    async def sendMessage(self, bot, message, messageKey=None, reply_markup=None, raw=False):
-        messasgeID = await DialogueReader.sendMessageByID(bot, self._chatID, message, raw=raw, reply_markup=reply_markup)
-        if messageKey != None:
-            self._user_data[messageKey] = messasgeID
+    # # Including a message key will store the message's ID in the user_data which can be editted later
+    # async def sendMessage(self, bot, message, messageKey=None, reply_markup=None, raw=False):
+    #     messasgeID = await DialogueReader.sendMessageByID(bot, self._chatID, message, raw=raw, reply_markup=reply_markup)
+    #     if messageKey != None:
+    #         self._user_data[messageKey] = messasgeID
 
     async def sendMessage(self, bot, message, messageKey=None, reply_markup=None, raw=False, **kwargs):
         messasgeID = await DialogueReader.sendMessageByID(bot, self._chatID, message, reply_markup=reply_markup, raw=raw, **kwargs)
         if messageKey != None:
             self._user_data[messageKey] = messasgeID
         
-    async def sendImageURL(self, bot, imageURL, messageKey=None, reply_markup=None):
-        messasgeID = await DialogueReader.sendImageURLByID(bot, self._chatID, imageURL, reply_markup=reply_markup)
+    async def sendImageURL(self, bot, imageURL, messageKey=None, reply_markup=None, caption=None, **kwargs):
+        messasgeID = await DialogueReader.sendImageURLByID(bot, self._chatID, imageURL, caption=caption, reply_markup=reply_markup, **kwargs)
         if messageKey != None:
             self._user_data[messageKey] = messasgeID

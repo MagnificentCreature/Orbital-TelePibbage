@@ -81,7 +81,7 @@ logging.basicConfig(
     level=logging.INFO
 )
 
-FRESH, ENTERCODE, INROOM, WAITING_FOR_HOST, PROMPTING_PHASE, LYING_PHASE, VOTING_PHASE, REVEAL_PHASE, ARCADE_GEN_PHASE, CAPTION_PHASE, BATTLE_PHASE, NESTED_FRESH = range(12)
+FRESH, ENTERCODE, INROOM, WAITING_FOR_HOST, PROMPTING_PHASE, LYING_PHASE, VOTING_PHASE, REVEAL_PHASE, ARCADE_GEN_PHASE, CAPTION_PHASE, PICKING_PHASE, BATTLE_PHASE = range(12)
 #Shortcut for returning to FRESH
 FRESH_CALLBACK = CallbackQueryHandler(BotCommands.return_to_fresh, pattern="^" + str(RETURN_TO_FRESH) + "$")
 
@@ -114,10 +114,10 @@ def main() -> None:
             ], 
             ARCADE_GEN_PHASE: [
                 CallbackQueryHandler(BotCommands.handle_arcade_gen, pattern=SEND_ARCADE_WORD_REGEX),
-                CallbackQueryHandler(BotCommands.handle_arcade_prompt, pattern=SEND_ARCADE_PROMPT_REGEX),
+                CallbackQueryHandler(BotCommands.handle_arcade_prompt, pattern=SEND_ARCADE_PROMPT_REGEX, block=False),
             ],
             CAPTION_PHASE: [
-
+                MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.take_caption),
             ],
             BATTLE_PHASE: [
 
@@ -126,7 +126,6 @@ def main() -> None:
         fallbacks=[MessageHandler(filters.COMMAND, BotCommands.unknown)],
         map_to_parent={
             FRESH: FRESH,
-            NESTED_FRESH: FRESH,
             WAITING_FOR_HOST: INROOM,
             INROOM: INROOM,
             ENTERCODE: ENTERCODE,

@@ -9,7 +9,7 @@ import random
 
 from telegram import InlineKeyboardMarkup
 from Chat.DialogueReader import DialogueReader
-from GameController import Lying
+from GameController import Caption, Lying
 from GameController.Image import Image
 from BotController import BotInitiator
 
@@ -166,7 +166,10 @@ class RoomHandler:
     @classmethod
     async def sendNextImage(cls, bot, roomCode, username):
         player = PlayersManager.queryPlayer(username)
-        return await Lying.sendNextImage(bot, cls._rooms[roomCode], player)
+        if cls._rooms[roomCode].getMode() == Room.Mode.VANILLA:
+            return await Lying.sendNextImage(bot, cls._rooms[roomCode], player)
+        elif cls._rooms[roomCode].getMode() == Room.Mode.ARCADE:
+            return await Caption.sendNextImage(bot, cls._rooms[roomCode], player)
 
     '''
     End game methods

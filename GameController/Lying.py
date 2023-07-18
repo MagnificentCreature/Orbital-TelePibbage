@@ -24,7 +24,7 @@ async def sendPhase2Messages(bot, room):
 async def sendNextImage(bot, room, player):
     imageList = await room.getRemainingImages(player)
     if len(imageList) <= 0:
-        player.deleteContext("LyingImage")
+        player.deleteMessage("LyingImage")
         player.deleteContext(Player.PlayerConstants.NEXT_LIE.value)
         player.setItem(Player.PlayerConstants.LIE, True)
         return False
@@ -33,7 +33,7 @@ async def sendNextImage(bot, room, player):
         print("NO IMAGE WTF LOL")
     player.setItem(Player.PlayerConstants.NEXT_LIE, image) # fill second param with image
     if not await player.queryMessagekey("LyingImage"):
-        await player.sendImageURL(bot, image.getImageURL(), messageKey="LyingImage") # , reply_markup=lie_keyboard
+        await player.sendImageURL(bot, image.getImageURL(), messageKey="LyingImage", caption="Phase2caption", **{"item": "lie"}) # , reply_markup=lie_keyboard
         return True
-    await player.editImageURL("LyingImage", image.getImageURL()) # , reply_markup=lie_keyboard
+    await player.editImageURL("LyingImage", image.getImageURL(), caption="Phase2caption", **{"item": "lie"}) # , reply_markup=lie_keyboard
     return True

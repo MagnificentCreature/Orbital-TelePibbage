@@ -39,10 +39,9 @@ MAX_PROMPT_LENGTH = 15
 def button_stall_decorator(func):
     @wraps(func)
     async def wrapper(update, context, *args, **kwargs):
-        await asyncio.sleep(0.5)
+        # await asyncio.sleep(0.5)
         if context.user_data.get("pressing_button", False):
             return
-        print(update.callback_query.from_user.username + " Pressing: " + str(context.user_data.get("pressing_button")))
         context.user_data["pressing_button"] = True
         result = await func(update, context, *args, **kwargs)
         context.user_data["pressing_button"] = False
@@ -116,6 +115,7 @@ async def change_mode(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return BotInitiator.INROOM
 
 async def start_game(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.callback_query.edit_message_reply_markup(reply_markup=None)
     if not await RoomHandler.startGame(update.callback_query.from_user.username, context.bot):
         return BotInitiator.INROOM
     if RoomHandler.getGameMode(context.user_data['roomCode']) == Room.Mode.VANILLA:
@@ -244,8 +244,7 @@ async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYP
         if not hasNext:
             await room.advanceState(context.bot)
             await RoomHandler.endGame(context.user_data['roomCode'], context.bot)
-            # return BotInitiator.VOTING_PHASE
-            return BotInitiator.NESTED_FRESH
+            return BotInitiator.FRESH
 
     return BotInitiator.VOTING_PHASE  
 
@@ -272,10 +271,8 @@ async def handle_arcade_gen(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
     if "arcade_gen_string" not in context.user_data:
         context.user_data["arcade_gen_string"] = [prompt_string1]
-        print("STING" + str(context.user_data["arcade_gen_string"]))
     elif len(context.user_data["arcade_gen_string"]) < int(number):
         context.user_data["arcade_gen_string"] += [prompt_string1]
-        print("STING2" + str(context.user_data["arcade_gen_string"]))
     else:
         return
     await ArcadeGen.recievePickedWord(update.callback_query.from_user.username, context.user_data["arcade_gen_string"], banned=banned_category)
@@ -296,9 +293,9 @@ async def handle_arcade_prompt(update: Update, context: ContextTypes.DEFAULT_TYP
     query = update.callback_query
     data = re.split(r"(?<!\\):", query.data)
     prompt = context.user_data["arcade_prompt_list"][int(data[1])]
-    if context.user_data.get("prompt", False):
+    if context.user_data.get("sent_arcade_prompt", False):
         return
-    context.user_data['prompt'] = prompt
+    context.user_data['sent_arcade_prompt'] = True
     
     await DialogueReader.sendMessageByID(context.bot, update.callback_query.from_user.id, "ArcadePhase1p7")
     
@@ -329,6 +326,9 @@ async def handle_arcade_prompt(update: Update, context: ContextTypes.DEFAULT_TYP
     
     check_items_task = asyncio.create_task(RoomHandler.checkItems(context.user_data['roomCode'], Player.PlayerConstants.PROMPT, context.bot))
     await check_items_task
+
+    del context.user_data['sent_arcade_prompt']
+    
     return BotInitiator.CAPTION_PHASE
 
 async def take_caption(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -344,19 +344,19 @@ async def take_caption(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     try:
         if context.user_data['next_caption'] is not None:
-            await context.user_data['next_caption'].insertLie(update.message.text, update.message.from_user.username)
+            await context.user_data['next_caption'].insertCaption(update.message.text, update.message.from_user.username)
             await update.message.delete()
             if not await RoomHandler.sendNextImage(context.bot, context.user_data["roomCode"], update.message.from_user.username):
-                waitingID = await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "WaitingForItems", **{'item': "lie"})     #TODO find a way to delete this message when the next round starts
-                await RoomHandler.checkItems(context.user_data['roomCode'], Player.PlayerConstants.LIE, context.bot)
-                return BotInitiator.VOTING_PHASE
-            return BotInitiator.LYING_PHASE
+                waitingID = await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "WaitingForItems", **{'item': "captions"})     #TODO find a way to delete this message when the next round starts
+                await RoomHandler.checkItems(context.user_data['roomCode'], Player.PlayerConstants.CAPTION, context.bot)
+                return BotInitiator.PICKING_PHASE
+            return BotInitiator.CAPTION_PHASE
     except KeyError:
         print("next_caption key error")
-        return BotInitiator.LYING_PHASE
+        return BotInitiator.CAPTION_PHASE
     
     # TODO: handle bad lies or failure to generate image
-    return BotInitiator.LYING_PHASE
+    return BotInitiator.CAPTION_PHASE
 
 async def play_again(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.callback_query.edit_message_reply_markup(reply_markup=None)

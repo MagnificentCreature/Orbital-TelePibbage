@@ -168,11 +168,13 @@ async def fetchImage(image, author, bot=None, retry_count = 0, arcade=False):
         if arcade:
           return None
         return randomImage(author)
-    if bot is not None:
-      await player.sendMessage(bot, "WaitingAgain", **{"retries": MAX_RETRIES - retry_count})
     if arcade:
+      if bot is not None:
+        await player.sendMessage(bot, "WaitingAgain", **{"time": 15, "retries": MAX_RETRIES - retry_count})
       await asyncio.sleep(ARCADE_EXTENDED_SLEEP) 
     else:
+      if bot is not None:
+        await player.sendMessage(bot, "WaitingAgain", **{"time": 10, "retries": MAX_RETRIES - retry_count})
       await asyncio.sleep(EXTENDED_SLEEP) 
     return await fetchImage(image, author, bot, retry_count + 1) #add await
   if getImageHash(myDict["output"][0]) == CENSOR_HASH:

@@ -7,7 +7,7 @@ from collections import deque
 import random
 from BotController import BotInitiator
 from Chat.DialogueReader import DialogueReader
-from GameController import ArcadeGen, Prompting, Lying, Voting, Reveal
+from GameController import ArcadeGen, Caption, Prompting, Lying, Voting, Reveal
 from GameController.Image import Image
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton, Update
 
@@ -41,6 +41,7 @@ class Room:
         self._state = Room.State.JOIN_STATE
         self._mode = Room.Mode.VANILLA
         self._advancing = False
+        self._shuffled_players = []
 
     def getCode(self):
         return self._code
@@ -179,13 +180,14 @@ class Room:
                     await ArcadeGen.beginPhase1(bot, self)
                     self._state = Room.State.ARCADE_GEN_STATE
                 case Room.State.ARCADE_GEN_STATE:
-                    await Lying.beginPhase2(bot, self)
+                    await Caption.beginPhase2(bot, self)
                     self._state = Room.State.CAPTION_STATE
         self._advancing = False
 
 
     async def startGame(self, bot):
-        self._shuffled_players = random.shuffle(self._players.copy())
+        self._shuffled_players = self._players.copy()
+        random.shuffle(self._shuffled_players)
         for eachPlayer in self._players:
             self._playerToRemainingImages[eachPlayer] = []
             if eachPlayer == self._host:
@@ -227,20 +229,21 @@ class Room:
     async def takeImage(self, player, image):
         if player not in self._players:
             return False
-        if self._state != Room.State.PROMPTING_STATE:
+        if self._state != Room.State.PROMPTING_STATE and self._state != Room.State.ARCADE_GEN_STATE:
             return False
         self._list_of_images.append(image)
         if self._mode == Room.Mode.VANILLA:
             for eachPlayer in self._players:
                 if eachPlayer == player:
                     continue
-                self._playerToRemainingImages[eachPlayer].append(image) 
+                self._playerToRemainingImages[eachPlayer].append(image)
         elif self._mode == Room.Mode.ARCADE:
-            max_range = min(len(self._players) - 1, 3)
+            max_range = min(len(self._players), 3)
             player_index = self._shuffled_players.index(player)
-            for i in range(1, max_range + 1):
+            for i in range(1, max_range):
                 next_player = self._shuffled_players[(player_index + i) % max_range]
                 self._playerToRemainingImages[next_player].append(image)
+            print("PlayerImages" + str(self._playerToRemainingImages))
 
     async def getRemainingImages(self, player):
         return self._playerToRemainingImages[player]                      
