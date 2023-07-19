@@ -7,7 +7,7 @@ from collections import deque
 import random
 from BotController import BotInitiator
 from Chat.DialogueReader import DialogueReader
-from GameController import ArcadeGen, Caption, CaptionSelection, Prompting, Lying, Voting, Reveal
+from GameController import ArcadeGen, Battle, Caption, CaptionSelection, Prompting, Lying, Voting, Reveal
 from GameController.Image import Image
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton, Update
 
@@ -28,6 +28,7 @@ class Room:
     _current_voting_image = None
     _playerToRemainingImages = {} #dictionary of player to list of images they have yet to give lies for
     _advancing = False #boolean to check if game is advancing to next state, for flow control
+    _current_battle_images = ()
     
     class State(Enum):
         JOIN_STATE, PROMPTING_STATE, LYING_STATE, VOTING_STATE, REVEAL_STATE, ARCADE_GEN_STATE, CAPTION_STATE, CAPTION_SELECTION_STATE, BATTLE_STATE = range(9)
@@ -62,7 +63,7 @@ class Room:
     def getMode(self):
         return self._mode
     
-    async def broadcast(self, bot, message, messageKey=None,reply_markup=None, raw=False, parse_mode=None, **kwargs):
+    async def broadcast(self, bot, message, messageKey=None, reply_markup=None, raw=False, parse_mode=None, **kwargs):
         for player in self._players:
             await player.sendMessage(bot, message, messageKey, reply_markup, raw=raw, parse_mode=parse_mode,**kwargs)
 
@@ -175,8 +176,9 @@ class Room:
                 case Room.State.VOTING_STATE:
                     await Reveal.beginPhase4(bot, self)
                     self._state = Room.State.REVEAL_STATE
-                # case Room.State.REVEAL_STATE:
-                #     return
+                # Currently has no use
+                case Room.State.REVEAL_STATE:
+                    return
         elif self._mode == Room.Mode.ARCADE:
             match self._state:
                 case Room.State.JOIN_STATE:
@@ -188,6 +190,12 @@ class Room:
                 case Room.State.CAPTION_STATE:
                     await CaptionSelection.beginPhase3(bot, self)
                     self._state = Room.State.CAPTION_SELECTION_STATE
+                case Room.State.CAPTION_SELECTION_STATE:
+                    await Battle.beginPhase4(bot, self)
+                    self._state = Room.State.BATTLE_STATE
+                # Currently has no use
+                case Room.State.BATTLE_STATE:
+                    return
         self._advancing = False
 
 
@@ -290,6 +298,59 @@ class Room:
             message += f"{i}\. {username}: {score} points\n"
 
         return message
+    
+    def beginBattle(self):
+        random.shuffle(self._shuffled_players)
+
+    def getBattleImages(self):
+        return self._current_battle_images
+
+    def broadcastLeaderboardArcade(self):
+        #TODO show the final leaderboard sequence
+        return
+    
+    def showBattleWinner(self):
+        # find the winning image by looking at the voters of both photos under battle_voters
+
+        # delete the losing image for each player (using the players messagekeys to the images, this will cause the other image to expand)
+
+        # Show who voted for which image (also show the author of the image and the caption) (Remember to store this message id in the player object)
+
+        return
+    
+    def sendBattleImages(self, bot):
+        #TODO delete the old leaderboard (and possibly the old media group, if editting is not possible) (player.deleteMessage should handle errors if it doesn't exist yet)
+
+        #TODO send the current battle images to the players (use send media group)
+
+        #TODO set the player messagekeys to the images
+
+        #TODO send the vote button again
+        return
+    
+    def showBatleVictory(self):
+        # showBattleWinner
+
+        # create task that waits for 5 seconds
+
+        #calculate the standings to find the next match, if its not the end (remember to check for rematch):
+
+            # reset the battle_voters of the images
+
+            # reset the current_battle_images
+
+            # finish waiting the 5 seconds
+
+            # broadcast the next battle
+
+        # else:
+
+            # finish waiting the 5 seconds
+
+            # broadcast the final leaderboard
+
+            # Call (roo handler) end game
+        return
     
     async def endGame(self, bot):
         for player in self._players:

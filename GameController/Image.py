@@ -17,6 +17,8 @@ class Image:
     imageLies = {} #store imageLies as a dict:tuple of lie_author:(lie, [list of players who fell for the lie])
     processingTime = 0 # 0 for image is made, else the number is the ETA
     requestID = 0 # 0 for image is made, else the number is the requestID
+    battle_voters = [] # store the voters for the battle
+    winstreak = 0 #Winstreak for the gaunlet
 
     def __init__(self, author, prompt, imageURL, processingTime = 0, requestID = 0):
         self.author = author
@@ -28,6 +30,8 @@ class Image:
         self.requestID = requestID
         self.imageCaptions = []
         self.choosenCaption = ()
+        self.battle_voters = []
+        self.winstreak = 0
 
     def getProcessing(self):
         return self.processingTime
@@ -89,6 +93,9 @@ class Image:
 
     def getCaption(self):
         return self.choosenCaption[0]
+    
+    def addBattleVoter(self, voter):
+        self.battle_voters.append(voter)
     
     async def showPlayersTricked(self):
         SPECIAL_CHARACTERS = ["[", "]", "(", ")", "~", "`", ">", "#", "+", "-", "=", "|", "{", "}", ".", "!", "*"] # [".",">","!"]        

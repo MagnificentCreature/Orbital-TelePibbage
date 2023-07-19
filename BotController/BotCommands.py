@@ -390,6 +390,39 @@ async def handle_pick(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     return BotInitiator.BATTLE_PHASE
 
+@button_stall_decorator
+async def battle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    #Flow control to see if the user is in a game
+    try:
+        if not context.user_data['in_game']:
+            return BotInitiator.FRESH
+    except KeyError:
+        return BotInitiator.FRESH
+
+    # Flow control check if the player has already voted
+    if context.user_data['has_voted']:
+        return BotInitiator.BATTLE_PHASE
+    
+    update.callback_query.message.delete() # Delete the message that asks the users to vote
+    query = update.callback_query
+    data = re.split(r"(?<!\\):", query.data)
+    voteNumber = data[1]
+
+    room = RoomHandler.getRoom(context.user_data['roomCode'])
+    
+    battleImages = await room.getBattleImages()
+    await battleImages[voteNumber].addBattleVoter(update.callback_query.from_user.username)
+    context.user_data['has_voted'] = True
+    context.user_data["waiting_msg"] = await DialogueReader.sendMessageByID(context.bot, update.callback_query.from_user.id, "WaitingForItems", **{'item': "vote"})     #TODO find a way to delete this message when the next round starts
+    
+    # checkItems returns True after everyone places vote for one image
+    if await room.checkItems(Player.PlayerConstants.HAS_VOTED, context.bot, advance=False):
+        #reveal
+        message = await room.showBatleVictory() 
+        return BotInitiator.BATTLE_PHASE
+
+    return BotInitiator.BATTLE_PHASE
+
 async def play_again(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.callback_query.edit_message_reply_markup(reply_markup=None)
     oldRoomCode = update.callback_query.data.split(":")[1]
