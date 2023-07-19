@@ -349,7 +349,7 @@ class Room:
 
             # broadcast the final leaderboard
 
-            # Call (roo handler) end game
+            # Call (roomhandler) end game
         return
     
     async def endGame(self, bot):
