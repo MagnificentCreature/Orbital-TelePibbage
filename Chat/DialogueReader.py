@@ -48,14 +48,18 @@ class DialogueReader:
 
     @staticmethod
     def additionalProcessing(inputString):
-        # SPECIAL_CHARACTERS = ["[", "]", "(", ")", "~", "`", ">", "#", "+", "-", "=", "|", "{", "}", ".", "!"] # [".",">","!"]
         # Replace new line characters with \n
         inputString = inputString.replace("\\n", "\n")
-        # Replace special characters with \<character> for telegram compliance
-        # for eachItem in SPECIAL_CHARACTERS:
-        #     inputString = inputString.replace(eachItem, f"\{eachItem}")
         # capitalise the first letter
         inputString = inputString[0].upper() + inputString[1:]
+        return inputString
+    
+    @staticmethod
+    def parseFormatting(inputString):
+        SPECIAL_CHARACTERS = ["[", "]", "(", ")", "~", "`", ">", "#", "+", "-", "=", "|", "{", "}", ".", "!"]
+        # Replace special characters with \<character> for telegram compliance
+        for eachItem in SPECIAL_CHARACTERS:
+            inputString = inputString.replace(eachItem, f"\{eachItem}")
         return inputString
     
     # @classmethod
@@ -129,7 +133,15 @@ class DialogueReader:
                     formattedText = cls.additionalProcessing(cls._dialogues[caption].format(**kwargs))
                 else:
                     formattedText = cls.additionalProcessing(cls._dialogues[caption])
-                return await bot.send_photo(chat_id=chat_id, photo=imageURL, reply_markup=reply_markup, caption=formattedText, parse_mode=parse_mode)
+                try:
+                    return await bot.send_photo(chat_id=chat_id, photo=imageURL, reply_markup=reply_markup, caption=formattedText, parse_mode=parse_mode)
+                except error.BadRequest as badReqError:
+                    print(badReqError)
+                    try:
+                        asyncio.sleep(1)
+                        return await bot.send_photo(chat_id=chat_id, photo=imageURL, reply_markup=reply_markup, caption=formattedText, parse_mode=parse_mode)
+                    except error.BadRequest as badReqError2:
+                        return await bot.send_message(chat_id=chat_id, text=f"Telegram failed to send image, here is the URL instead\n{imageURL}\nThe caption is:\n{formattedText}", reply_markup=reply_markup, parse_mode=parse_mode)
             except error.Forbidden as e:
                 logging.error("Error sending message to chat_id " + str(chat_id) + ": " + str(e))
         except error.TimedOut as e:

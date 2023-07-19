@@ -13,6 +13,7 @@ class Image:
     correct_players = []
     imageURL = "" #store imageURL
     imageCaptions = [] #store imageCaptions as a list of tuples: (caption, username)
+    choosenCaption = ("", "") #store the choosen caption as a tuple: (caption, caption_author)
     imageLies = {} #store imageLies as a dict:tuple of lie_author:(lie, [list of players who fell for the lie])
     processingTime = 0 # 0 for image is made, else the number is the ETA
     requestID = 0 # 0 for image is made, else the number is the requestID
@@ -25,6 +26,8 @@ class Image:
         self.correct_players = []
         self.processingTime = processingTime
         self.requestID = requestID
+        self.imageCaptions = []
+        self.choosenCaption = ()
 
     def getProcessing(self):
         return self.processingTime
@@ -75,11 +78,17 @@ class Image:
     
     def getCaptionKeyboard(self):
         caption_buttons = []
-        for caption, _author in self.imageCaptions:
-            caption_button = InlineKeyboardButton(caption, callback_data=f"{BotInitiator.CAPTION}:{_author}")
+        for i, (caption, _author) in enumerate(self.imageCaptions):
+            caption_button = InlineKeyboardButton(caption, callback_data=f"{BotInitiator.CAPTION}:{i}:{_author}")
             caption_buttons.append([caption_button])
         # random.shuffle(caption_buttons)
         return InlineKeyboardMarkup(caption_buttons)
+    
+    def selectCaption(self, captionNum, author):
+        self.choosenCaption = (self.imageCaptions[captionNum][0], author)
+
+    def getCaption(self):
+        return self.choosenCaption[0]
     
     async def showPlayersTricked(self):
         SPECIAL_CHARACTERS = ["[", "]", "(", ")", "~", "`", ">", "#", "+", "-", "=", "|", "{", "}", ".", "!", "*"] # [".",">","!"]        

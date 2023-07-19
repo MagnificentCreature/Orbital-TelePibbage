@@ -38,7 +38,7 @@ ArcadePhase1p3, Bellow you will see some magic words I pulled out of my magic ha
 ArcadePhase1p4, Perfect, now pick another enchated word...
 ArcadePhase1p5, Last word, something that will elevate your work into a masterpiece.
 ArcadePhase1p6, Now some finishing touches, to tie the cryptic spell all together
-ArcadePhase1p7, YES! Ooo I can feel the potential in this one, now let me take those words into my magic hat and see what I can pull out... this might take a while... let me go prepare the canvas...
+ArcadePhase1p7, *{prompt}\!\?\!*\nOOOoo YES\! I can feel the potential in this one, now let me throw those words into my magic hat and see what I can pull out\.\.\. this might take a while\.\.\. let me go prepare the canvas\.\.\.
 ArcadePhase2p1, Your masterpiece is almost ready! But before that, I appear to have lost the labels on some of my other images in the museum. Rather than going through the trouble of finding them, I'll just ask you to make up new labels for me!
 ArcadePhase2p2, I'm sure a connoisseur such as yourself can perfectly capture its creators intent and can "cook" something that will "knock the shoes out of" the wider audience and blow its creators mind? hmm?
 ArcadePhase3p1, Viola! Your masterpiece is complete and on canvas! Now, your fellow brilliant articAIns have conjured some SPLENDID labels! Pick the one you think best fits our image on the wall. 

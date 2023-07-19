@@ -152,6 +152,8 @@ class Room:
         return True
     
     async def advanceState(self, bot):
+        for player in self._players:
+            await player.deleteMessage("waiting_msg")
         if not self._advancing:
             self._advancing = True
         else:
@@ -219,7 +221,7 @@ class Room:
     #true if all have sent prompts(or other item) and proceeded to next phase
     async def checkItems(self, item, bot, advance=True):
         for playerObj in self._players: 
-            if not playerObj.querySentItem(item):
+            if not playerObj.queryItem(item):
                 return False
         # At this point all players have sent prompts, advance state (unless in the case of lie, where we wait for players to send all their lies)
         if advance:
@@ -247,7 +249,6 @@ class Room:
             for i in range(1, max_range):
                 next_player = self._shuffled_players[(player_index + i) % max_range]
                 self._playerToRemainingImages[next_player].append(image)
-            print("PlayerImages" + str(self._playerToRemainingImages))
 
     async def getRemainingImages(self, player):
         return self._playerToRemainingImages[player]                      
@@ -275,12 +276,6 @@ class Room:
 
     async def getVotingImage(self):
         return self._current_voting_image
-    
-    async def broadcast_image_captions(self, bot):
-        for image in self._list_of_images:
-            image_url = image.getImageURL()
-            author = image.getAuthor()
-            PlayersManager.queryPlayer(author).sendImageURL(bot, image_url, reply_markup=image.getCaptionKeyboard())
     
     def getLeaderboard(self):
         leaderboard = sorted(self._players, key=lambda player: player.getScore(), reverse=True)

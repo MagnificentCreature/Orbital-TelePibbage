@@ -3,7 +3,10 @@ Player object, identified by his unique username.
 Stores information about his username, scores etc
 Can later be linked to a database to keep track of (leaderboard/overall scores)
 '''
+import asyncio
 from enum import Enum
+
+import telegram
 
 from Chat.DialogueReader import DialogueReader
 from telegram import InputMediaPhoto
@@ -14,18 +17,30 @@ class Player:
     _score = 0
     _user_data = None
     
+    def timeOutRetryDecorator(func):
+        async def wrapper(*args, **kwargs):
+            try:
+                return await func(*args, **kwargs)
+            except telegram.error.TimedOut as e:
+                print("Timed out" + str(e))
+                asyncio.sleep(1)
+                return await wrapper(*args, **kwargs)
+        return wrapper
+
     class PlayerConstants(Enum):
         PRESSING_BUTTON = "pressing_button"
+        WAITING_MSG = "waiting_msg"
         PROMPT = "prompt"
         LIE = "lie"
         NEXT_LIE = "next_lie"
         HAS_VOTED = "has_voted"
         ARCADE_PROMPT_LIST = "arcade_prompt_list"
         ARCADE_GEN_STRING = "arcade_gen_string"
-        SENT_ARCADE_PROMPT = "sent_arcade_prompt"
+        BANNED_CATEGORY = "banned_category"
         NEXT_CAPTION = "next_caption"
         CAPTION = "caption"
         HAS_PICKED = "has_picked"
+        ARCADE_IMAGE = "arcade_image"
     
     def __init__(self, username, chatID=0, _user_data={}, score=0):
         self._username = username
@@ -99,12 +114,14 @@ class Player:
             return False
         self._user_data[itemKey.value] = value
 
-    def querySentItem(self, itemKey):
-        if itemKey not in Player.PlayerConstants.__members__.values():
+    def queryItem(self, itemKey):
+        if itemKey not in Player.PlayerConstants.__members__.values() or itemKey.value not in self._user_data:
             return False
         try:
-            return self._user_data[itemKey.value] is not None and self._user_data[itemKey.value] is not False
+            if self._user_data[itemKey.value] is not None and self._user_data[itemKey.value] is not False:
+                return self._user_data[itemKey.value]
         except KeyError:
+            print(f"itemKey {itemKey.value} returned KeyError, likely inputted string instead of player constant")
             return False
     
     async def startGame(self):
@@ -129,17 +146,27 @@ class Player:
     #     if newMessageKey != None:
     #         self._user_data[newMessageKey] = self._user_data.pop(messageKey)
 
+    @timeOutRetryDecorator
     async def editMessage(self, messageKey, message, newMessageKey=None, reply_markup=None, parse_mode=None, **kwargs):
-        await self._user_data[messageKey].edit_text(text=DialogueReader.queryDialogue(message, **kwargs), reply_markup=reply_markup, parse_mode=parse_mode)
+        if messageKey not in self._user_data:
+            return
+        try:
+            await self._user_data[messageKey].edit_text(text=DialogueReader.queryDialogue(message, **kwargs), reply_markup=reply_markup, parse_mode=parse_mode)
+        except telegram.error.BadRequest as badReqError:
+            print(badReqError)
+            pass
         if newMessageKey != None:
             self._user_data[newMessageKey] = self._user_data.pop(messageKey)
 
+    @timeOutRetryDecorator
     async def editImageURL(self, messageKey, imageURL, newMessageKey=None, reply_markup=None, parse_mode=None, caption=None, **kwargs):
         await self._user_data[messageKey].edit_media(media=InputMediaPhoto(imageURL, caption=DialogueReader.queryDialogue(caption, **kwargs)), reply_markup=reply_markup, parse_mode=parse_mode)
         if newMessageKey != None:
             self._user_data[newMessageKey] = self._user_data.pop(messageKey)
 
     async def deleteMessage(self, messageKey):
+        if messageKey not in self._user_data:
+            return
         await self._user_data[messageKey].delete()
         del self._user_data[messageKey]
 
