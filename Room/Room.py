@@ -24,7 +24,7 @@ class Room:
     _mode = None #game mode
     _state = 0 # 0 = join state, 1 = game state
     _list_of_images = []
-    _list_copy = None
+    _list_copy = None #Copy of image list to pop for voting and for arcade battling
     _current_voting_image = None
     _playerToRemainingImages = {} #dictionary of player to list of images they have yet to give lies for
     _advancing = False #boolean to check if game is advancing to next state, for flow control
@@ -300,7 +300,12 @@ class Room:
         return message
     
     def beginBattle(self):
-        random.shuffle(self._shuffled_players)
+        # Create a copy of the image list
+        self._list_copy = self._list_of_images.copy()
+
+        # Randomly pop two to add into the current_battle_images
+
+        return
 
     def getBattleImages(self):
         return self._current_battle_images
@@ -309,7 +314,7 @@ class Room:
         #TODO show the final leaderboard sequence
         return
     
-    def showBattleWinner(self):
+    def broadcastBattleWinner(self):
         # find the winning image by looking at the voters of both photos under battle_voters
 
         # delete the losing image for each player (using the players messagekeys to the images, this will cause the other image to expand)
@@ -318,36 +323,38 @@ class Room:
 
         return
     
-    def sendBattleImages(self, bot):
+    def sendBattleImages(self, bot, finals=False):
         #TODO delete the old leaderboard (and possibly the old media group, if editting is not possible) (player.deleteMessage should handle errors if it doesn't exist yet)
 
         #TODO send the current battle images to the players (use send media group)
 
         #TODO set the player messagekeys to the images
 
-        #TODO send the vote button again
+        #TODO send the vote button again (if its the finals send a special message, send the REMATCH message if the new challenger is in the champions winstreak list)
         return
     
-    def showBatleVictory(self):
-        # showBattleWinner
+    def advanceBatle(self):
+        # call broadcastBattleWinner
 
         # create task that waits for 5 seconds
 
-        #calculate the standings to find the next match, if its not the end (remember to check for rematch):
+        # calculate the standings to find the next match, (if the list_copy is empty) 
+        # remember to check for rematch by looping through the original list and seeing if the one with the highest winstreak is the current winner
+        # if its not the end 
 
             # reset the battle_voters of the images
 
-            # reset the current_battle_images
+            # reset the current_battle_images (pop the next challenger from the list_copy)
 
             # finish waiting the 5 seconds
 
-            # broadcast the next battle
+            # broadcast the next battle (sendBattleImages) (check if finals)
 
         # else:
 
             # finish waiting the 5 seconds
 
-            # broadcast the final leaderboard
+            # broadcast the final leaderboard (broadcastLeaderboardArcade)
 
             # Call (roomhandler) end game
         return

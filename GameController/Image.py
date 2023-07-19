@@ -18,7 +18,7 @@ class Image:
     processingTime = 0 # 0 for image is made, else the number is the ETA
     requestID = 0 # 0 for image is made, else the number is the requestID
     battle_voters = [] # store the voters for the battle
-    winstreak = 0 #Winstreak for the gaunlet
+    winstreak = [] #Winstreak for the gaunlet stored as a list of defeated images
 
     def __init__(self, author, prompt, imageURL, processingTime = 0, requestID = 0):
         self.author = author

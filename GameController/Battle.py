@@ -3,6 +3,7 @@ from DialogueReader import DialogueReader
 
 async def beginPhase4(bot, room):
     await sendPhase4Messages(bot, room)
+    await room.beginBattle()
 
 async def sendPhase4Messages(bot, room):
     await room.broadcast(bot, "ArcadePhase4p1", parse_mode=DialogueReader.MARKDOWN)

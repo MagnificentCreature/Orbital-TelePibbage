@@ -418,7 +418,7 @@ async def battle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYP
     # checkItems returns True after everyone places vote for one image
     if await room.checkItems(Player.PlayerConstants.HAS_VOTED, context.bot, advance=False):
         #reveal
-        message = await room.showBatleVictory() 
+        message = await room.advanceBatle() 
         return BotInitiator.BATTLE_PHASE
 
     return BotInitiator.BATTLE_PHASE
