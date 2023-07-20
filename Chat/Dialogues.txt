@@ -43,7 +43,11 @@ ArcadePhase2p1, Your masterpiece is almost ready! But before that, I appear to h
 ArcadePhase2p2, I'm sure a connoisseur such as yourself can perfectly capture its creators intent and can "cook" something that will "knock the shoes out of" the wider audience and blow its creators mind? hmm?
 ArcadePhase3p1, Look at what a beauty you made! Now, your fellow brilliant articAIns have conjured some SPLENDID labels! Pick the one you think best fits our image on the wall. 
 ArcadePhase4p1, Your masterpiece is now finally complete and on canvas\!\nIt seems there is only one thing left to do, a BATTLE OF FIRE AND FLAMES UNTIL ONLY ONE REMAINS\!\!\!
-ArcadePhase4p2, You will be presented with two images. Your task is to decide which will be hung in the museum and the other that will be burned to the ground\!\n\n*Let the battle begin\!*
+ArcadePhase4p2, You will be presented with two images\. Your task is to decide which will be hung in the museum and the other that will be burned to the ground\!\n\n*Let the battle begin\!*
+ArcadePhase4p3, Pick the display you find superior
+ArcadePhase4pRematch, FINAL BATTLE *REMATCH\!*:\nPick the display that will *WIN IT ALL\!\!\!*
+ArcadePhase4pChallenger, FINAL BATTLE :\nOne last fight that will decide the *FINAL VICTOR\!\!\!*
+ArcadePhase5p1, And the winner is\.\.\.\n@{AIrtist} with captions from @{captioner}\!\n Congratulations, you have won the most magnificent prize\! You can now hang your masterpieces in the museum and admire them for all eternity\!\n\n*Thank you for playing\!*
 # Error Messages 
 InGame, Error to {action} room, perhaps you are already in another game
 AlreadyInRoom, You are already in this room!

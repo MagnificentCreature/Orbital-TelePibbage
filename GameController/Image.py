@@ -96,6 +96,25 @@ class Image:
     
     def addBattleVoter(self, voter):
         self.battle_voters.append(voter)
+
+    def getVoteCount(self):
+        return len(self.battle_voters)
+    
+    def resetBattleVoters(self):
+        self.battle_voters = []
+
+    def showBattleVoters(self):
+        message = ""
+        message += f"Votes for {self.author}'s image and {self.choosenCaption[0]} caption:\n"
+        for voter in self.battle_voters:
+            message += f"@{voter}\n"
+        return message
+    
+    def getWinstreakCount(self):
+        return len(self.winstreak)
+
+    def isRematch(self, otherImage):
+        return otherImage in self.winstreak
     
     async def showPlayersTricked(self):
         SPECIAL_CHARACTERS = ["[", "]", "(", ")", "~", "`", ">", "#", "+", "-", "=", "|", "{", "}", ".", "!", "*"] # [".",">","!"]        

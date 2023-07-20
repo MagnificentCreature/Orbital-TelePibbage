@@ -160,15 +160,27 @@ class Player:
 
     @timeOutRetryDecorator
     async def editImageURL(self, messageKey, imageURL, newMessageKey=None, reply_markup=None, parse_mode=None, caption=None, **kwargs):
-        await self._user_data[messageKey].edit_media(media=InputMediaPhoto(imageURL, caption=DialogueReader.queryDialogue(caption, **kwargs)), reply_markup=reply_markup, parse_mode=parse_mode)
+        await self._user_data[messageKey].edit_media(media=InputMediaPhoto(imageURL, caption=DialogueReader.queryDialogue(caption, **kwargs), parse_mode=parse_mode), reply_markup=reply_markup)
         if newMessageKey != None:
             self._user_data[newMessageKey] = self._user_data.pop(messageKey)
 
-    async def deleteMessage(self, messageKey):
+    async def deleteMessage(self, messageKey, itemKey=None):
         if messageKey not in self._user_data:
+            return
+        # Item key is used if the messageKey is a dictionary or list of messages
+        if itemKey != None:
+            await self._user_data[messageKey][itemKey].delete()
+            del self._user_data[messageKey][itemKey]
             return
         await self._user_data[messageKey].delete()
         del self._user_data[messageKey]
+
+    async def deleteMessageList(self, messageKeyList):
+        if messageKeyList not in self._user_data:
+            return
+        for message in self._user_data[messageKeyList]:
+            await message.delete()
+        del self._user_data[messageKeyList]
 
     # # Including a message key will store the message's ID in the user_data which can be editted later
     # async def sendMessage(self, bot, message, messageKey=None, reply_markup=None, raw=False):
@@ -176,12 +188,17 @@ class Player:
     #     if messageKey != None:
     #         self._user_data[messageKey] = messasgeID
 
-    async def sendMessage(self, bot, message, messageKey=None, reply_markup=None, raw=False, **kwargs):
-        messasgeID = await DialogueReader.sendMessageByID(bot, self._chatID, message, reply_markup=reply_markup, raw=raw, **kwargs)
+    async def sendMessage(self, bot, message, messageKey=None, reply_markup=None, raw=False, parse_mode=None, **kwargs):
+        messasgeID = await DialogueReader.sendMessageByID(bot, self._chatID, message, reply_markup=reply_markup, raw=raw, parse_mode=parse_mode, **kwargs)
         if messageKey != None:
             self._user_data[messageKey] = messasgeID
         
-    async def sendImageURL(self, bot, imageURL, messageKey=None, reply_markup=None, caption=None, **kwargs):
-        messasgeID = await DialogueReader.sendImageURLByID(bot, self._chatID, imageURL, caption=caption, reply_markup=reply_markup, **kwargs)
+    async def sendImageURL(self, bot, imageURL, messageKey=None, reply_markup=None, caption=None, raw=False, parse_mode=None, **kwargs):
+        messasgeID = await DialogueReader.sendImageURLByID(bot, self._chatID, imageURL, caption=caption, raw=raw, parse_mode=parse_mode, reply_markup=reply_markup, **kwargs)
         if messageKey != None:
             self._user_data[messageKey] = messasgeID
+    async def sendMediaGroup(self, bot, mediaGroup, messageKey=None, caption=None, raw=False, parse_mode=None, **kwargs):
+        # Note messageID will be a list of message IDs for each media
+        messasgeIDs = await DialogueReader.sendMediaGroupByID(bot, self._chatID, mediaGroup, caption=caption, raw=raw, parse_mode=parse_mode, **kwargs)
+        if messageKey != None:
+            self._user_data[messageKey] = messasgeIDs

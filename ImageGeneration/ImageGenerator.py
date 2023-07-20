@@ -16,10 +16,10 @@ URL = "https://stablediffusionapi.com/api/v4/dreambooth"
 FETCH_URL = "https://stablediffusionapi.com/api/v4/dreambooth/fetch"
 CENSOR_HASH = "e9c4a470ad900801f7de4f9402eb27af8a1cc00eac80d618ef16bac39fb27d33"
 
-MAX_RETRIES = 1
+MAX_RETRIES = 3
 MAX_TIME = 120
 EXTENDED_SLEEP = 10
-ARCADE_EXTENDED_SLEEP = 1
+ARCADE_EXTENDED_SLEEP = 15
 
 PAYLOAD_DATA_TEMPLATE_V4 = {
   "key": AI_API_TOKEN,

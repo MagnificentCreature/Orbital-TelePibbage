@@ -198,7 +198,6 @@ class Room:
                     return
         self._advancing = False
 
-
     async def startGame(self, bot):
         self._shuffled_players = self._players.copy()
         random.shuffle(self._shuffled_players)
@@ -299,64 +298,107 @@ class Room:
 
         return message
     
-    def beginBattle(self):
+    def beginBattle(self, bot):
         # Create a copy of the image list
-        self._list_copy = self._list_of_images.copy()
+        self._list_copy = self._list_of_images
 
         # Randomly pop two to add into the current_battle_images
+        image1 = self._list_copy.pop(random.randint(0, len(self._list_copy) - 1))
+        image2 = self._list_copy.pop(random.randint(0, len(self._list_copy) - 1))
+        self._current_battle_images = (image1, image2)
+
+        self.sendBattleImages(bot)
 
         return
 
     def getBattleImages(self):
         return self._current_battle_images
 
-    def broadcastLeaderboardArcade(self):
-        #TODO show the final leaderboard sequence
+    async def broadcastLeaderboardArcade(self):
+        # show the final leaderboard sequence
+        self.broadcast(self, "ArcadePhase5p1", parse_mode=DialogueReader.MARKDOWN, **{'AIrtist':"a", 'captioner':"b"})
         return
     
-    def broadcastBattleWinner(self):
+    #Calculates the battle winner and sends the victory message to the players
+    async def broadcastBattleWinner(self):
+        message = f"*☆☆☆☆☆Battle Results☆☆☆☆☆*\n"
+        
+        for image in self._current_battle_images:
+            message += image.showBattleVoters() + "\n"
+
         # find the winning image by looking at the voters of both photos under battle_voters
+        winner = max(self._current_battle_images, key=lambda image: image.getVoteCount())
 
         # delete the losing image for each player (using the players messagekeys to the images, this will cause the other image to expand)
+        for eachPlayer in self._players:
+            await eachPlayer.deleteMessage("battle_images", itemKey=self._current_battle_images.index(winner))
 
-        # Show who voted for which image (also show the author of the image and the caption) (Remember to store this message id in the player object)
+            # Show who voted for which image (also show the author of the image and the caption) (Remember to store this message id in the player object)
+            await eachPlayer.sendMessage(winner.getBattleVoters(), messageKey="battle_winner", parse_mode=DialogueReader.MARKDOWN)
 
+        return winner
+    
+    async def sendBattleImages(self, bot, finals=False):
+        voting_keyboard = InlineKeyboardMarkup([
+            [
+                InlineKeyboardButton(text=f"Vote for \"{self._current_battle_images[0].getCaption()}\"", callback_data=f"{BotInitiator.BATTLE_VOTE}:0"),
+                InlineKeyboardButton(text=f"Vote for \"{self._current_battle_images[1].getCaption()}\"", callback_data=f"{BotInitiator.BATTLE_VOTE}:1"),
+            ]
+        ])
+        mediaGroup = [image.getImageURL() for image in self._current_battle_images] #TODO: Change this to the proper image canvas thing
+        # delete the old leaderboard (and possibly the old media group, if editting is not possible) (player.deleteMessage should handle errors if it doesn't exist yet)
+        for eachPlayer in self._players:
+            await eachPlayer.deleteMessageList("battle_images")
+            await eachPlayer.deleteMessage("battle_winner")
+
+            # send the current battle images to the players (use send media group)
+            await eachPlayer.sendMediaGroup(bot, mediaGroup, messageKey="battle_images") #This will set the player "battle_images" messagekey to the images
+
+            # send the vote button again (if its the finals send a special message, send the REMATCH message if the new challenger is in the champions winstreak list)
+            if finals:
+                if self._current_battle_images[0].isRematch(self._current_battle_images[1]):
+                    await eachPlayer.sendMessage(bot, "ArcadePhase4pRematch", messageKey="battle_winner", reply_markup=voting_keyboard)
+                    continue
+                await eachPlayer.sendMessage(bot, "ArcadePhase4pChallenger", messageKey="battle_winner", reply_markup=voting_keyboard)
+                continue
+            await eachPlayer.sendMessage(bot, "ArcadePhase4p3", messageKey="battle_winner", reply_markup=voting_keyboard) #todo set reply_markup 
         return
     
-    def sendBattleImages(self, bot, finals=False):
-        #TODO delete the old leaderboard (and possibly the old media group, if editting is not possible) (player.deleteMessage should handle errors if it doesn't exist yet)
-
-        #TODO send the current battle images to the players (use send media group)
-
-        #TODO set the player messagekeys to the images
-
-        #TODO send the vote button again (if its the finals send a special message, send the REMATCH message if the new challenger is in the champions winstreak list)
-        return
-    
-    def advanceBatle(self):
+    async def advanceBattle(self, bot):
         # call broadcastBattleWinner
+        winner = await self.broadcastBattleWinner()
 
         # create task that waits for 5 seconds
+        wait5sec = asyncio.create_task(asyncio.sleep(5))
 
-        # calculate the standings to find the next match, (if the list_copy is empty) 
-        # remember to check for rematch by looping through the original list and seeing if the one with the highest winstreak is the current winner
-        # if its not the end 
-
-            # reset the battle_voters of the images
+        # calculate the standings to find the next match, (if the list_copy is empty)
+        if len(self._list_copy) > 0:
+            finals = False
+            # if its not the end, reset the battle_voters of the images
+            for image in self._current_battle_images:
+                image.resetBattleVoters()
 
             # reset the current_battle_images (pop the next challenger from the list_copy)
+            self._current_battle_images = (winner, self._list_copy.pop(random.randint(0, len(self._list_copy) - 1)))
+        else:
+            # check for rematch seeing if the one with the highest winstreak is the current winner
+            highestWinstreakImage = max(self._list_of_images, key=lambda image: image.getWinstreak())
+            if highestWinstreakImage == winner:
+                await wait5sec
+                # broadcast the final leaderboard (broadcastLeaderboardArcade)
+                await self.broadcastLeaderboardArcade()
+                # return True to end the room
+                return True
+            
+            finals = True            
+            self._current_battle_images = (winner, highestWinstreakImage)
+        
+        # finish waiting the 5 seconds
+        await wait5sec
 
-            # finish waiting the 5 seconds
+        # broadcast the next battle (sendBattleImages)
+        await self.sendBattleImages(bot, finals=finals)
 
-            # broadcast the next battle (sendBattleImages) (check if finals)
-
-        # else:
-
-            # finish waiting the 5 seconds
-
-            # broadcast the final leaderboard (broadcastLeaderboardArcade)
-
-            # Call (roomhandler) end game
         return
     
     async def endGame(self, bot):
