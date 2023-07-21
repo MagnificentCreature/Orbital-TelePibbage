@@ -1,4 +1,5 @@
 import asyncio
+from Chat.DialogueReader import DialogueReader
 
 from Player.Player import Player
 
@@ -8,7 +9,7 @@ async def beginPhase3(bot, room):
     await room.broadCall(bot, broadcast_image_captions)
 
 async def sendPhase3Messages(bot, room):
-    await room.broadcast(bot, "ArcadePhase3p1")
+    await room.broadcast(bot, "ArcadePhase3p1", parse_mode=DialogueReader.MARKDOWN)
     
 async def broadcast_image_captions(bot, room, player):
     image = player.queryItem(Player.PlayerConstants.ARCADE_IMAGE)

@@ -134,7 +134,7 @@ class DialogueReader:
                         formattedText = cls.additionalProcessing(cls._dialogues[caption].format(**kwargs))
                     else:
                         formattedText = cls.additionalProcessing(cls._dialogues[caption])
-                        return await bot.send_photo(chat_id=chat_id, photo=imageURL, reply_markup=reply_markup, caption=formattedText, parse_mode=parse_mode)
+                    return await bot.send_photo(chat_id=chat_id, photo=imageURL, reply_markup=reply_markup, caption=formattedText, parse_mode=parse_mode)
                 except error.BadRequest as badReqError:
                     print(badReqError)
                     try:
@@ -147,6 +147,7 @@ class DialogueReader:
                             return await bot.send_message(chat_id=chat_id, text=f"Telegram failed to send image, here is the URL instead\n{imageURL}\nThe caption is:\n{caption}", reply_markup=reply_markup)
                         return await bot.send_message(chat_id=chat_id, text=f"Telegram failed to send image, here is the URL instead\n{imageURL}\nThe caption is:\n{formattedText}", reply_markup=reply_markup)
             except error.Forbidden as e:
+                print(e)
                 logging.error("Error sending message to chat_id " + str(chat_id) + ": " + str(e))
         except error.TimedOut as e:
             if exponential_backoff > cls.MAX_RETRIES:
@@ -158,7 +159,7 @@ class DialogueReader:
             return await cls.sendImageURLByID(bot, chat_id, imageURL, caption=caption, exponential_backoff=exponential_backoff+1,reply_markup=reply_markup, raw=raw, parse_mode=parse_mode, **kwargs)
 
     @classmethod
-    async def sendImageGroupByID(cls, bot, chat_id, mediaGroup, caption=None, exponential_backoff=1, raw=False, parse_mode=None, **kwargs):
+    async def sendMediaGroupByID(cls, bot, chat_id, mediaGroup, caption=None, exponential_backoff=1, raw=False, parse_mode=None, **kwargs):
         #TODO: Decide to keep or remove this
         if isinstance(mediaGroup[0], str):
             mediaGroup = [InputMediaPhoto(media) for media in mediaGroup]

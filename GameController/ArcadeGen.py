@@ -5,6 +5,7 @@ from random_word import Wordnik
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 from BotController import BotInitiator
+from Chat.DialogueReader import DialogueReader
 from Player.Player import Player
 from Player.PlayersManager import PlayersManager
 
@@ -166,7 +167,7 @@ def randomise_strings(*strings):
     return result
 
 async def sendPhase1Messages(bot, room):
-    await room.broadcast(bot, "ArcadePhase1p1")
+    await room.broadcast(bot, "ArcadePhase1p1", parse_mode=DialogueReader.MARKDOWN)
     await asyncio.sleep(3)
     await room.broadcast(bot, "ArcadePhase1p2")
     await asyncio.sleep(3)

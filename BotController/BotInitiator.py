@@ -115,7 +115,7 @@ def main() -> None:
                 MessageHandler(filters.COMMAND, BotCommands.unknown),
             ], 
             ARCADE_GEN_PHASE: [
-                CallbackQueryHandler(BotCommands.handle_arcade_gen, pattern=SEND_ARCADE_WORD_REGEX),
+                CallbackQueryHandler(BotCommands.handle_arcade_gen, pattern=SEND_ARCADE_WORD_REGEX, block=False),
                 CallbackQueryHandler(BotCommands.handle_arcade_prompt, pattern=SEND_ARCADE_PROMPT_REGEX, block=False),
             ],
             CAPTION_PHASE: [

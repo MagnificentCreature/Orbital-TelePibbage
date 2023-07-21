@@ -298,43 +298,55 @@ class Room:
 
         return message
     
-    def beginBattle(self, bot):
+    async def beginBattle(self, bot):
         # Create a copy of the image list
-        self._list_copy = self._list_of_images
+        self._list_copy = self._list_of_images.copy()
 
         # Randomly pop two to add into the current_battle_images
         image1 = self._list_copy.pop(random.randint(0, len(self._list_copy) - 1))
         image2 = self._list_copy.pop(random.randint(0, len(self._list_copy) - 1))
         self._current_battle_images = (image1, image2)
 
-        self.sendBattleImages(bot)
+        await self.sendBattleImages(bot)
 
         return
 
     def getBattleImages(self):
         return self._current_battle_images
+    
+    def getOtherBattleImage(self, image):
+        if image == self._current_battle_images[0]:
+            return self._current_battle_images[1]
+        return self._current_battle_images[0]
 
-    async def broadcastLeaderboardArcade(self):
+    async def broadcastLeaderboardArcade(self, bot):
         # show the final leaderboard sequence
-        self.broadcast(self, "ArcadePhase5p1", parse_mode=DialogueReader.MARKDOWN, **{'AIrtist':"a", 'captioner':"b"})
+        await self.broadcast(bot, "ArcadePhase5p1", parse_mode=DialogueReader.MARKDOWN, **{'AIrtist':"a", 'captioner':"b"})
         return
     
     #Calculates the battle winner and sends the victory message to the players
-    async def broadcastBattleWinner(self):
+    async def broadcastBattleWinner(self, bot):
         message = f"*☆☆☆☆☆Battle Results☆☆☆☆☆*\n"
         
         for image in self._current_battle_images:
-            message += image.showBattleVoters() + "\n"
+            print("Image: " + image.getImageURL())
+            message += f"{image.showBattleVoters()}\n"
+            print(message)
 
         # find the winning image by looking at the voters of both photos under battle_voters
-        winner = max(self._current_battle_images, key=lambda image: image.getVoteCount())
+        # handle case where there is a tie
+        if self._current_battle_images[0].getVoteCount() == self._current_battle_images[1].getVoteCount():
+            winner = random.choice(self._current_battle_images)
+            message += f"\n*Seems like we have a tie\!*\nBut I prefer this one!\n"
+        else:
+            winner = max(self._current_battle_images, key=lambda image: image.getVoteCount())
 
         # delete the losing image for each player (using the players messagekeys to the images, this will cause the other image to expand)
         for eachPlayer in self._players:
             await eachPlayer.deleteMessage("battle_images", itemKey=self._current_battle_images.index(winner))
 
             # Show who voted for which image (also show the author of the image and the caption) (Remember to store this message id in the player object)
-            await eachPlayer.sendMessage(winner.getBattleVoters(), messageKey="battle_winner", parse_mode=DialogueReader.MARKDOWN)
+            await eachPlayer.sendMessage(bot, winner.showBattleVoters(), messageKey="battle_winner", raw=True, parse_mode=DialogueReader.MARKDOWN)
 
         return winner
     
@@ -366,7 +378,8 @@ class Room:
     
     async def advanceBattle(self, bot):
         # call broadcastBattleWinner
-        winner = await self.broadcastBattleWinner()
+        winner = await self.broadcastBattleWinner(bot)
+        winner.addWinstreak(self.getOtherBattleImage(winner))
 
         # create task that waits for 5 seconds
         wait5sec = asyncio.create_task(asyncio.sleep(5))
@@ -382,11 +395,11 @@ class Room:
             self._current_battle_images = (winner, self._list_copy.pop(random.randint(0, len(self._list_copy) - 1)))
         else:
             # check for rematch seeing if the one with the highest winstreak is the current winner
-            highestWinstreakImage = max(self._list_of_images, key=lambda image: image.getWinstreak())
+            highestWinstreakImage = max(self._list_of_images, key=lambda image: image.getWinstreakCount())
             if highestWinstreakImage == winner:
                 await wait5sec
                 # broadcast the final leaderboard (broadcastLeaderboardArcade)
-                await self.broadcastLeaderboardArcade()
+                await self.broadcastLeaderboardArcade(bot)
                 # return True to end the room
                 return True
             

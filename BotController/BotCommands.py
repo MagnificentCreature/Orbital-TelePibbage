@@ -64,7 +64,7 @@ def timeout_decorator(func):
         try:
             return await func(update, context, *args, **kwargs)
         except telegram.error.TimedOut as timeOutError:
-            print("Timed out" + str(timeOutError))
+            print(f"Timed out running {func.__name__}\n" + str(timeOutError))
     return wrapper
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -143,6 +143,7 @@ async def start_game(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return BotInitiator.ARCADE_GEN_PHASE
 
 @check_in_game_decorator
+@timeout_decorator
 async def take_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # TODO: handle bad prompts or failure to generate image
     #asyncio.wait_for(ImageGenerator.imageQuery(update.message).wait(), timeout=60)
@@ -198,6 +199,7 @@ async def take_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return BotInitiator.LYING_PHASE
 
 @check_in_game_decorator
+@timeout_decorator
 async def take_lie(update: Update, context: ContextTypes.DEFAULT_TYPE):    
     # check if the room is in the lying state
     if not await RoomHandler.checkState(context.user_data['roomCode'], Room.State.LYING_STATE):
@@ -222,6 +224,7 @@ async def take_lie(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return BotInitiator.LYING_PHASE
 
 @button_stall_decorator
+@timeout_decorator
 async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     #Flow control to see if the user is in a game
     try:
@@ -264,6 +267,7 @@ async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYP
 
 @button_stall_decorator
 @check_in_game_decorator
+@timeout_decorator
 async def handle_arcade_gen(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # check if the room is in the arcade gen state
     if not await RoomHandler.checkState(context.user_data['roomCode'], Room.State.ARCADE_GEN_STATE):
@@ -293,6 +297,7 @@ async def handle_arcade_gen(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 @button_stall_decorator
 @check_in_game_decorator
+@timeout_decorator
 async def handle_arcade_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # check if the room is in the prompting state
     if not await RoomHandler.checkState(context.user_data['roomCode'], Room.State.ARCADE_GEN_STATE):
@@ -343,6 +348,7 @@ async def handle_arcade_prompt(update: Update, context: ContextTypes.DEFAULT_TYP
     return BotInitiator.CAPTION_PHASE
 
 @check_in_game_decorator
+@timeout_decorator
 async def take_caption(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # check if the room is in the lying state
     if not await RoomHandler.checkState(context.user_data['roomCode'], Room.State.CAPTION_STATE):
@@ -368,6 +374,7 @@ async def take_caption(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 @button_stall_decorator
 @check_in_game_decorator
+@timeout_decorator
 async def handle_pick(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
     query = update.callback_query
@@ -391,6 +398,7 @@ async def handle_pick(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return BotInitiator.BATTLE_PHASE
 
 @button_stall_decorator
+@timeout_decorator
 async def battle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     #Flow control to see if the user is in a game
     try:
@@ -400,25 +408,25 @@ async def battle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYP
         return BotInitiator.FRESH
 
     # Flow control check if the player has already voted
-    if context.user_data['has_voted']:
+    if context.user_data.get('has_voted', False):
         return BotInitiator.BATTLE_PHASE
     
-    update.callback_query.message.delete() # Delete the message that asks the users to vote
+    await update.callback_query.message.delete() # Delete the message that asks the users to vote
     query = update.callback_query
     data = re.split(r"(?<!\\):", query.data)
     voteNumber = int(data[1])
 
     room = RoomHandler.getRoom(context.user_data['roomCode'])
     
-    battleImages = await room.getBattleImages()
-    await battleImages[voteNumber].addBattleVoter(update.callback_query.from_user.username)
+    battleImages = room.getBattleImages()
+    battleImages[voteNumber].addBattleVoter(update.callback_query.from_user.username)
     context.user_data['has_voted'] = True
-    context.user_data["waiting_msg"] = await DialogueReader.sendMessageByID(context.bot, update.callback_query.from_user.id, "WaitingForItems", **{'item': "vote"})     #TODO find a way to delete this message when the next round starts
+    # context.user_data["waiting_msg"] = await DialogueReader.sendMessageByID(context.bot, update.callback_query.from_user.id, "WaitingForItems", **{'item': "vote"})     #TODO find a way to delete this message when the next round starts
     
     # checkItems returns True after everyone places vote for one image
     if await room.checkItems(Player.PlayerConstants.HAS_VOTED, context.bot, advance=False):
         #reveal
-        if await room.advanceBattle():
+        if await room.advanceBattle(context.bot):
             await RoomHandler.endGame(context.user_data['roomCode'], context.bot)
             return BotInitiator.FRESH 
         return BotInitiator.BATTLE_PHASE

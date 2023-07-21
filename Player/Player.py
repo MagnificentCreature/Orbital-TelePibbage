@@ -23,7 +23,7 @@ class Player:
                 return await func(*args, **kwargs)
             except telegram.error.TimedOut as e:
                 print("Timed out" + str(e))
-                asyncio.sleep(1)
+                await asyncio.sleep(1)
                 return await wrapper(*args, **kwargs)
         return wrapper
 
@@ -170,7 +170,10 @@ class Player:
         # Item key is used if the messageKey is a dictionary or list of messages
         if itemKey != None:
             await self._user_data[messageKey][itemKey].delete()
-            del self._user_data[messageKey][itemKey]
+            try:
+                del self._user_data[messageKey][itemKey]
+            except TypeError:
+                pass
             return
         await self._user_data[messageKey].delete()
         del self._user_data[messageKey]
@@ -178,8 +181,11 @@ class Player:
     async def deleteMessageList(self, messageKeyList):
         if messageKeyList not in self._user_data:
             return
-        for message in self._user_data[messageKeyList]:
-            await message.delete()
+        try:
+            for message in self._user_data[messageKeyList]:
+                await message.delete()
+        except TypeError:
+            pass
         del self._user_data[messageKeyList]
 
     # # Including a message key will store the message's ID in the user_data which can be editted later

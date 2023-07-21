@@ -31,7 +31,7 @@ class Image:
         self.imageCaptions = []
         self.choosenCaption = ()
         self.battle_voters = []
-        self.winstreak = 0
+        self.winstreak = []
 
     def getProcessing(self):
         return self.processingTime
@@ -100,6 +100,9 @@ class Image:
     def getVoteCount(self):
         return len(self.battle_voters)
     
+    def addWinstreak(self, image):
+        self.winstreak.append(image)
+
     def resetBattleVoters(self):
         self.battle_voters = []
 
