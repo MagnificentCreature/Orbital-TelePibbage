@@ -329,9 +329,7 @@ class Room:
         message = f"*☆☆☆☆☆Battle Results☆☆☆☆☆*\n"
         
         for image in self._current_battle_images:
-            print("Image: " + image.getImageURL())
             message += f"{image.showBattleVoters()}\n"
-            print(message)
 
         # find the winning image by looking at the voters of both photos under battle_voters
         # handle case where there is a tie
@@ -346,7 +344,7 @@ class Room:
             await eachPlayer.deleteMessage("battle_images", itemKey=self._current_battle_images.index(winner))
 
             # Show who voted for which image (also show the author of the image and the caption) (Remember to store this message id in the player object)
-            await eachPlayer.sendMessage(bot, winner.showBattleVoters(), messageKey="battle_winner", raw=True, parse_mode=DialogueReader.MARKDOWN)
+            await eachPlayer.sendMessage(bot, message, messageKey="battle_winner", raw=True, parse_mode=DialogueReader.MARKDOWN)
 
         return winner
     

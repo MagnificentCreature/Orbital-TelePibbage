@@ -108,7 +108,7 @@ class Image:
 
     def showBattleVoters(self):
         message = ""
-        message += f"Votes for {self.author}'s image and {self.choosenCaption[0]} caption:\n"
+        message += f"Votes for {self.author}'s image and {self.choosenCaption[1]} caption:\n"
         for voter in self.battle_voters:
             message += f"@{voter}\n"
         return message
