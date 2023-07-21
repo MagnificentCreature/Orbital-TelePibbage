@@ -6,7 +6,10 @@ So keeping track of who is in which room is important, and each player can only 
 
 import asyncio
 import random
-from GameController import Lying
+
+from telegram import InlineKeyboardMarkup
+from Chat.DialogueReader import DialogueReader
+from GameController import Caption, Lying
 from GameController.Image import Image
 from BotController import BotInitiator
 
@@ -65,8 +68,8 @@ class RoomHandler:
             return False
         
         #send start game message to player
-        await player.sendMessage(bot, "WaitingToStart", messageKey="waiting_to_start", reply_markup=BotInitiator.WaitingKeyboard)
-
+        await player.sendMessage(bot, "WaitingToStart", messageKey="waiting_to_start", reply_markup=BotInitiator.WaitingKeyboard, parse_mode=DialogueReader.MARKDOWN, **{'gameMode':room.getMode().value})
+        
         return True
 
     @classmethod
@@ -88,10 +91,28 @@ class RoomHandler:
             return False
         
         # send start game message to host
-        await host.sendMessage(bot, "StartGameOption", messageKey="start_game_option", reply_markup=BotInitiator.StartGameKeyboard)
+        await host.sendMessage(bot, "StartGameOption", messageKey="start_game_option", reply_markup=InlineKeyboardMarkup(BotInitiator.StartGameButtons), parse_mode=DialogueReader.MARKDOWN, **{'gameMode':room.getMode().value})
         
         return True
     
+    @classmethod
+    async def changeMode(cls, username, bot):
+        player = PlayersManager.queryPlayer(username)
+        roomCode = player.getRoomCode()
+        
+        #check if player is in a room
+        if roomCode == "":
+            print("Player is not in a room, this could be a bug")
+            return False
+        
+        room = cls._rooms[roomCode]
+        #check if player is host
+        if not room.isHost(player):
+            await player.sendMessage(bot, "NotHost")
+            return False
+        
+        return await room.changeMode()
+
     @classmethod
     async def startGame(cls, username, bot):
         player = PlayersManager.queryPlayer(username)
@@ -127,6 +148,10 @@ class RoomHandler:
     def getRoom(cls, roomCode):
         return cls._rooms[roomCode]  
     
+    @classmethod
+    def getGameMode(cls, roomCode):
+        return cls._rooms[roomCode].getMode()
+    
     '''
     Prompting Phase methods
     '''
@@ -141,7 +166,10 @@ class RoomHandler:
     @classmethod
     async def sendNextImage(cls, bot, roomCode, username):
         player = PlayersManager.queryPlayer(username)
-        return await Lying.sendNextImage(bot, cls._rooms[roomCode], player)
+        if cls._rooms[roomCode].getMode() == Room.Mode.VANILLA:
+            return await Lying.sendNextImage(bot, cls._rooms[roomCode], player)
+        elif cls._rooms[roomCode].getMode() == Room.Mode.ARCADE:
+            return await Caption.sendNextImage(bot, cls._rooms[roomCode], player)
 
     '''
     End game methods

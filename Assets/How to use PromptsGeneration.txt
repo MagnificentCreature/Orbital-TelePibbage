@@ -1,0 +1,10 @@
+The first row will contain the main headers, ie Colour, Games etc
+In each Column there will be sub headers indicated by a starting braces and number, ie (5).
+This number indicates its realitve rate (compared to the row), of how often an item inside the column is used.
+
+the (current) 6 columns will be:
+Colour, Medium, Photography, Lighting, Descriptor, Film and Games
+
+the sixth option will be from random words which will also favour the player usernames
+
+Once an option is picked from a category, they can no longer pick from that category. (ie if they pick colour, they can no longer pick colour again). A random word will be generated in its place

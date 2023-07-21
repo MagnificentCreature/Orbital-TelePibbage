@@ -8,13 +8,17 @@ from Player.PlayersManager import PlayersManager
 from BotController import BotInitiator
 import re
 class Image:
-    author = "a" #store author
-    prompt = "a"
+    author = "" #store author
+    prompt = ""
     correct_players = []
-    imageURL = "a" #store imageURL
+    imageURL = "" #store imageURL
+    imageCaptions = [] #store imageCaptions as a list of tuples: (caption, username)
+    choosenCaption = ("", "") #store the choosen caption as a tuple: (caption, caption_author)
     imageLies = {} #store imageLies as a dict:tuple of lie_author:(lie, [list of players who fell for the lie])
     processingTime = 0 # 0 for image is made, else the number is the ETA
     requestID = 0 # 0 for image is made, else the number is the requestID
+    battle_voters = [] # store the voters for the battle
+    winstreak = [] #Winstreak for the gaunlet stored as a list of defeated images
 
     def __init__(self, author, prompt, imageURL, processingTime = 0, requestID = 0):
         self.author = author
@@ -24,6 +28,10 @@ class Image:
         self.correct_players = []
         self.processingTime = processingTime
         self.requestID = requestID
+        self.imageCaptions = []
+        self.choosenCaption = ()
+        self.battle_voters = []
+        self.winstreak = []
 
     def getProcessing(self):
         return self.processingTime
@@ -45,6 +53,9 @@ class Image:
         # self.imageLies.append((lie, username, []))
         self.imageLies[lieAuthor] = (str(lie), [])
 
+    async def insertCaption(self, caption, captionAuthor):
+        self.imageCaptions.append((caption, captionAuthor))
+
     async def addPlayersTricked(self, lieAuthor, playerTricked):
         if lieAuthor == self.author:
             # if the prompt picked was by the original author means its the truth
@@ -58,11 +69,9 @@ class Image:
         for lieAuthor, (lie, _playerTricked) in self.imageLies.items():
             if lieAuthor == reciever:
                 continue
-            formatted_lie = lie.replace(r":", r"\:")
-            lie_button = InlineKeyboardButton(lie, callback_data=f"{BotInitiator.VOTE}:{formatted_lie}:{lieAuthor}")
+            lie_button = InlineKeyboardButton(lie, callback_data=f"{BotInitiator.VOTE}:{lieAuthor}")
             lie_buttons.append([lie_button])
-        formatted_prompt = self.prompt.replace(r":", r"\:")
-        prompt_button = InlineKeyboardButton(self.prompt, callback_data=f"{BotInitiator.VOTE}:{formatted_prompt}:{self.author}")
+        prompt_button = InlineKeyboardButton(self.prompt, callback_data=f"{BotInitiator.VOTE}:{self.author}")
         lie_buttons.append([prompt_button])
         random.shuffle(lie_buttons)
 
@@ -70,6 +79,48 @@ class Image:
         # self.imageLies[self.author] = (self.prompt, [])
 
         return InlineKeyboardMarkup(lie_buttons)
+    
+    def getCaptionKeyboard(self):
+        caption_buttons = []
+        for i, (caption, _author) in enumerate(self.imageCaptions):
+            caption_button = InlineKeyboardButton(caption, callback_data=f"{BotInitiator.CAPTION}:{i}:{_author}")
+            caption_buttons.append([caption_button])
+        # random.shuffle(caption_buttons)
+        return InlineKeyboardMarkup(caption_buttons)
+    
+    def selectCaption(self, captionNum, author):
+        self.choosenCaption = (self.imageCaptions[captionNum][0], author)
+
+    def getCaption(self):
+        return self.choosenCaption[0]
+    
+    def getCaptionAuthor(self):
+        return self.choosenCaption[1]
+    
+    def addBattleVoter(self, voter):
+        self.battle_voters.append(voter)
+
+    def getVoteCount(self):
+        return len(self.battle_voters)
+    
+    def addWinstreak(self, image):
+        self.winstreak.append(image)
+
+    def resetBattleVoters(self):
+        self.battle_voters = []
+
+    def showBattleVoters(self):
+        message = ""
+        message += f"Votes for {self.author}'s image and {self.choosenCaption[1]} caption:\n"
+        for voter in self.battle_voters:
+            message += f"@{voter}\n"
+        return message
+    
+    def getWinstreakCount(self):
+        return len(self.winstreak)
+
+    def isRematch(self, otherImage):
+        return otherImage in self.winstreak
     
     async def showPlayersTricked(self):
         SPECIAL_CHARACTERS = ["[", "]", "(", ")", "~", "`", ">", "#", "+", "-", "=", "|", "{", "}", ".", "!", "*"] # [".",">","!"]        

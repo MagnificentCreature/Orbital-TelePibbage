@@ -10,7 +10,7 @@ import random
 from BotController import BotInitiator
 import logging
 
-from telegram import error
+from telegram import InputMediaPhoto, error
 from telegram import constants
 
 
@@ -48,44 +48,52 @@ class DialogueReader:
 
     @staticmethod
     def additionalProcessing(inputString):
-        # SPECIAL_CHARACTERS = ["[", "]", "(", ")", "~", "`", ">", "#", "+", "-", "=", "|", "{", "}", ".", "!"] # [".",">","!"]
         # Replace new line characters with \n
         inputString = inputString.replace("\\n", "\n")
-        # Replace special characters with \<character> for telegram compliance
-        # for eachItem in SPECIAL_CHARACTERS:
-        #     inputString = inputString.replace(eachItem, f"\{eachItem}")
         # capitalise the first letter
         inputString = inputString[0].upper() + inputString[1:]
         return inputString
     
-    @classmethod
-    def queryDialogue(cls, key):
-        return cls.additionalProcessing(cls._dialogues[key])
+    @staticmethod
+    def parseFormatting(inputString):
+        SPECIAL_CHARACTERS = ["[", "]", "(", ")", "~", "`", ">", "#", "+", "-", "=", "|", "{", "}", ".", "!"]
+        # Replace special characters with \<character> for telegram compliance
+        for eachItem in SPECIAL_CHARACTERS:
+            inputString = inputString.replace(eachItem, f"\{eachItem}")
+        return inputString
+    
+    # @classmethod
+    # def queryDialogue(cls, key):
+    #     return cls.additionalProcessing(cls._dialogues[key])
     
     @classmethod
     def queryDialogue(cls, key, **kwargs):
+        if key is None:
+            return None
+        if len(kwargs) == 0:
+            return cls.additionalProcessing(cls._dialogues[key])
         return cls.additionalProcessing(cls._dialogues[key].format(**kwargs))
 
-    @classmethod
-    async def sendMessageByID(cls, bot, chat_id, message, reply_markup=None, raw=False, exponential_backoff=1, parse_mode=None):
-        try:
-            #Use telegram api to send a message
-            try:
-                if raw:
-                    return await bot.send_message(chat_id=chat_id, text=message, reply_markup=reply_markup, parse_mode=parse_mode) 
-                if (message not in cls._dialogues):
-                    print("Message " + message + " not found in dialogues.txt")
-                formattedText = cls.additionalProcessing(cls._dialogues[message])
-                return await bot.send_message(chat_id=chat_id, text=formattedText, reply_markup=reply_markup, parse_mode=parse_mode)
-            except error.Forbidden as e:
-                logging.error("Error sending message to chat_id " + str(chat_id) + ": " + str(e))
-        except error.TimedOut as e:
-            if exponential_backoff > cls.MAX_RETRIES:
-                print("FAILURE TO SEND, ABORTING")
-                return
-            logging.error("Timeout error sending message to chat_id " + str(chat_id) + ": " + str(e))
-            asyncio.sleep(2**random.randint(1, exponential_backoff))
-            return await cls.sendMessageByID(bot, chat_id, message, reply_markup=reply_markup, raw=raw, exponential_backoff=exponential_backoff+1, parse_mode=parse_mode)
+    # @classmethod
+    # async def sendMessageByID(cls, bot, chat_id, message, reply_markup=None, raw=False, exponential_backoff=1, parse_mode=None):
+    #     try:
+    #         #Use telegram api to send a message
+    #         try:
+    #             if raw:
+    #                 return await bot.send_message(chat_id=chat_id, text=message, reply_markup=reply_markup, parse_mode=parse_mode) 
+    #             if (message not in cls._dialogues):
+    #                 print("Message " + message + " not found in dialogues.txt")
+    #             formattedText = cls.additionalProcessing(cls._dialogues[message])
+    #             return await bot.send_message(chat_id=chat_id, text=formattedText, reply_markup=reply_markup, parse_mode=parse_mode)
+    #         except error.Forbidden as e:
+    #             logging.error("Error sending message to chat_id " + str(chat_id) + ": " + str(e))
+    #     except error.TimedOut as e:
+    #         if exponential_backoff > cls.MAX_RETRIES:
+    #             print("FAILURE TO SEND, ABORTING")
+    #             return
+    #         logging.error("Timeout error sending message to chat_id " + str(chat_id) + ": " + str(e))
+    #         await asyncio.sleep(2**random.randint(1, exponential_backoff))
+    #         return await cls.sendMessageByID(bot, chat_id, message, reply_markup=reply_markup, raw=raw, exponential_backoff=exponential_backoff+1, parse_mode=parse_mode)
 
 
     @classmethod
@@ -97,7 +105,10 @@ class DialogueReader:
                     return await bot.send_message(chat_id=chat_id, text=message, reply_markup=reply_markup, parse_mode=parse_mode)
                 if (message not in cls._dialogues):
                     print("Message " + message + " not found in dialogues.txt")
-                formattedText = cls.additionalProcessing(cls._dialogues[message].format(**kwargs))
+                if len(kwargs) != 0:
+                    formattedText = cls.additionalProcessing(cls._dialogues[message].format(**kwargs))
+                else:
+                     formattedText = cls.additionalProcessing(cls._dialogues[message])
                 return await bot.send_message(chat_id=chat_id, text=formattedText, reply_markup=reply_markup, parse_mode=parse_mode)
             except error.Forbidden as e:
                 logging.error("Error sending message to chat_id " + str(chat_id) + ": " + str(e))
@@ -111,10 +122,70 @@ class DialogueReader:
             return await cls.sendMessageByID(bot, chat_id, message, reply_markup=reply_markup, raw=raw, exponential_backoff=exponential_backoff+1, parse_mode=parse_mode, **kwargs)
     
     @classmethod
-    async def sendImageURLByID(cls, bot, chat_id, imageURL, caption=None, exponential_backoff=1, reply_markup=None, parse_mode=None):
+    async def sendImageURLByID(cls, bot, chat_id, imageURL, caption=None, exponential_backoff=1, reply_markup=None, raw=False, parse_mode=None, **kwargs):
         try:
             try:
-                return await bot.send_photo(chat_id=chat_id, photo=imageURL, reply_markup=reply_markup, caption=caption, parse_mode=parse_mode)
+                try:
+                    if raw or caption is None:
+                        return await bot.send_photo(chat_id=chat_id, photo=imageURL, reply_markup=reply_markup, caption=caption, parse_mode=parse_mode)
+                    if (caption not in cls._dialogues):
+                        print("Message " + caption + " not found in dialogues.txt")
+                    if len(kwargs) != 0:
+                        formattedText = cls.additionalProcessing(cls._dialogues[caption].format(**kwargs))
+                    else:
+                        formattedText = cls.additionalProcessing(cls._dialogues[caption])
+                    return await bot.send_photo(chat_id=chat_id, photo=imageURL, reply_markup=reply_markup, caption=formattedText, parse_mode=parse_mode)
+                except error.BadRequest as badReqError:
+                    print(badReqError)
+                    try:
+                        await asyncio.sleep(1)
+                        if raw or caption is None:
+                            return await bot.send_photo(chat_id=chat_id, photo=imageURL, reply_markup=reply_markup, caption=caption, parse_mode=parse_mode)
+                        return await bot.send_photo(chat_id=chat_id, photo=imageURL, reply_markup=reply_markup, caption=formattedText, parse_mode=parse_mode)
+                    except error.BadRequest as badReqError2:
+                        if raw or caption is None:
+                            return await bot.send_message(chat_id=chat_id, text=f"Telegram failed to send image, here is the URL instead\n{imageURL}\nThe caption is:\n{caption}", reply_markup=reply_markup)
+                        return await bot.send_message(chat_id=chat_id, text=f"Telegram failed to send image, here is the URL instead\n{imageURL}\nThe caption is:\n{formattedText}", reply_markup=reply_markup)
+            except error.Forbidden as e:
+                print(e)
+                logging.error("Error sending message to chat_id " + str(chat_id) + ": " + str(e))
+        except error.TimedOut as e:
+            if exponential_backoff > cls.MAX_RETRIES:
+                print("FAILURE TO SEND, ABORTING")
+                return
+            logging.error("Timeout error sending message to chat_id " + str(chat_id) + ": " + str(e))
+            logging.info("Retrying with exponential backoff of " + str(2**exponential_backoff) + " seconds")
+            await asyncio.sleep(2**random.randint(1, exponential_backoff))
+            return await cls.sendImageURLByID(bot, chat_id, imageURL, caption=caption, exponential_backoff=exponential_backoff+1,reply_markup=reply_markup, raw=raw, parse_mode=parse_mode, **kwargs)
+
+    @classmethod
+    async def sendMediaGroupByID(cls, bot, chat_id, mediaGroup, caption=None, exponential_backoff=1, raw=False, parse_mode=None, **kwargs):
+        #TODO: Decide to keep or remove this
+        if isinstance(mediaGroup[0], str):
+            mediaGroup = [InputMediaPhoto(media) for media in mediaGroup]
+        try:
+            try:
+                try:
+                    if raw or caption is None:
+                        return await bot.send_media_group(chat_id=chat_id, media=mediaGroup, caption=caption, parse_mode=parse_mode)
+                    if (caption not in cls._dialogues):
+                        print("Message " + caption + " not found in dialogues.txt")
+                    if len(kwargs) != 0:
+                        formattedText = cls.additionalProcessing(cls._dialogues[caption].format(**kwargs))
+                    else:
+                        formattedText = cls.additionalProcessing(cls._dialogues[caption])
+                    return await bot.send_media_group(chat_id=chat_id, media=mediaGroup, caption=formattedText, parse_mode=parse_mode)
+                except error.BadRequest as badReqError:
+                    print(badReqError)
+                    try:
+                        asyncio.sleep(1)
+                        if raw or caption is None:
+                            return await bot.send_media_group(chat_id=chat_id, media=mediaGroup, caption=caption, parse_mode=parse_mode)
+                        return await bot.send_media_group(chat_id=chat_id, media=mediaGroup, caption=formattedText, parse_mode=parse_mode)
+                    except error.BadRequest as badReqError2:
+                        if raw or caption is None:
+                            return await bot.send_message(chat_id=chat_id, text=f"Telegram failed to send image, here is the URL instead\n{[media.getImageURL() for media in mediaGroup]}\nThe caption is:\n{caption}")
+                        return await bot.send_message(chat_id=chat_id, text=f"Telegram failed to send image, here is the URL instead\n{[media.getImageURL() for media in mediaGroup]}\nThe caption is:\n{formattedText}")
             except error.Forbidden as e:
                 logging.error("Error sending message to chat_id " + str(chat_id) + ": " + str(e))
         except error.TimedOut as e:
@@ -123,5 +194,5 @@ class DialogueReader:
                 return
             logging.error("Timeout error sending message to chat_id " + str(chat_id) + ": " + str(e))
             logging.info("Retrying with exponential backoff of " + str(2**exponential_backoff) + " seconds")
-            asyncio.sleep(2**random.randint(1, exponential_backoff))
-            return await cls.sendImageURLByID(bot, chat_id, imageURL, reply_markup=reply_markup, exponential_backoff=exponential_backoff+1, parse_mode=parse_mode)
+            await asyncio.sleep(2**random.randint(1, exponential_backoff))
+            return await cls.sendImageGroupByID(bot, chat_id, mediaGroup, caption=caption, exponential_backoff=exponential_backoff+1, raw=raw, parse_mode=parse_mode, **kwargs)

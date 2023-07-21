@@ -19,17 +19,22 @@ BOT_TOKEN = conf.TELE_BOT_TOKEN
 # State definitions for fresh level commands
 CREATE_ROOM, JOIN_ROOM, START_GAME = map(chr, range(3))
 # Entercode and In_room level commands
-RETURN_TO_FRESH = map(chr, range(3,4))
+RETURN_TO_FRESH, CHANGE_MODE = map(chr, range(3,5))
 # In_game level commands
-ENTER_PROMPT, ENTER_LIE, VOTE = map(chr, range(4,7))
+SEND_PROMPT, SEND_LIE, VOTE = map(chr, range(5,8))
+SEND_ARCADE_WORD, SEND_ARCADE_PROMPT, CAPTION, BATTLE_VOTE = map(chr, range(8,12))
 # End game restart commands
-PLAY_AGAIN = map(chr, range(7,8))
+PLAY_AGAIN = map(chr, range(12,13))
 #Shortcut for Conversation Handler END
 END = ConversationHandler.END
 #VOTE REGEX
-VOTE_REGEX = fr"{VOTE}:[^:]+:[^:]+"
+VOTE_REGEX = fr"{VOTE}:[^:]+"
 #regex for PLAY_AGAIN:Four uppercase letters
 PLAY_AGAIN_REGEX = f"{PLAY_AGAIN}" + ":[A-Z]{4}"
+SEND_ARCADE_WORD_REGEX = f"{SEND_ARCADE_WORD}:.*"
+SEND_ARCADE_PROMPT_REGEX = f"{SEND_ARCADE_PROMPT}:.*"
+CAPTION_REGEX = fr"{CAPTION}:[^:]+"
+BATTLE_REGEX = fr"{BATTLE_VOTE}:[^:]+"
 
 # for FRESH
 WelcomeKeyboard = InlineKeyboardMarkup([
@@ -54,19 +59,22 @@ WaitingKeyboard = InlineKeyboardMarkup([
 ])
 
 # for Hosts INROOM
-StartGameKeyboard = InlineKeyboardMarkup([
+StartGameButtons = [
     [
         InlineKeyboardButton(text="Start Game", callback_data=str(START_GAME)),
     ],
     [
+        InlineKeyboardButton(text="Change to Arcade Game Mode", callback_data=str(CHANGE_MODE)),
+    ],
+    [
         InlineKeyboardButton(text="Back", callback_data=str(RETURN_TO_FRESH)),
     ],
-])
+]
 
 # for PROMPTING_PHASE
 # StartGameKeyboard = InlineKeyboardMarkup([
 #     [
-#         InlineKeyboardButton(text="Enter Prompt", callback_data=str(ENTER_PROMPT)),
+#         InlineKeyboardButton(text="Enter Prompt", callback_data=str(SEND_PROMPT)),
 #     ],
 # ])
 
@@ -75,22 +83,23 @@ logging.basicConfig(
     level=logging.INFO
 )
 
-FRESH, ENTERCODE, INROOM, WAITING_FOR_HOST, PROMPTING_PHASE, LYING_PHASE, VOTING_PHASE, REVEAL_PHASE = range(8)
+FRESH, ENTERCODE, INROOM, WAITING_FOR_HOST, PROMPTING_PHASE, LYING_PHASE, VOTING_PHASE, REVEAL_PHASE, ARCADE_GEN_PHASE, CAPTION_PHASE, PICKING_PHASE, BATTLE_PHASE = range(12)
 #Shortcut for returning to FRESH
 FRESH_CALLBACK = CallbackQueryHandler(BotCommands.return_to_fresh, pattern="^" + str(RETURN_TO_FRESH) + "$")
 
 def main() -> None:
-    application = ApplicationBuilder().token(BOT_TOKEN).build()
+    application = ApplicationBuilder().token(BOT_TOKEN).read_timeout(30).write_timeout(30).build()
     
     # In game conversation handler
     game_conv_handler = ConversationHandler(
         entry_points=[
                 CallbackQueryHandler(BotCommands.start_game, pattern="^" + str(START_GAME) + "$"),
-                MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.take_prompt),
+                MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.take_prompt, block=False),
+                CallbackQueryHandler(BotCommands.handle_arcade_gen, pattern=SEND_ARCADE_WORD_REGEX),
             ],
         states={
             PROMPTING_PHASE: [
-                MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.take_prompt),
+                MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.take_prompt, block=False),
             ],
             LYING_PHASE: [
                 MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.take_lie),
@@ -104,16 +113,31 @@ def main() -> None:
             REVEAL_PHASE: [
                 # MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.reveal_lies),
                 MessageHandler(filters.COMMAND, BotCommands.unknown),
-            ]
+            ], 
+            ARCADE_GEN_PHASE: [
+                CallbackQueryHandler(BotCommands.handle_arcade_gen, pattern=SEND_ARCADE_WORD_REGEX, block=False),
+                CallbackQueryHandler(BotCommands.handle_arcade_prompt, pattern=SEND_ARCADE_PROMPT_REGEX, block=False),
+            ],
+            CAPTION_PHASE: [
+                MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.take_caption),
+            ],
+            PICKING_PHASE: [
+                CallbackQueryHandler(BotCommands.handle_pick, pattern=CAPTION_REGEX),
+            ],
+            BATTLE_PHASE: [
+                CallbackQueryHandler(BotCommands.battle_vote_callback, pattern=BATTLE_REGEX),
+                CallbackQueryHandler(BotCommands.create_room, pattern="^" + str(CREATE_ROOM) + "$"),
+                CallbackQueryHandler(BotCommands.join_room_start, pattern="^" + str(JOIN_ROOM) + "$"),
+                CallbackQueryHandler(BotCommands.play_again, pattern=PLAY_AGAIN_REGEX),
+            ],
         },
         fallbacks=[MessageHandler(filters.COMMAND, BotCommands.unknown)],
         map_to_parent={
+            FRESH: FRESH,
             WAITING_FOR_HOST: INROOM,
             INROOM: INROOM,
-            FRESH: FRESH,
             ENTERCODE: ENTERCODE,
-        }
-    )
+        })
 
     # Add conversation handler with the states GENDER, PHOTO, LOCATION and BIO
     main_conv_handler = ConversationHandler(
@@ -129,13 +153,14 @@ def main() -> None:
             ],
             INROOM: [
                 game_conv_handler,
+                CallbackQueryHandler(BotCommands.change_mode, pattern="^" + str(CHANGE_MODE) + "$"),
                 FRESH_CALLBACK,
             ],
         },
         fallbacks=[
                 MessageHandler(filters.COMMAND, BotCommands.unknown),
             ],
-    )
+    block=False)
 
     application.add_handler(main_conv_handler)
 
