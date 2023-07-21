@@ -335,7 +335,7 @@ class Room:
         # handle case where there is a tie
         if self._current_battle_images[0].getVoteCount() == self._current_battle_images[1].getVoteCount():
             winner = random.choice(self._current_battle_images)
-            message += f"\n*Seems like we have a tie\!*\nBut I prefer this one!\n"
+            message += f"\n*Seems like we have a tie\!*\nBut I prefer this one\!\n"
         else:
             winner = max(self._current_battle_images, key=lambda image: image.getVoteCount())
 

@@ -8,11 +8,12 @@ from BotController import BotInitiator
 from Chat.DialogueReader import DialogueReader
 from Player.Player import Player
 from Player.PlayersManager import PlayersManager
+import conf
 
 PROMPT_POOL = 'Assets\PromptsGenerationPool.csv'
 PREPOSITIONS = 'Assets\Preposition.csv'
 MIN_CORPUS_COUNT = 10000
-WORDNIK_API_KEY = "zqai8u9e5pi2p1ia43ee0359w7loishvhyoll5k06hk5j3ges"
+WORDNIK_API_KEY = conf.WORDNIK_API_TOKEN
 ROW_SIZE = 2
 
 _generation_data = None

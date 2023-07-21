@@ -16,15 +16,27 @@ class Player:
     _chatID = 0
     _score = 0
     _user_data = None
+    _running_edit = False
     
     def timeOutRetryDecorator(func):
         async def wrapper(*args, **kwargs):
-            try:
-                return await func(*args, **kwargs)
-            except telegram.error.TimedOut as e:
-                print("Timed out" + str(e))
-                await asyncio.sleep(1)
-                return await wrapper(*args, **kwargs)
+            max_retries = 5
+            retry_delay = 1
+            retry_count = 0
+            while retry_count < max_retries:
+                try:
+                    return await func(*args, **kwargs)
+                except telegram.error.TimedOut as e:
+                    if retry_count >= max_retries:
+                        print(f"Timed out: {str(e)} after {retry_count} retries. Giving up.")
+                        raise
+                    else:
+                        print(f"Timed out: {str(e)} running {func.__name__}. Retrying in {retry_delay} seconds...")
+                        await asyncio.sleep(retry_delay)
+                        retry_delay *= 2
+                        retry_count += 1
+
+            return await wrapper(*args, **kwargs)
         return wrapper
 
     class PlayerConstants(Enum):
@@ -178,6 +190,7 @@ class Player:
         await self._user_data[messageKey].delete()
         del self._user_data[messageKey]
 
+    @timeOutRetryDecorator
     async def deleteMessageList(self, messageKeyList):
         if messageKeyList not in self._user_data:
             return
@@ -185,6 +198,8 @@ class Player:
             for message in self._user_data[messageKeyList]:
                 await message.delete()
         except TypeError:
+            pass
+        except telegram.error.BadRequest as badReqError:
             pass
         del self._user_data[messageKeyList]
 

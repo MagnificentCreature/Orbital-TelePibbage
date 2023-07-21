@@ -60,12 +60,34 @@ def check_in_game_decorator(func):
 
 def timeout_decorator(func):
     @wraps(func)
-    async def wrapper(update, context, *args, **kwargs):
-        try:
-            return await func(update, context, *args, **kwargs)
-        except telegram.error.TimedOut as timeOutError:
-            print(f"Timed out running {func.__name__}\n" + str(timeOutError))
+    async def wrapper(*args, **kwargs):
+        max_retries = 5
+        retry_delay = 1
+        retry_count = 0
+        while retry_count < max_retries:
+            try:
+                return await func(*args, **kwargs)
+            except telegram.error.TimedOut as e:
+                if retry_count >= max_retries:
+                    print(f"Timed out: {str(e)} after {retry_count} retries. Giving up.")
+                    raise
+                else:
+                    print(f"Timed out: {str(e)} running {func.__name__}. Retrying in {retry_delay} seconds...")
+                    await asyncio.sleep(retry_delay)
+                    retry_delay *= 2
+                    retry_count += 1
+
+        return await wrapper(*args, **kwargs)
     return wrapper
+
+# def timeout_decorator(func):
+#     @wraps(func)
+#     async def wrapper(update, context, *args, **kwargs):
+#         try:
+#             return await func(update, context, *args, **kwargs)
+#         except telegram.error.TimedOut as timeOutError:
+#             print(f"Timed out running {func.__name__}\n" + str(timeOutError))
+#     return wrapper
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if (update.message.from_user.username is None):
@@ -129,6 +151,7 @@ async def generate(update: Update, context: ContextTypes.DEFAULT_TYPE):
     print(update.message.from_user.username + "Generated Image: " + str(imageURL))
     await DialogueReader.sendImageURLByID(context.bot, update.message.from_user.id, imageURL)
 
+@button_stall_decorator
 async def change_mode(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await RoomHandler.changeMode(update.callback_query.from_user.username, context.bot)
     return BotInitiator.INROOM
