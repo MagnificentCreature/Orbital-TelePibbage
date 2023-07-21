@@ -320,9 +320,9 @@ class Room:
             return self._current_battle_images[1]
         return self._current_battle_images[0]
 
-    async def broadcastLeaderboardArcade(self, bot):
+    async def broadcastLeaderboardArcade(self, bot, winner):
         # show the final leaderboard sequence
-        await self.broadcast(bot, "ArcadePhase5p1", parse_mode=DialogueReader.MARKDOWN, **{'AIrtist':f"{self._ge}", 'captioner':"b"})
+        await self.broadcast(bot, "ArcadePhase5p1", parse_mode=DialogueReader.MARKDOWN, **{'AIrtist':f"{winner.getAuthor()}", 'captioner':f"{winner.getCaptionAuthor()}"})
         return
     
     #Calculates the battle winner and sends the victory message to the players
@@ -378,9 +378,9 @@ class Room:
             # send the vote button again (if its the finals send a special message, send the REMATCH message if the new challenger is in the champions winstreak list)
             if finals:
                 if self._current_battle_images[0].isRematch(self._current_battle_images[1]):
-                    await eachPlayer.sendMessage(bot, "ArcadePhase4pRematch", messageKey="battle_winner", reply_markup=finals_keyboard)
+                    await eachPlayer.sendMessage(bot, "ArcadePhase4pRematch", messageKey="battle_winner", reply_markup=finals_keyboard, parse_mode=DialogueReader.MARKDOWN)
                     continue
-                await eachPlayer.sendMessage(bot, "ArcadePhase4pChallenger", messageKey="battle_winner", reply_markup=finals_keyboard)
+                await eachPlayer.sendMessage(bot, "ArcadePhase4pChallenger", messageKey="battle_winner", reply_markup=finals_keyboard, parse_mode=DialogueReader.MARKDOWN)
                 continue
             await eachPlayer.sendMessage(bot, "ArcadePhase4p3", messageKey="battle_winner", reply_markup=voting_keyboard) #todo set reply_markup 
         return
@@ -420,6 +420,8 @@ class Room:
             
             finals = True            
             self._current_battle_images = (winner, highestWinstreakImage)
+            for image in self._current_battle_images:
+                image.resetBattleVoters()
         
         # finish waiting the 5 seconds
         await wait5sec

@@ -94,6 +94,9 @@ class Image:
     def getCaption(self):
         return self.choosenCaption[0]
     
+    def getCaptionAuthor(self):
+        return self.choosenCaption[1]
+    
     def addBattleVoter(self, voter):
         self.battle_voters.append(voter)
 
