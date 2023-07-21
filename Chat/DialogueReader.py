@@ -138,7 +138,7 @@ class DialogueReader:
                 except error.BadRequest as badReqError:
                     print(badReqError)
                     try:
-                        asyncio.sleep(1)
+                        await asyncio.sleep(1)
                         if raw or caption is None:
                             return await bot.send_photo(chat_id=chat_id, photo=imageURL, reply_markup=reply_markup, caption=caption, parse_mode=parse_mode)
                         return await bot.send_photo(chat_id=chat_id, photo=imageURL, reply_markup=reply_markup, caption=formattedText, parse_mode=parse_mode)

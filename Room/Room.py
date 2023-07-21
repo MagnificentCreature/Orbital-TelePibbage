@@ -4,6 +4,7 @@ Class that holds data about rooms
 from enum import Enum
 import asyncio
 from collections import deque
+import math
 import random
 from BotController import BotInitiator
 from Chat.DialogueReader import DialogueReader
@@ -321,7 +322,7 @@ class Room:
 
     async def broadcastLeaderboardArcade(self, bot):
         # show the final leaderboard sequence
-        await self.broadcast(bot, "ArcadePhase5p1", parse_mode=DialogueReader.MARKDOWN, **{'AIrtist':"a", 'captioner':"b"})
+        await self.broadcast(bot, "ArcadePhase5p1", parse_mode=DialogueReader.MARKDOWN, **{'AIrtist':f"{self._ge}", 'captioner':"b"})
         return
     
     #Calculates the battle winner and sends the victory message to the players
@@ -341,7 +342,7 @@ class Room:
 
         # delete the losing image for each player (using the players messagekeys to the images, this will cause the other image to expand)
         for eachPlayer in self._players:
-            await eachPlayer.deleteMessage("battle_images", itemKey=self._current_battle_images.index(winner))
+            await eachPlayer.deleteMessage("battle_images", itemKey=abs(self._current_battle_images.index(winner) - 1))
 
             # Show who voted for which image (also show the author of the image and the caption) (Remember to store this message id in the player object)
             await eachPlayer.sendMessage(bot, message, messageKey="battle_winner", raw=True, parse_mode=DialogueReader.MARKDOWN)
@@ -349,10 +350,20 @@ class Room:
         return winner
     
     async def sendBattleImages(self, bot, finals=False):
+        left_button = InlineKeyboardButton(text=f"Vote for \"{self._current_battle_images[0].getCaption()}\"", callback_data=f"{BotInitiator.BATTLE_VOTE}:0")
+        right_button = InlineKeyboardButton(text=f"Vote for \"{self._current_battle_images[1].getCaption()}\"", callback_data=f"{BotInitiator.BATTLE_VOTE}:1")
+        finals_left_button = InlineKeyboardButton(text=f"Vote for \"{self._current_battle_images[0].getCaption()}\"", callback_data=f"{BotInitiator.BATTLE_VOTE}:0:True")
+        finals_right_button = InlineKeyboardButton(text=f"Vote for \"{self._current_battle_images[1].getCaption()}\"", callback_data=f"{BotInitiator.BATTLE_VOTE}:1:True")
         voting_keyboard = InlineKeyboardMarkup([
             [
-                InlineKeyboardButton(text=f"Vote for \"{self._current_battle_images[0].getCaption()}\"", callback_data=f"{BotInitiator.BATTLE_VOTE}:0"),
-                InlineKeyboardButton(text=f"Vote for \"{self._current_battle_images[1].getCaption()}\"", callback_data=f"{BotInitiator.BATTLE_VOTE}:1"),
+                left_button,
+                right_button
+            ]
+        ])
+        finals_keyboard = InlineKeyboardMarkup([
+            [
+                finals_left_button,
+                finals_right_button
             ]
         ])
         mediaGroup = [image.getImageURL() for image in self._current_battle_images] #TODO: Change this to the proper image canvas thing
@@ -367,14 +378,14 @@ class Room:
             # send the vote button again (if its the finals send a special message, send the REMATCH message if the new challenger is in the champions winstreak list)
             if finals:
                 if self._current_battle_images[0].isRematch(self._current_battle_images[1]):
-                    await eachPlayer.sendMessage(bot, "ArcadePhase4pRematch", messageKey="battle_winner", reply_markup=voting_keyboard)
+                    await eachPlayer.sendMessage(bot, "ArcadePhase4pRematch", messageKey="battle_winner", reply_markup=finals_keyboard)
                     continue
-                await eachPlayer.sendMessage(bot, "ArcadePhase4pChallenger", messageKey="battle_winner", reply_markup=voting_keyboard)
+                await eachPlayer.sendMessage(bot, "ArcadePhase4pChallenger", messageKey="battle_winner", reply_markup=finals_keyboard)
                 continue
             await eachPlayer.sendMessage(bot, "ArcadePhase4p3", messageKey="battle_winner", reply_markup=voting_keyboard) #todo set reply_markup 
         return
     
-    async def advanceBattle(self, bot):
+    async def advanceBattle(self, bot, finals=False):
         # call broadcastBattleWinner
         winner = await self.broadcastBattleWinner(bot)
         winner.addWinstreak(self.getOtherBattleImage(winner))
@@ -382,9 +393,15 @@ class Room:
         # create task that waits for 5 seconds
         wait5sec = asyncio.create_task(asyncio.sleep(5))
 
+        if finals:
+            await wait5sec
+            # broadcast the final leaderboard (broadcastLeaderboardArcade)
+            await self.broadcastLeaderboardArcade(bot, winner)
+            # return True to end the room
+            return True
+
         # calculate the standings to find the next match, (if the list_copy is empty)
         if len(self._list_copy) > 0:
-            finals = False
             # if its not the end, reset the battle_voters of the images
             for image in self._current_battle_images:
                 image.resetBattleVoters()
@@ -397,7 +414,7 @@ class Room:
             if highestWinstreakImage == winner:
                 await wait5sec
                 # broadcast the final leaderboard (broadcastLeaderboardArcade)
-                await self.broadcastLeaderboardArcade(bot)
+                await self.broadcastLeaderboardArcade(bot, winner)
                 # return True to end the room
                 return True
             
@@ -409,6 +426,9 @@ class Room:
 
         # broadcast the next battle (sendBattleImages)
         await self.sendBattleImages(bot, finals=finals)
+        # reset player voting status
+        for eachPlayer in self._players:
+            eachPlayer.setItem(Player.PlayerConstants.HAS_VOTED, False)
 
         return
     

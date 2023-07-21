@@ -196,10 +196,11 @@ class Player:
             return
         try:
             for message in self._user_data[messageKeyList]:
-                await message.delete()
+                try:
+                    await message.delete()
+                except telegram.error.BadRequest as badReqError:
+                    pass
         except TypeError:
-            pass
-        except telegram.error.BadRequest as badReqError:
             pass
         del self._user_data[messageKeyList]
 

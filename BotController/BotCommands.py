@@ -438,6 +438,9 @@ async def battle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYP
     query = update.callback_query
     data = re.split(r"(?<!\\):", query.data)
     voteNumber = int(data[1])
+    finals = False
+    if len(data) > 2:
+        finals = data[2] == "True"
 
     room = RoomHandler.getRoom(context.user_data['roomCode'])
     
@@ -449,7 +452,7 @@ async def battle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYP
     # checkItems returns True after everyone places vote for one image
     if await room.checkItems(Player.PlayerConstants.HAS_VOTED, context.bot, advance=False):
         #reveal
-        if await room.advanceBattle(context.bot):
+        if await room.advanceBattle(context.bot, finals=finals):
             await RoomHandler.endGame(context.user_data['roomCode'], context.bot)
             return BotInitiator.FRESH 
         return BotInitiator.BATTLE_PHASE
