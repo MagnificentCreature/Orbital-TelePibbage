@@ -21,8 +21,14 @@ async def revealNextImage(bot, room, player):
       player.sendImageURL(bot, imageObj.getImageURL())
 
       message = imageObj.showPlayersTricked()
-      # player.sendMessage(bot, message)
-      # await room.broadcast(bot, message, raw=True)
+
+      print('hi')
+
+    #   # prepare image frame
+    #   await imageObj.showBestPrompt()
+    #   # broadcast image frame
+    #   await room.broadcastFramedImage(bot)    
+
       await player.send_message(bot, message, raw=True) #unsafe method?
     # message = await image.getMessage(Player.PlayerConstants.NEXT_LIE)
 

@@ -448,4 +448,7 @@ class Room:
             ])
             await player.sendMessage(bot, "Welcome3", reply_markup=PlayAgainKeyboard)
  
-                        
+    async def broadcastFramedImage(self, bot):
+        with open('finalImg.png', 'rb') as img:
+            for eachPlayer in self._players:
+                await bot.send_photo(chat_id=eachPlayer.getChatId(), photo=img)                        

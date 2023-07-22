@@ -103,6 +103,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await player.sendMessage(context.bot, "Welcome2", reply_markup=BotInitiator.WelcomeKeyboard)
     return BotInitiator.FRESH
 
+async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "HelpGuide", parse_mode=DialogueReader.MARKDOWN)
+
 async def create_room(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.callback_query.edit_message_text(text=DialogueReader.queryDialogue("CreateRoom1"))
     await RoomHandler.generateRoom(update.callback_query.from_user.username, context.bot)
@@ -279,6 +282,13 @@ async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYP
         message = await votingImage.showPlayersTricked()
 
         await room.broadcast(context.bot, message=message, raw=True, parse_mode=DialogueReader.MARKDOWN)
+        
+        print('ho')
+        # prepare image frame
+        await votingImage.showBestPrompt()
+        # broadcast image frame
+        await room.broadcastFramedImage(context.bot)
+        
         await asyncio.sleep(2)
         hasNext = await room.broadcast_voting_image(context.bot)
         if not hasNext:

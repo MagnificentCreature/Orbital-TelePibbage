@@ -102,7 +102,7 @@ class DialogueReader:
             #Use telegram api to send a message, additional arguments are given in the form of **{{key}=value}
             try:
                 if raw:
-                    return await bot.send_message(chat_id=chat_id, text=message, reply_markup=reply_markup, parse_mode=parse_mode)
+                    return await bot.send_message(chat_id=chat_id, text=message, reply_markup=reply_markup)
                 if (message not in cls._dialogues):
                     print("Message " + message + " not found in dialogues.txt")
                 if len(kwargs) != 0:

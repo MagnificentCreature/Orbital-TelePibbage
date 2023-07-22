@@ -98,6 +98,9 @@ class Player:
     def getUsername(self):
         return self._username
     
+    def getChatId(self):
+        return self._chatID
+    
     def inRoom(self):
         return self._user_data['roomCode'] != ""
     

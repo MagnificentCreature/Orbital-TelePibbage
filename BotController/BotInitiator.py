@@ -162,6 +162,9 @@ def main() -> None:
             ],
     block=False)
 
-    application.add_handler(main_conv_handler)
+    help_handler = CommandHandler("help", BotCommands.help)
 
+    application.add_handler(main_conv_handler)
+    application.add_handler(help_handler)
+    
     application.run_polling()
