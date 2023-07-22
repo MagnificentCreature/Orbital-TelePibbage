@@ -194,7 +194,7 @@ class Image:
         #hardcode height
         y_text =  40
 
-        font = ImageFont.truetype("C:\\Users\\User\\Downloads\\TelePibbage\\Orbital-TelePibbage\\Assets\\GrenzeGotisch-Regular.ttf", 50)
+        font = ImageFont.truetype("Assets\\Font\\GrenzeGotisch-Regular.ttf", 50)
 
         # Create a text image with the text placed within the box
         text_draw = ImageDraw.Draw(background)
