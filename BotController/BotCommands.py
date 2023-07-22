@@ -7,6 +7,9 @@ from functools import wraps
 import random
 import time
 import re
+import urllib.request
+from PIL import Image, ImageFont, ImageDraw
+import textwrap
 
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton, InputMediaPhoto, Update
 import telegram
@@ -105,6 +108,40 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "HelpGuide", parse_mode=DialogueReader.MARKDOWN)
+
+    urllib.request.urlretrieve("https://i.imgur.com/rxyQjQe.png", "bgFrame.png")
+    # urllib.request.urlretrieve("https://i.imgur.com/EdSQzFR.png", "sample.png")
+    urllib.request.urlretrieve("https://cdn.stablediffusionapi.com/generations/0-7847a1f0-894d-4f18-84e4-81dfc92e6c78.png", "sample.png")
+    background = Image.open("bgFrame.png")
+    sample = Image.open("sample.png")
+
+    background.paste(sample, (245, 206))
+
+    text = "hello WORLD how are you doing my friend, this is aNEWWWWWWW ERAA, sdgugew fugwefw wewefuwefiwefw ewfuwefuigwegf"
+    lines = textwrap.wrap(text, width=40, max_lines=2)
+
+    # Starting position of the text in canvas
+    x = 105  
+    y = 840 
+    #hardcode height
+    y_text =  40
+
+    font = ImageFont.truetype("C:\\Users\\User\\Downloads\\TelePibbage\\Orbital-TelePibbage\\GrenzeGotisch-Regular.ttf", 50)
+
+    # Create a text image with the text placed within the box
+    text_draw = ImageDraw.Draw(background)
+
+    for line in lines:
+        print('h')
+        line_width = font.getlength(line)
+        text_draw.text((x, y), line, font=font, fill=(0, 0, 0))
+        y += y_text
+
+    # Save the final image
+    background.save("Assets/Images/finalImg.png")
+
+    with open('Assets/Images/finalImg.png', 'rb') as img:
+        await context.bot.send_photo(chat_id=update.message.from_user.id, photo=img)
 
 async def create_room(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.callback_query.edit_message_text(text=DialogueReader.queryDialogue("CreateRoom1"))

@@ -180,7 +180,7 @@ class Image:
         # urllib.request.urlretrieve("https://i.imgur.com/EdSQzFR.png", "sample.png")
         # remove "\" from self.imageURL"
         self.newImageURL = re.sub(r"\\", "", self.imageURL)
-        print("new image url: "self.newImageURL)
+        print("new image url: " + self.newImageURL)
         urllib.request.urlretrieve(self.newImageURL, "sample.png")
         sample = MyImage.open("sample.png")
         # urllib.request.urlretrieve(self.imageURL, "sample.png")
