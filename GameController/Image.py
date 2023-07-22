@@ -12,6 +12,8 @@ import PIL.Image as MyImage
 from PIL import ImageFont, ImageDraw
 import textwrap
 
+IMAGE_ASSETS_PATH = "Assets\\Images\\"
+FONT_ASSETS_PATH = "Assets\\Font\\"
 class Image:
     author = "" #store author
     prompt = ""
@@ -174,13 +176,15 @@ class Image:
         print(mostPopularPrompt)
 
         # obtain photo frame
-        urllib.request.urlretrieve("https://i.imgur.com/UN0tpJR.png", "bgFrame.png")
+        urllib.request.urlretrieve("https://i.imgur.com/UN0tpJR.png", f"{IMAGE_ASSETS_PATH}bgFrame.png")
         # urllib.request.urlretrieve("https://i.imgur.com/EdSQzFR.png", "sample.png")
-        print(self.imageURL)
-        response = urllib.request.urlopen(self.imageURL)
-        sample = response.read()
+        # remove "\" from self.imageURL"
+        self.newImageURL = re.sub(r"\\", "", self.imageURL)
+        print("new image url: "self.newImageURL)
+        urllib.request.urlretrieve(self.newImageURL, "sample.png")
+        sample = MyImage.open("sample.png")
         # urllib.request.urlretrieve(self.imageURL, "sample.png")
-        background = MyImage.open("bgFrame.png")
+        background = MyImage.open(f"{IMAGE_ASSETS_PATH}bgFrame.png")
         # sample = MyImage.open("sample.png")
 
         background.paste(sample, (245, 206))
@@ -194,7 +198,7 @@ class Image:
         #hardcode height
         y_text =  40
 
-        font = ImageFont.truetype("Assets\\Font\\GrenzeGotisch-Regular.ttf", 50)
+        font = ImageFont.truetype(f"{FONT_ASSETS_PATH}GrenzeGotisch-Regular.ttf", 50)
 
         # Create a text image with the text placed within the box
         text_draw = ImageDraw.Draw(background)
