@@ -313,6 +313,16 @@ class Room:
         # Randomly pop two to add into the current_battle_images
         image1 = self._list_copy.pop(random.randint(0, len(self._list_copy) - 1))
         image2 = self._list_copy.pop(random.randint(0, len(self._list_copy) - 1))
+        
+        image1_url = self._list_copy.pop(random.randint(0, len(self._list_copy) - 1)).getImageURL()
+        image2_url = self._list_copy.pop(random.randint(0, len(self._list_copy) - 1)).getImageURL()
+
+        # Get the images using urllib.request
+        image1 = Image.open(urllib.request.urlopen(image1_url))
+        image2 = Image.open(urllib.request.urlopen(image2_url))
+
+        self._current_battle_images = (image1, image2)
+        
         self._current_battle_images = (image1, image2)
 
         await self.sendBattleImages(bot)
