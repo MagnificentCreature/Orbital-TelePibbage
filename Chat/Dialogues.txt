@@ -68,3 +68,4 @@ MaxRetries, Image generation took to long, automatically generating simpler imag
 WaitingAgain, Image generation is taking a while, waiting for another {time} seconds, {retries} retries left.
 PromptFailed, Previous prompt failed to generate, try making another!
 LieTooLong, Your lie is too long!\nYour lie must be at most {limit} characters long, try again!
+CaptionTooLong, Your caption is too long!\nYour caption must be at most {limit} characters long, try again!

@@ -385,8 +385,17 @@ async def take_caption(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     try:
         if context.user_data['next_caption'] is not None:
-            await context.user_data['next_caption'].insertCaption(update.message.text, update.message.from_user.username)
             await update.message.delete()
+            if "CaptionTooLong" in context.user_data:
+                await context.user_data["CaptionTooLong"].delete()
+                del context.user_data["CaptionTooLong"] 
+            
+            # Check if lie is too long
+            if len(update.message.text) > MAX_CHARACTERS:
+                await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "CaptionTooLong", messageKey="CaptionTooLong", **{"limit": MAX_CHARACTERS})
+                return BotInitiatorConstants.CAPTION_PHASE
+            
+            await context.user_data['next_caption'].insertCaption(update.message.text, update.message.from_user.username)
             if not await RoomHandler.sendNextImage(context.bot, context.user_data["roomCode"], update.message.from_user.username):
                 context.user_data["waiting_msg"] = await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "WaitingForItems", **{'item': "caption"})     #TODO find a way to delete this message when the next round starts
                 await RoomHandler.checkItems(context.user_data['roomCode'], PlayerConstants.CAPTION, context.bot)
