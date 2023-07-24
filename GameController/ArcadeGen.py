@@ -4,9 +4,10 @@ import random
 from random_word import Wordnik
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
-from BotController import BotInitiator
+from BotController.BotInitiatorConstants import BotInitiatorConstants
 from Chat.DialogueReader import DialogueReader
 from Player.Player import Player
+from Player.PlayerConstants import PlayerConstants
 from Player.PlayersManager import PlayersManager
 import conf
 
@@ -181,7 +182,7 @@ def make_keyboard(word_list, number=1, row_size=ROW_SIZE, final_keyboard=False):
         for i, (word, header) in enumerate(word_list.items()):
             if i % row_size == 0:
                 keyboard.append([])
-            keyboard[-1].append(InlineKeyboardButton(word, callback_data=f"{BotInitiator.SEND_ARCADE_WORD}:{word}:{number}:{header}"))
+            keyboard[-1].append(InlineKeyboardButton(word, callback_data=f"{BotInitiatorConstants.SEND_ARCADE_WORD}:{word}:{number}:{header}"))
         return InlineKeyboardMarkup(keyboard)
     
     for i, word in enumerate(word_list):
@@ -189,9 +190,9 @@ def make_keyboard(word_list, number=1, row_size=ROW_SIZE, final_keyboard=False):
             row = []
             keyboard.append(row)
         if final_keyboard:
-            row.append(InlineKeyboardButton(word, callback_data=f"{BotInitiator.SEND_ARCADE_PROMPT}:{i}"))
+            row.append(InlineKeyboardButton(word, callback_data=f"{BotInitiatorConstants.SEND_ARCADE_PROMPT}:{i}"))
         else:
-            row.append(InlineKeyboardButton(word, callback_data=f"{BotInitiator.SEND_ARCADE_WORD}:{word}:{number}"))
+            row.append(InlineKeyboardButton(word, callback_data=f"{BotInitiatorConstants.SEND_ARCADE_WORD}:{word}:{number}"))
     return InlineKeyboardMarkup(keyboard)    
 
 # Function to be used to under room broadCall to send a specified list to the player
@@ -221,7 +222,7 @@ async def recievePickedWord(username, wordList, banned=None):
             final_list = [f"{wordList[0]}, {wordList[1]}, {wordList[2]}", 
                           randomise_strings(*wordList), 
                           randomise_strings(*wordList)]
-            player.setItem(Player.PlayerConstants.ARCADE_PROMPT_LIST, final_list)
+            player.setItem(PlayerConstants.ARCADE_PROMPT_LIST, final_list)
             await player.editMessage("arcade_prompting", "ArcadePhase1p6", reply_markup=make_keyboard(final_list, row_size=1, final_keyboard=True))
         case _:
             print(wordList)

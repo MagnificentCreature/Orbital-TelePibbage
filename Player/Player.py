@@ -11,6 +11,8 @@ import telegram
 from Chat.DialogueReader import DialogueReader
 from telegram import InputMediaPhoto
 
+from Player.PlayerConstants import PlayerConstants
+
 class Player:
     _username = ""
     _chatID = 0
@@ -38,21 +40,6 @@ class Player:
 
             return await wrapper(*args, **kwargs)
         return wrapper
-
-    class PlayerConstants(Enum):
-        PRESSING_BUTTON = "pressing_button"
-        WAITING_MSG = "waiting_msg"
-        PROMPT = "prompt"
-        LIE = "lie"
-        NEXT_LIE = "next_lie"
-        HAS_VOTED = "has_voted"
-        ARCADE_PROMPT_LIST = "arcade_prompt_list"
-        ARCADE_GEN_STRING = "arcade_gen_string"
-        BANNED_CATEGORY = "banned_category"
-        NEXT_CAPTION = "next_caption"
-        CAPTION = "caption"
-        HAS_PICKED = "has_picked"
-        ARCADE_IMAGE = "arcade_image"
     
     def __init__(self, username, chatID=0, _user_data={}, score=0):
         self._username = username
@@ -66,7 +53,7 @@ class Player:
         return self._username
                 
     def reset(self):
-        for itemKey in self.PlayerConstants.__members__.values():
+        for itemKey in PlayerConstants.__members__.values():
             try:
                 del self._user_data[itemKey.value]
             except KeyError:
@@ -98,9 +85,6 @@ class Player:
     def getUsername(self):
         return self._username
     
-    def getChatId(self):
-        return self._chatID
-    
     def inRoom(self):
         return self._user_data['roomCode'] != ""
     
@@ -125,12 +109,12 @@ class Player:
         self._user_data['in_game'] = True
     
     def setItem(self, itemKey, value):
-        if itemKey not in Player.PlayerConstants.__members__.values():
+        if itemKey not in PlayerConstants.__members__.values():
             return False
         self._user_data[itemKey.value] = value
 
     def queryItem(self, itemKey):
-        if itemKey not in Player.PlayerConstants.__members__.values() or itemKey.value not in self._user_data:
+        if itemKey not in PlayerConstants.__members__.values() or itemKey.value not in self._user_data:
             return False
         try:
             if self._user_data[itemKey.value] is not None and self._user_data[itemKey.value] is not False:

@@ -4,14 +4,12 @@ Information passed into rooms are given only as the usernames
 So keeping track of who is in which room is important, and each player can only be in one room at a time
 '''
 
-import asyncio
 import random
 
 from telegram import InlineKeyboardMarkup
+from BotController.BotInitiatorConstants import BotInitiatorConstants
 from Chat.DialogueReader import DialogueReader
 from GameController import Caption, Lying
-from GameController.Image import Image
-from BotController import BotInitiator
 
 from Room.Room import Room
 
@@ -68,7 +66,7 @@ class RoomHandler:
             return False
         
         #send start game message to player
-        await player.sendMessage(bot, "WaitingToStart", messageKey="waiting_to_start", reply_markup=BotInitiator.WaitingKeyboard, parse_mode=DialogueReader.MARKDOWN, **{'gameMode':room.getMode().value})
+        await player.sendMessage(bot, "WaitingToStart", messageKey="waiting_to_start", reply_markup=BotInitiatorConstants.WaitingKeyboard, parse_mode=DialogueReader.MARKDOWN, **{'gameMode':room.getMode().value})
         
         return True
 
@@ -91,7 +89,7 @@ class RoomHandler:
             return False
         
         # send start game message to host
-        await host.sendMessage(bot, "StartGameOption", messageKey="start_game_option", reply_markup=InlineKeyboardMarkup(BotInitiator.StartGameButtons), parse_mode=DialogueReader.MARKDOWN, **{'gameMode':room.getMode().value})
+        await host.sendMessage(bot, "StartGameOption", messageKey="start_game_option", reply_markup=InlineKeyboardMarkup(BotInitiatorConstants.StartGameButtons), parse_mode=DialogueReader.MARKDOWN, **{'gameMode':room.getMode().value})
         
         return True
     

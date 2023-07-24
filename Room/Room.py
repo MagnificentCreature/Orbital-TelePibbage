@@ -3,18 +3,14 @@ Class that holds data about rooms
 """
 from enum import Enum
 import asyncio
-from collections import deque
-import math
 import random
-from BotController import BotInitiator
+from BotController.BotInitiatorConstants import BotInitiatorConstants
 from Chat.DialogueReader import DialogueReader
 from GameController import ArcadeGen, Battle, Caption, CaptionSelection, Prompting, Lying, Voting, Reveal
-from GameController.Image import Image
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton, Update
 from io import BytesIO
 
-from Player.Player import Player
-from Player.PlayersManager import PlayersManager
+from Player.PlayerConstants import PlayerConstants
 
 class Room:
     _code = ""
@@ -147,7 +143,7 @@ class Room:
             # if player is the host, make the next player the host
             self._host = self._players[1]
             # Send new host the host message
-            keyboard = BotInitiator.StartGameButtons.copy()
+            keyboard = BotInitiatorConstants.StartGameButtons.copy()
             keyboard[0][1].text = f"Change to {self._mode.value} Game Mode"
             await self._host.editMessage("waiting_to_start", "StartGameOption", newMessageKey="start_game_option", reply_markup=InlineKeyboardMarkup(keyboard), parse_mode=DialogueReader.MARKDOWN, **{'gameMode':self._mode.value})
         self._players.remove(player)
@@ -220,11 +216,11 @@ class Room:
         # send message to all players
         for eachPlayer in self._players:
             if self.isHost(eachPlayer):
-                keyboard = BotInitiator.StartGameButtons.copy()
-                keyboard[1][0] = InlineKeyboardButton(text=f"Change to {self.get_other_member(self._mode).value} Game Mode", callback_data=str(BotInitiator.CHANGE_MODE))
+                keyboard = BotInitiatorConstants.StartGameButtons.copy()
+                keyboard[1][0] = InlineKeyboardButton(text=f"Change to {self.get_other_member(self._mode).value} Game Mode", callback_data=str(BotInitiatorConstants.CHANGE_MODE))
                 await eachPlayer.editMessage("start_game_option", "StartGameOption", reply_markup=InlineKeyboardMarkup(keyboard), parse_mode=DialogueReader.MARKDOWN, **{'gameMode':self._mode.value})
                 continue
-            await eachPlayer.editMessage("waiting_to_start", "WaitingToStart", reply_markup=BotInitiator.WaitingKeyboard, parse_mode=DialogueReader.MARKDOWN, **{'gameMode':self._mode.value})
+            await eachPlayer.editMessage("waiting_to_start", "WaitingToStart", reply_markup=BotInitiatorConstants.WaitingKeyboard, parse_mode=DialogueReader.MARKDOWN, **{'gameMode':self._mode.value})
         return True
     
     #true if all have sent prompts(or other item) and proceeded to next phase
@@ -274,10 +270,10 @@ class Room:
 
         for eachPlayer in self._players:
             if eachPlayer.getUsername() == author:
-                eachPlayer.setItem(Player.PlayerConstants.HAS_VOTED, True)
+                eachPlayer.setItem(PlayerConstants.HAS_VOTED, True)
                 await eachPlayer.sendImageURL(bot, image_url)    
             else:
-                eachPlayer.setItem(Player.PlayerConstants.HAS_VOTED, False)
+                eachPlayer.setItem(PlayerConstants.HAS_VOTED, False)
                 await eachPlayer.sendImageURL(bot, image_url, reply_markup=imageObj.getInlineKeyboard(eachPlayer.getUsername()))
         # if len(self._list_copy) <= 0:
         #     return False #Return false to indicate that there are no more images to send after
@@ -361,10 +357,10 @@ class Room:
         return winner
     
     async def sendBattleImages(self, bot, finals=False):
-        left_button = InlineKeyboardButton(text=f"Vote for \"{self._current_battle_images[0].getCaption()}\"", callback_data=f"{BotInitiator.BATTLE_VOTE}:0")
-        right_button = InlineKeyboardButton(text=f"Vote for \"{self._current_battle_images[1].getCaption()}\"", callback_data=f"{BotInitiator.BATTLE_VOTE}:1")
-        finals_left_button = InlineKeyboardButton(text=f"Vote for \"{self._current_battle_images[0].getCaption()}\"", callback_data=f"{BotInitiator.BATTLE_VOTE}:0:True")
-        finals_right_button = InlineKeyboardButton(text=f"Vote for \"{self._current_battle_images[1].getCaption()}\"", callback_data=f"{BotInitiator.BATTLE_VOTE}:1:True")
+        left_button = InlineKeyboardButton(text=f"Vote for \"{self._current_battle_images[0].getCaption()}\"", callback_data=f"{BotInitiatorConstants.BATTLE_VOTE}:0")
+        right_button = InlineKeyboardButton(text=f"Vote for \"{self._current_battle_images[1].getCaption()}\"", callback_data=f"{BotInitiatorConstants.BATTLE_VOTE}:1")
+        finals_left_button = InlineKeyboardButton(text=f"Vote for \"{self._current_battle_images[0].getCaption()}\"", callback_data=f"{BotInitiatorConstants.BATTLE_VOTE}:0:True")
+        finals_right_button = InlineKeyboardButton(text=f"Vote for \"{self._current_battle_images[1].getCaption()}\"", callback_data=f"{BotInitiatorConstants.BATTLE_VOTE}:1:True")
         voting_keyboard = InlineKeyboardMarkup([
             [
                 left_button,
@@ -441,7 +437,7 @@ class Room:
         await self.sendBattleImages(bot, finals=finals)
         # reset player voting status
         for eachPlayer in self._players:
-            eachPlayer.setItem(Player.PlayerConstants.HAS_VOTED, False)
+            eachPlayer.setItem(PlayerConstants.HAS_VOTED, False)
 
         return
     
@@ -450,12 +446,11 @@ class Room:
             player.reset()
             PlayAgainKeyboard = InlineKeyboardMarkup([
                 [
-                    InlineKeyboardButton(text="Create Room", callback_data=str(BotInitiator.CREATE_ROOM)),
-                    InlineKeyboardButton(text="Join Room", callback_data=str(BotInitiator.JOIN_ROOM)),
+                    InlineKeyboardButton(text="Create Room", callback_data=str(BotInitiatorConstants.CREATE_ROOM)),
+                    InlineKeyboardButton(text="Join Room", callback_data=str(BotInitiatorConstants.JOIN_ROOM)),
                 ],
                 [
-                    InlineKeyboardButton(text="Play with the same people", callback_data=f"{str(BotInitiator.PLAY_AGAIN)}:{self._code}")
+                    InlineKeyboardButton(text="Play with the same people", callback_data=f"{str(BotInitiatorConstants.PLAY_AGAIN)}:{self._code}")
                 ]
             ])
             await player.sendMessage(bot, "Welcome3", reply_markup=PlayAgainKeyboard)
- 
