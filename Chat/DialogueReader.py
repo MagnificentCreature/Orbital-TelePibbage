@@ -135,7 +135,7 @@ class DialogueReader:
                         formattedText = cls.additionalProcessing(cls._dialogues[caption])
                     return await bot.send_photo(chat_id=chat_id, photo=imageURL, reply_markup=reply_markup, caption=formattedText, parse_mode=parse_mode)
                 except error.BadRequest as badReqError:
-                    print(badReqError)
+                    print("BadReqError " + str(badReqError))
                     try:
                         await asyncio.sleep(1)
                         if raw or caption is None:
@@ -175,7 +175,7 @@ class DialogueReader:
                         formattedText = cls.additionalProcessing(cls._dialogues[caption])
                     return await bot.send_media_group(chat_id=chat_id, media=mediaGroup, caption=formattedText, parse_mode=parse_mode)
                 except error.BadRequest as badReqError:
-                    print(badReqError)
+                    print("BadReqError " + str(badReqError))
                     try:
                         asyncio.sleep(1)
                         if raw or caption is None:

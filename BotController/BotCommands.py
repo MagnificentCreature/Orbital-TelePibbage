@@ -30,7 +30,7 @@ MAX_CHARACTERS = 80
 def button_stall_decorator(func):
     @wraps(func)
     async def wrapper(update, context, *args, **kwargs):
-        # await asyncio.sleep(0.5)
+        # await asyncio.sleep(0.5)S
         if context.user_data.get("pressing_button", False):
             return
         context.user_data["pressing_button"] = True

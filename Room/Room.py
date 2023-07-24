@@ -8,6 +8,7 @@ from BotController.BotInitiatorConstants import BotInitiatorConstants
 from Chat.DialogueReader import DialogueReader
 from GameController import ArcadeGen, Battle, Caption, CaptionSelection, Prompting, Lying, Voting, Reveal
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton, Update
+from io import BytesIO
 
 from Player.PlayerConstants import PlayerConstants
 
@@ -281,6 +282,16 @@ class Room:
     async def getVotingImage(self):
         return self._current_voting_image
     
+    async def broadcastFramedImage(self, bot, finalImage):
+        #NOTE: finalImage is a GameController.Image object
+        bio = BytesIO() # got to import BytesIO from io
+        framedFinalImage = await finalImage.getFramedImage()
+        framedFinalImage.save(bio, 'PNG')
+                              
+        for eachPlayer in self._players:
+            bio.seek(0)
+            await eachPlayer.sendImageURL(bot, bio)
+    
     def getLeaderboard(self):
         leaderboard = sorted(self._players, key=lambda player: player.getScore(), reverse=True)
         message = f"*☆☆☆☆☆{leaderboard[0]}☆☆☆☆☆*\n"
@@ -442,4 +453,4 @@ class Room:
                     InlineKeyboardButton(text="Play with the same people", callback_data=f"{str(BotInitiatorConstants.PLAY_AGAIN)}:{self._code}")
                 ]
             ])
-            await player.sendMessage(bot, "Welcome3", reply_markup=PlayAgainKeyboard)                       
+            await player.sendMessage(bot, "Welcome3", reply_markup=PlayAgainKeyboard)
