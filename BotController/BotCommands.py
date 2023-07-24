@@ -24,7 +24,8 @@ from GameController import ArcadeGen
 from BotController.BotInitiatorConstants import BotInitiatorConstants
 
 MIN_PROMPT_LENGTH = 3
-MAX_PROMPT_LENGTH = 15
+# MAX_PROMPT_LENGTH = 15
+MAX_CHARACTERS = 80
 
 def button_stall_decorator(func):
     @wraps(func)
@@ -180,8 +181,8 @@ async def take_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return BotInitiatorConstants.PROMPTING_PHASE
     
     # check if prompt exceeds limit
-    if len(prompt.split(" ")) > MAX_PROMPT_LENGTH:
-        await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "PromptManyWords", **{"limit": MAX_PROMPT_LENGTH})
+    if len(prompt) > MAX_CHARACTERS:
+        await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "PromptManyChars", **{"limit": MAX_CHARACTERS})
         return BotInitiatorConstants.PROMPTING_PHASE
     
     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "PromptRecieved")
@@ -224,8 +225,19 @@ async def take_lie(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     try:
         if context.user_data['next_lie'] is not None:
-            await context.user_data['next_lie'].insertLie(update.message.text, update.message.from_user.username)
+            # check if update.message.text is over the character limit
+            # Tidy up old message
             await update.message.delete()
+            if "LieTooLong" in context.user_data:
+                await context.user_data["LieTooLong"].delete()
+                del context.user_data["LieTooLong"] 
+            
+            # Check if lie is too long
+            if len(update.message.text) > MAX_CHARACTERS:
+                await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "LieTooLong", messageKey="LieTooLong", **{"limit": MAX_CHARACTERS})
+                return BotInitiatorConstants.LYING_PHASE
+            
+            await context.user_data['next_lie'].insertLie(update.message.text, update.message.from_user.username)
             if not await RoomHandler.sendNextImage(context.bot, context.user_data["roomCode"], update.message.from_user.username):
                 context.user_data["waiting_msg"] = await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "WaitingForItems", **{'item': "lie"})     #TODO find a way to delete this message when the next round starts
                 await RoomHandler.checkItems(context.user_data['roomCode'], PlayerConstants.LIE, context.bot)

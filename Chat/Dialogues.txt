@@ -62,8 +62,9 @@ NotHost, You are not the host. Only the host can start the game.
 NotEnoughPlayers, Not enough players to start the game. Need at least 3 players.
 InvalidPrompt, Image was censored for various reasons, try sending the same prompt or another prompt again
 PromptFewWords, Prompt too short!\nYour prompt must be at least {limit} words long, try again!
-PromptManyWords, Prompt too long!\nYour prompt must be at most {limit} words long, try again!
+PromptManyChars, Prompt too long!\nYour prompt must be at most {limit} characters long, try again!
 PromptTakingAwhile, Your prompt is taking a while to generate, please hold...\nEstimate time is {eta} more seconds
 MaxRetries, Image generation took to long, automatically generating simpler image.\nNote: If this does not produce an image, you are free to try again with a simpler prompt, however, it could be that Stable Diffusion is experiencing heavy load.
 WaitingAgain, Image generation is taking a while, waiting for another {time} seconds, {retries} retries left.
 PromptFailed, Previous prompt failed to generate, try making another!
+LieTooLong, Your lie is too long!\nYour lie must be at most {limit} characters long, try again!
