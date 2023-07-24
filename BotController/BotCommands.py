@@ -8,8 +8,10 @@ import random
 import time
 import re
 import urllib.request
+import requests
 from PIL import Image, ImageFont, ImageDraw
 import textwrap
+from io import BytesIO
 
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton, InputMediaPhoto, Update
 import telegram
@@ -107,13 +109,18 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return BotInitiator.FRESH
 
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    IMAGE_ASSETS_PATH = "Assets\\Images\\"
+    FONT_ASSETS_PATH = "Assets\\Font\\"
+
     await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "HelpGuide", parse_mode=DialogueReader.MARKDOWN)
 
-    urllib.request.urlretrieve("https://i.imgur.com/rxyQjQe.png", "bgFrame.png")
+    urllib.request.urlretrieve("https://i.imgur.com/UN0tpJR.png", "bgFrame.png")
     # urllib.request.urlretrieve("https://i.imgur.com/EdSQzFR.png", "sample.png")
-    urllib.request.urlretrieve("https://cdn.stablediffusionapi.com/generations/0-7847a1f0-894d-4f18-84e4-81dfc92e6c78.png", "sample.png")
+    response = requests.get('https://cdn.stablediffusionapi.com/generations/0-7847a1f0-894d-4f18-84e4-81dfc92e6c78.png')    
     background = Image.open("bgFrame.png")
-    sample = Image.open("sample.png")
+    response.raise_for_status()
+    sample = Image.open(BytesIO(response.content))
+    # sample = Image.open("sample.png")
 
     background.paste(sample, (245, 206))
 
@@ -126,8 +133,7 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     #hardcode height
     y_text =  40
 
-    font = ImageFont.truetype("C:\\Users\\User\\Downloads\\TelePibbage\\Orbital-TelePibbage\\GrenzeGotisch-Regular.ttf", 50)
-
+    font = ImageFont.truetype(f"{FONT_ASSETS_PATH}GrenzeGotisch-Regular.ttf", 50)
     # Create a text image with the text placed within the box
     text_draw = ImageDraw.Draw(background)
 
@@ -324,7 +330,7 @@ async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYP
         # prepare image frame
         await votingImage.showBestPrompt()
         # broadcast image frame
-        await room.broadcastFramedImage(context.bot)
+        await room.broadcastFramedImage(context.bot, votingImage)
         
         await asyncio.sleep(2)
         hasNext = await room.broadcast_voting_image(context.bot)

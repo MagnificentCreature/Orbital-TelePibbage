@@ -8,6 +8,8 @@ from Player.PlayersManager import PlayersManager
 from BotController import BotInitiator
 import re
 import urllib.request
+import requests
+from io import BytesIO
 import PIL.Image as MyImage
 from PIL import ImageFont, ImageDraw
 import textwrap
@@ -26,6 +28,7 @@ class Image:
     requestID = 0 # 0 for image is made, else the number is the requestID
     battle_voters = [] # store the voters for the battle
     winstreak = [] #Winstreak for the gaunlet stored as a list of defeated images
+    framedImage = ""
 
     def __init__(self, author, prompt, imageURL, processingTime = 0, requestID = 0):
         self.author = author
@@ -39,6 +42,7 @@ class Image:
         self.choosenCaption = ()
         self.battle_voters = []
         self.winstreak = []
+        self.framedImage = ""
 
     def getProcessing(self):
         return self.processingTime
@@ -169,22 +173,20 @@ class Image:
     
     async def showBestPrompt(self):
 
+        # add original prompt to dictionary of image lies
+        self.imageLies[self.author] = (self.prompt, self.correct_players)
         # obtain text
         sortedLies = sorted(self.imageLies.items(), key=lambda x:len(x[1][1]), reverse=True)
         mostPopularPrompt = sortedLies[0][1][0]
 
         print(mostPopularPrompt)
 
-        # obtain photo frame
-        urllib.request.urlretrieve("https://i.imgur.com/UN0tpJR.png", f"{IMAGE_ASSETS_PATH}bgFrame.png")
+        urllib.request.urlretrieve("https://i.imgur.com/UN0tpJR.png", "bgFrame.png")
         # urllib.request.urlretrieve("https://i.imgur.com/EdSQzFR.png", "sample.png")
-        # remove "\" from self.imageURL"
-        self.newImageURL = re.sub(r"\\", "", self.imageURL)
-        print("new image url: " + self.newImageURL)
-        urllib.request.urlretrieve(self.newImageURL, "sample.png")
-        sample = MyImage.open("sample.png")
-        # urllib.request.urlretrieve(self.imageURL, "sample.png")
-        background = MyImage.open(f"{IMAGE_ASSETS_PATH}bgFrame.png")
+        response = requests.get(self.imageURL)    
+        background = MyImage.open("bgFrame.png")
+        response.raise_for_status()
+        sample = MyImage.open(BytesIO(response.content))
         # sample = MyImage.open("sample.png")
 
         background.paste(sample, (245, 206))
@@ -211,7 +213,12 @@ class Image:
 
         # Save the final image
         background.save("finalImg.png")
+
+        self.framedImage = MyImage.open("finalImg.png")
         
         print('got to end')
         # with open('finalImg.png', 'rb') as img:
         #     await context.bot.send_photo(chat_id=update.message.from_user.id, photo=img)
+
+    async def getFramedImage(self):
+        return self.framedImage

@@ -11,6 +11,7 @@ from Chat.DialogueReader import DialogueReader
 from GameController import ArcadeGen, Battle, Caption, CaptionSelection, Prompting, Lying, Voting, Reveal
 from GameController.Image import Image
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton, Update
+from io import BytesIO
 
 from Player.Player import Player
 from Player.PlayersManager import PlayersManager
@@ -448,7 +449,18 @@ class Room:
             ])
             await player.sendMessage(bot, "Welcome3", reply_markup=PlayAgainKeyboard)
  
-    async def broadcastFramedImage(self, bot):
-        with open('finalImg.png', 'rb') as img:
-            for eachPlayer in self._players:
-                await bot.send_photo(chat_id=eachPlayer.getChatId(), photo=img)                        
+    # async def broadcastFramedImage(self, bot):
+    #     with open('finalImg.png', 'rb') as img:
+    #         for eachPlayer in self._players:
+    #             await bot.send_photo(chat_id=eachPlayer.getChatId(), photo=img)                        
+
+    async def broadcastFramedImage(self, bot, finalImage):
+        #NOTE: finalImage is a GameController.Image object
+        bio = BytesIO() # got to import BytesIO from io
+        framedFinalImage = await finalImage.getFramedImage()
+        framedFinalImage.convert('RGB')
+        framedFinalImage.save(bio, 'JPEG')
+                              
+        bio.seek(0)
+        for eachPlayer in self._players:
+                await eachPlayer.sendImageURL(chat_id=eachPlayer.getChatId(), photo=bio)
