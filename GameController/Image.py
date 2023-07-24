@@ -177,7 +177,7 @@ class Image:
         self.imageLies[self.author] = (self.prompt, self.correct_players)
         # obtain text
         sortedLies = sorted(self.imageLies.items(), key=lambda x:len(x[1][1]), reverse=True)
-        mostPopularPrompt = sortedLies[0][1][0]
+        mostPopularPrompt = "BEST PROMPT: " + sortedLies[0][1][0]
 
         print(mostPopularPrompt)
 
