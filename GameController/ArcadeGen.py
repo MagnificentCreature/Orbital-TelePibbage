@@ -6,7 +6,6 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 from BotController.BotInitiatorConstants import BotInitiatorConstants
 from Chat.DialogueReader import DialogueReader
-from Player.Player import Player
 from Player.PlayerConstants import PlayerConstants
 from Player.PlayersManager import PlayersManager
 import conf

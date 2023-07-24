@@ -1,9 +1,7 @@
 import asyncio
 import random
 
-from Player.Player import Player
 from Player.PlayerConstants import PlayerConstants
-from Player.PlayersManager import PlayersManager
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 from Chat.DialogueReader import DialogueReader
 
