@@ -48,7 +48,7 @@ ArcadePhase4p2, You will be presented with two images\. Your task is to decide w
 ArcadePhase4p3, Pick the display you find superior
 ArcadePhase4pRematch, FINAL BATTLE *REMATCH\!*:\nPick the display that will *WIN IT ALL\!\!\!*
 ArcadePhase4pChallenger, FINAL BATTLE :\nOne last fight that will decide the *FINAL VICTOR\!\!\!*
-ArcadePhase5p1, And the winner is\.\.\.\n@{AIrtist} with captions from @{captioner}\!\n Congratulations, you have won the most magnificent prize\! You can now hang your masterpieces in the museum and admire them for all eternity\!\n\n*Thank you for playing\!*
+ArcadePhase5p1, And the winner is\.\.\.\n@{AIrtist} with captions from @{captioner}\!\nCongratulations, you have won the most magnificent prize\! You can now hang your masterpieces in the museum and admire them for all eternity\!\n\n*Thank you for playing\!*
 # Error Messages 
 InGame, Error to {action} room, perhaps you are already in another game
 AlreadyInRoom, You are already in this room!

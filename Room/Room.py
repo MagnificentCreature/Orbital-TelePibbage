@@ -334,7 +334,7 @@ class Room:
     
     #Calculates the battle winner and sends the victory message to the players
     async def broadcastBattleWinner(self, bot):
-        message = f"*☆☆☆☆☆Battle Results☆☆☆☆☆*\n"
+        message = f"*☆☆☆Battle Results☆☆☆*\n"
         
         for image in self._current_battle_images:
             message += f"{image.showBattleVoters()}\n"
@@ -357,10 +357,10 @@ class Room:
         return winner
     
     async def sendBattleImages(self, bot, finals=False):
-        left_button = InlineKeyboardButton(text=f"Vote for \"{self._current_battle_images[0].getCaption()}\"", callback_data=f"{BotInitiatorConstants.BATTLE_VOTE}:0")
-        right_button = InlineKeyboardButton(text=f"Vote for \"{self._current_battle_images[1].getCaption()}\"", callback_data=f"{BotInitiatorConstants.BATTLE_VOTE}:1")
-        finals_left_button = InlineKeyboardButton(text=f"Vote for \"{self._current_battle_images[0].getCaption()}\"", callback_data=f"{BotInitiatorConstants.BATTLE_VOTE}:0:True")
-        finals_right_button = InlineKeyboardButton(text=f"Vote for \"{self._current_battle_images[1].getCaption()}\"", callback_data=f"{BotInitiatorConstants.BATTLE_VOTE}:1:True")
+        left_button = InlineKeyboardButton(text=f"Vote for Left Image", callback_data=f"{BotInitiatorConstants.BATTLE_VOTE}:0") # \"{self._current_battle_images[0].getCaption()}\"
+        right_button = InlineKeyboardButton(text=f"Vote for Right Image", callback_data=f"{BotInitiatorConstants.BATTLE_VOTE}:1")
+        finals_left_button = InlineKeyboardButton(text=f"Vote for Left Image", callback_data=f"{BotInitiatorConstants.BATTLE_VOTE}:0:True")
+        finals_right_button = InlineKeyboardButton(text=f"Vote for Right Image", callback_data=f"{BotInitiatorConstants.BATTLE_VOTE}:1:True")
         voting_keyboard = InlineKeyboardMarkup([
             [
                 left_button,

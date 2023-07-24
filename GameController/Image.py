@@ -172,7 +172,6 @@ class Image:
         return message
     
     async def showBestPrompt(self):
-
         # add original prompt to dictionary of image lies
         self.imageLies[self.author] = (self.prompt, self.correct_players)
         # obtain text
@@ -190,11 +189,9 @@ class Image:
 
         background = MyImage.open(f"{IMAGE_ASSETS_PATH}.png")
         sample = MyImage.open(BytesIO(response.content))
-        # sample = MyImage.open("sample.png")
 
         background.paste(sample, (245, 206))
 
-        # text = "hello WORLD how are you doing my friend, this is aNEWWWWWWW ERAA, sdgugew fugwefw wewefuwefiwefw ewfuwefuigwegf"
         lines = textwrap.wrap(mostPopularPrompt, width=40, max_lines=2)
 
         # Starting position of the text in canvas
