@@ -143,11 +143,14 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         text_draw.text((x, y), line, font=font, fill=(0, 0, 0))
         y += y_text
 
-    # Save the final image
-    background.save("Assets/Images/finalImg.png")
-
-    with open('Assets/Images/finalImg.png', 'rb') as img:
-        await context.bot.send_photo(chat_id=update.message.from_user.id, photo=img)
+    
+    # print(background.instanceoftype(Image.Image))
+    # print the type of background
+    print(type(background))
+    bio = BytesIO() # got to import BytesIO from io
+    background.save(bio, 'PNG')
+    bio.seek(0)
+    await context.bot.send_photo(chat_id=update.message.from_user.id, photo=bio)
 
 async def create_room(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.callback_query.edit_message_text(text=DialogueReader.queryDialogue("CreateRoom1"))

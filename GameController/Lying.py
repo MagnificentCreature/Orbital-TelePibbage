@@ -24,7 +24,7 @@ async def sendPhase2Messages(bot, room):
 async def sendNextImage(bot, room, player):
     imageList = await room.getRemainingImages(player)
     if len(imageList) <= 0:
-        player.deleteMessage("LyingImage")
+        await player.deleteMessage("LyingImage")
         player.deleteContext(Player.PlayerConstants.NEXT_LIE.value)
         player.setItem(Player.PlayerConstants.LIE, True)
         return False

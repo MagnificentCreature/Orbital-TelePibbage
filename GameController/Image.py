@@ -28,7 +28,7 @@ class Image:
     requestID = 0 # 0 for image is made, else the number is the requestID
     battle_voters = [] # store the voters for the battle
     winstreak = [] #Winstreak for the gaunlet stored as a list of defeated images
-    framedImage = ""
+    framedImage = None
 
     def __init__(self, author, prompt, imageURL, processingTime = 0, requestID = 0):
         self.author = author
@@ -42,7 +42,7 @@ class Image:
         self.choosenCaption = ()
         self.battle_voters = []
         self.winstreak = []
-        self.framedImage = ""
+        self.framedImage = None
 
     def getProcessing(self):
         return self.processingTime
@@ -211,10 +211,7 @@ class Image:
             text_draw.text((x, y), line, font=font, fill=(0, 0, 0))
             y += y_text
 
-        # Save the final image
-        background.save("finalImg.png")
-
-        self.framedImage = MyImage.open("finalImg.png")
+        self.framedImage = background
         
         print('got to end')
         # with open('finalImg.png', 'rb') as img:

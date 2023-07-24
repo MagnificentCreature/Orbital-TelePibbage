@@ -458,9 +458,8 @@ class Room:
         #NOTE: finalImage is a GameController.Image object
         bio = BytesIO() # got to import BytesIO from io
         framedFinalImage = await finalImage.getFramedImage()
-        framedFinalImage.convert('RGB')
-        framedFinalImage.save(bio, 'JPEG')
+        framedFinalImage.save(bio, 'PNG')
                               
-        bio.seek(0)
         for eachPlayer in self._players:
-                await eachPlayer.sendImageURL(chat_id=eachPlayer.getChatId(), photo=bio)
+            bio.seek(0)
+            await eachPlayer.sendImageURL(bot, bio)
