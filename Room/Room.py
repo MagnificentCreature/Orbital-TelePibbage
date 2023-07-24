@@ -286,6 +286,16 @@ class Room:
     async def getVotingImage(self):
         return self._current_voting_image
     
+    async def broadcastFramedImage(self, bot, finalImage):
+        #NOTE: finalImage is a GameController.Image object
+        bio = BytesIO() # got to import BytesIO from io
+        framedFinalImage = await finalImage.getFramedImage()
+        framedFinalImage.save(bio, 'PNG')
+                              
+        for eachPlayer in self._players:
+            bio.seek(0)
+            await eachPlayer.sendImageURL(bot, bio)
+    
     def getLeaderboard(self):
         leaderboard = sorted(self._players, key=lambda player: player.getScore(), reverse=True)
         message = f"*☆☆☆☆☆{leaderboard[0]}☆☆☆☆☆*\n"
@@ -449,17 +459,3 @@ class Room:
             ])
             await player.sendMessage(bot, "Welcome3", reply_markup=PlayAgainKeyboard)
  
-    # async def broadcastFramedImage(self, bot):
-    #     with open('finalImg.png', 'rb') as img:
-    #         for eachPlayer in self._players:
-    #             await bot.send_photo(chat_id=eachPlayer.getChatId(), photo=img)                        
-
-    async def broadcastFramedImage(self, bot, finalImage):
-        #NOTE: finalImage is a GameController.Image object
-        bio = BytesIO() # got to import BytesIO from io
-        framedFinalImage = await finalImage.getFramedImage()
-        framedFinalImage.save(bio, 'PNG')
-                              
-        for eachPlayer in self._players:
-            bio.seek(0)
-            await eachPlayer.sendImageURL(bot, bio)

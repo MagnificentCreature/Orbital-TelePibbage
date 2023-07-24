@@ -2,11 +2,11 @@
 This class will store data about a given image and its associated lies
 '''
 
+import os
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton, Update
 import random
 from Player.PlayersManager import PlayersManager
 from BotController import BotInitiator
-import re
 import urllib.request
 import requests
 from io import BytesIO
@@ -178,14 +178,15 @@ class Image:
         # obtain text
         sortedLies = sorted(self.imageLies.items(), key=lambda x:len(x[1][1]), reverse=True)
         mostPopularPrompt = "BEST PROMPT: " + sortedLies[0][1][0]
+        
+        # check if there is already a bgFrame.png
+        
+        if not os.path.isfile(f"{IMAGE_ASSETS_PATH}bgFrame.png"):
+            urllib.request.urlretrieve("https://i.imgur.com/UN0tpJR.png", f"{IMAGE_ASSETS_PATH}bgFrame.png")
+            response = requests.get(self.imageURL)    
+            response.raise_for_status()
 
-        print(mostPopularPrompt)
-
-        urllib.request.urlretrieve("https://i.imgur.com/UN0tpJR.png", "bgFrame.png")
-        # urllib.request.urlretrieve("https://i.imgur.com/EdSQzFR.png", "sample.png")
-        response = requests.get(self.imageURL)    
-        background = MyImage.open("bgFrame.png")
-        response.raise_for_status()
+        background = MyImage.open(f"{IMAGE_ASSETS_PATH}.png")
         sample = MyImage.open(BytesIO(response.content))
         # sample = MyImage.open("sample.png")
 
@@ -206,16 +207,11 @@ class Image:
         text_draw = ImageDraw.Draw(background)
 
         for line in lines:
-            print('h')
-            line_width = font.getlength(line)
             text_draw.text((x, y), line, font=font, fill=(0, 0, 0))
             y += y_text
 
         self.framedImage = background
         
-        print('got to end')
-        # with open('finalImg.png', 'rb') as img:
-        #     await context.bot.send_photo(chat_id=update.message.from_user.id, photo=img)
 
     async def getFramedImage(self):
         return self.framedImage
