@@ -2,10 +2,10 @@
 This class will store data about a given image and its associated lies
 '''
 
-from telegram import InlineKeyboardMarkup, InlineKeyboardButton, Update
+from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 import random
+from BotController.BotInitiatorConstants import BotInitiatorConstants
 from Player.PlayersManager import PlayersManager
-from BotController import BotInitiator
 import re
 import urllib.request
 import PIL.Image as MyImage
@@ -76,9 +76,9 @@ class Image:
         for lieAuthor, (lie, _playerTricked) in self.imageLies.items():
             if lieAuthor == reciever:
                 continue
-            lie_button = InlineKeyboardButton(lie, callback_data=f"{BotInitiator.VOTE}:{lieAuthor}")
+            lie_button = InlineKeyboardButton(lie, callback_data=f"{BotInitiatorConstants.VOTE}:{lieAuthor}")
             lie_buttons.append([lie_button])
-        prompt_button = InlineKeyboardButton(self.prompt, callback_data=f"{BotInitiator.VOTE}:{self.author}")
+        prompt_button = InlineKeyboardButton(self.prompt, callback_data=f"{BotInitiatorConstants.VOTE}:{self.author}")
         lie_buttons.append([prompt_button])
         random.shuffle(lie_buttons)
 
@@ -90,7 +90,7 @@ class Image:
     def getCaptionKeyboard(self):
         caption_buttons = []
         for i, (caption, _author) in enumerate(self.imageCaptions):
-            caption_button = InlineKeyboardButton(caption, callback_data=f"{BotInitiator.CAPTION}:{i}:{_author}")
+            caption_button = InlineKeyboardButton(caption, callback_data=f"{BotInitiatorConstants.CAPTION}:{i}:{_author}")
             caption_buttons.append([caption_button])
         # random.shuffle(caption_buttons)
         return InlineKeyboardMarkup(caption_buttons)

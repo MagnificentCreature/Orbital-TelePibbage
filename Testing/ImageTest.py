@@ -1,17 +1,18 @@
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import sys
 sys.path.append('.')
 from GameController.Image import Image
 from Player.Player import Player
 
+
 class TestImage(unittest.TestCase):
     
     def setUp(self):
         self.image = Image(author="John Doe", prompt="Cats and Dogs", imageURL="http://example.com/sample.jpg")
         self.player = Player(username="John Doe", chatID=12345)
-        self.player_other = Player(username="Jane Smith", chatID=67890)
+        self.player2 = Player(username="Jane Smith", chatID=67890)
 
     def test_get_image_URL(self):
         # Test that getImageURL returns the correct value
@@ -25,12 +26,10 @@ class TestImage(unittest.TestCase):
         # Test that getPrompt returns the correct value
         assert self.image.getPrompt() == "Cats and Dogs"
 
+    #Mock the queryPlayer method from PlayersManager
     @patch('ArcadeGenTest.PlayersManager.queryPlayer')
     async def test_insert_lie(self, mock_queryPlayer):
-        # Set up the mock object
         mock_queryPlayer.return_value = self.player
-
-        # Test that insertLie behaves correctly
         await self.image.insertLie("This is a lie", self.player.getUsername())
 
         # Check that the lie was inserted correctly
@@ -38,10 +37,7 @@ class TestImage(unittest.TestCase):
 
     @patch('ArcadeGenTest.PlayersManager.queryPlayer')
     async def test_insert_caption(self, mock_queryPlayer):
-        # Set up the mock object
         mock_queryPlayer.return_value = self.player
-
-        # Test that insertCaption behaves correctly
         await self.image.insertCaption("This is a caption", self.player.getUsername())
 
         # Check that the caption was inserted correctly
@@ -49,20 +45,37 @@ class TestImage(unittest.TestCase):
 
     @patch('ArcadeGenTest.PlayersManager.queryPlayer')
     async def test_add_players_tricked(self, mock_queryPlayer):
-        # Set up the mock objects
-        mock_queryPlayer.side_effect = [self.player, self.player_other]
+        mock_queryPlayer.side_effect = [self.player, self.player2]
+        await self.image.insertLie("This is a lie", self.player.getUsername())
 
+        # Add a player who was tricked by the lie
+        await self.image.addPlayersTricked(self.player.getUsername(), self.player2.getUsername())
+
+        # Check that the player was added to the list of players tricked by the lie
+        self.assertIn(self.player2.getUsername(), self.image.imageLies[self.player.getUsername()][1])
+
+        async def test_getCaptionKeyboard(self):
+        # First, insert a caption
+            await self.image.insertCaption("This is a caption", self.player.getUsername())
+
+        # Get the caption keyboard
+        caption_keyboard = self.image.getCaptionKeyboard()
+
+        # Check the structure of the caption keyboard
+        self.assertIsInstance(caption_keyboard, Mock)
+        self.assertIn(("This is a caption", self.player.getUsername()), caption_keyboard)
+
+    async def test_getInlineKeyboard(self):
         # First, insert a lie
         await self.image.insertLie("This is a lie", self.player.getUsername())
 
-        # Now, add a player who was tricked by the lie
-        await self.image.addPlayersTricked(self.player.getUsername(), self.player_other.getUsername())
+        # Get the inline keyboard
+        inline_keyboard = self.image.getInlineKeyboard(self.player.getUsername())
 
-        # Check that the player was added to the list of players tricked by the lie
-        self.assertIn(self.player_other.getUsername(), self.image.imageLies[self.player.getUsername()][1])
+        # Check the structure of the inline keyboard
+        self.assertIsInstance(inline_keyboard, Mock)
+        self.assertIn(("This is a lie", self.player.getUsername()), inline_keyboard)
 
-
-    # Add more methods as needed...
 
 if __name__ == "__main__":
     unittest.main()

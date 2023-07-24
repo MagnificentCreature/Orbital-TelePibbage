@@ -7,7 +7,6 @@ Calls to this class can be made from the public function sendMessage(bot, chat, 
 import asyncio
 from os import path
 import random
-from BotController import BotInitiator
 import logging
 
 from telegram import InputMediaPhoto, error

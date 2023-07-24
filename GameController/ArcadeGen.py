@@ -4,7 +4,7 @@ import random
 from random_word import Wordnik
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
-from BotController import BotInitiator
+from BotController.BotInitiatorConstants import BotInitiatorConstants
 from Chat.DialogueReader import DialogueReader
 from Player.Player import Player
 from Player.PlayerConstants import PlayerConstants
@@ -182,7 +182,7 @@ def make_keyboard(word_list, number=1, row_size=ROW_SIZE, final_keyboard=False):
         for i, (word, header) in enumerate(word_list.items()):
             if i % row_size == 0:
                 keyboard.append([])
-            keyboard[-1].append(InlineKeyboardButton(word, callback_data=f"{BotInitiator.SEND_ARCADE_WORD}:{word}:{number}:{header}"))
+            keyboard[-1].append(InlineKeyboardButton(word, callback_data=f"{BotInitiatorConstants.SEND_ARCADE_WORD}:{word}:{number}:{header}"))
         return InlineKeyboardMarkup(keyboard)
     
     for i, word in enumerate(word_list):
@@ -190,9 +190,9 @@ def make_keyboard(word_list, number=1, row_size=ROW_SIZE, final_keyboard=False):
             row = []
             keyboard.append(row)
         if final_keyboard:
-            row.append(InlineKeyboardButton(word, callback_data=f"{BotInitiator.SEND_ARCADE_PROMPT}:{i}"))
+            row.append(InlineKeyboardButton(word, callback_data=f"{BotInitiatorConstants.SEND_ARCADE_PROMPT}:{i}"))
         else:
-            row.append(InlineKeyboardButton(word, callback_data=f"{BotInitiator.SEND_ARCADE_WORD}:{word}:{number}"))
+            row.append(InlineKeyboardButton(word, callback_data=f"{BotInitiatorConstants.SEND_ARCADE_WORD}:{word}:{number}"))
     return InlineKeyboardMarkup(keyboard)    
 
 # Function to be used to under room broadCall to send a specified list to the player
