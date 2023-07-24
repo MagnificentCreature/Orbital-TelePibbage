@@ -23,7 +23,7 @@ async def revealNextImage(bot, room, player):
       message = imageObj.showPlayersTricked()
 
       await player.send_message(bot, message, raw=True) #unsafe method?
-    # message = await image.getMessage(Player.PlayerConstants.NEXT_LIE)
+    # message = await image.getMessage(PlayerConstants.NEXT_LIE)
 
 async def revealLeaderboard(bot, room):
     leaderboardMsg = room.getLeaderboard()

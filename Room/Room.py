@@ -13,6 +13,7 @@ from GameController.Image import Image
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton, Update
 
 from Player.Player import Player
+from Player.PlayerConstants import PlayerConstants
 from Player.PlayersManager import PlayersManager
 
 class Room:
@@ -273,10 +274,10 @@ class Room:
 
         for eachPlayer in self._players:
             if eachPlayer.getUsername() == author:
-                eachPlayer.setItem(Player.PlayerConstants.HAS_VOTED, True)
+                eachPlayer.setItem(PlayerConstants.HAS_VOTED, True)
                 await eachPlayer.sendImageURL(bot, image_url)    
             else:
-                eachPlayer.setItem(Player.PlayerConstants.HAS_VOTED, False)
+                eachPlayer.setItem(PlayerConstants.HAS_VOTED, False)
                 await eachPlayer.sendImageURL(bot, image_url, reply_markup=imageObj.getInlineKeyboard(eachPlayer.getUsername()))
         # if len(self._list_copy) <= 0:
         #     return False #Return false to indicate that there are no more images to send after
@@ -430,7 +431,7 @@ class Room:
         await self.sendBattleImages(bot, finals=finals)
         # reset player voting status
         for eachPlayer in self._players:
-            eachPlayer.setItem(Player.PlayerConstants.HAS_VOTED, False)
+            eachPlayer.setItem(PlayerConstants.HAS_VOTED, False)
 
         return
     

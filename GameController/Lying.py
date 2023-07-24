@@ -2,6 +2,7 @@ import asyncio
 import random
 
 from Player.Player import Player
+from Player.PlayerConstants import PlayerConstants
 from Player.PlayersManager import PlayersManager
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 from Chat.DialogueReader import DialogueReader
@@ -25,13 +26,13 @@ async def sendNextImage(bot, room, player):
     imageList = await room.getRemainingImages(player)
     if len(imageList) <= 0:
         player.deleteMessage("LyingImage")
-        player.deleteContext(Player.PlayerConstants.NEXT_LIE.value)
-        player.setItem(Player.PlayerConstants.LIE, True)
+        player.deleteContext(PlayerConstants.NEXT_LIE.value)
+        player.setItem(PlayerConstants.LIE, True)
         return False
     image = imageList.pop(random.randint(0, len(imageList) - 1))
     if image is None:
         print("NO IMAGE WTF LOL")
-    player.setItem(Player.PlayerConstants.NEXT_LIE, image) # fill second param with image
+    player.setItem(PlayerConstants.NEXT_LIE, image) # fill second param with image
     if not await player.queryMessagekey("LyingImage"):
         await player.sendImageURL(bot, image.getImageURL(), messageKey="LyingImage", caption="Phase2caption", **{"item": "lie"}) # , reply_markup=lie_keyboard
         return True

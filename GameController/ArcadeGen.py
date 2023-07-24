@@ -7,6 +7,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from BotController import BotInitiator
 from Chat.DialogueReader import DialogueReader
 from Player.Player import Player
+from Player.PlayerConstants import PlayerConstants
 from Player.PlayersManager import PlayersManager
 import conf
 
@@ -221,7 +222,7 @@ async def recievePickedWord(username, wordList, banned=None):
             final_list = [f"{wordList[0]}, {wordList[1]}, {wordList[2]}", 
                           randomise_strings(*wordList), 
                           randomise_strings(*wordList)]
-            player.setItem(Player.PlayerConstants.ARCADE_PROMPT_LIST, final_list)
+            player.setItem(PlayerConstants.ARCADE_PROMPT_LIST, final_list)
             await player.editMessage("arcade_prompting", "ArcadePhase1p6", reply_markup=make_keyboard(final_list, row_size=1, final_keyboard=True))
         case _:
             print(wordList)

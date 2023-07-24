@@ -26,6 +26,8 @@ from telegram.ext import (
 
 import sys
 from pathlib import Path
+
+from Player.PlayerConstants import PlayerConstants
 sys.path.insert(1, str(Path(__file__).parent.parent.absolute()))
 
 from Player.Player import Player
@@ -223,7 +225,7 @@ async def take_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     context.user_data["waiting_msg"] = await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "WaitingForItems", **{'item': "prompt"})     #TODO find a way to delete this message when the next phase starts
     
-    check_items_task = asyncio.create_task(RoomHandler.checkItems(context.user_data['roomCode'], Player.PlayerConstants.PROMPT, context.bot))
+    check_items_task = asyncio.create_task(RoomHandler.checkItems(context.user_data['roomCode'], PlayerConstants.PROMPT, context.bot))
     await check_items_task
     return BotInitiator.LYING_PHASE
 
@@ -242,7 +244,7 @@ async def take_lie(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.delete()
             if not await RoomHandler.sendNextImage(context.bot, context.user_data["roomCode"], update.message.from_user.username):
                 context.user_data["waiting_msg"] = await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "WaitingForItems", **{'item': "lie"})     #TODO find a way to delete this message when the next round starts
-                await RoomHandler.checkItems(context.user_data['roomCode'], Player.PlayerConstants.LIE, context.bot)
+                await RoomHandler.checkItems(context.user_data['roomCode'], PlayerConstants.LIE, context.bot)
                 return BotInitiator.VOTING_PHASE
             return BotInitiator.LYING_PHASE
     except KeyError:
@@ -280,7 +282,7 @@ async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYP
     context.user_data["waiting_msg"] = await DialogueReader.sendMessageByID(context.bot, update.callback_query.from_user.id, "WaitingForItems", **{'item': "vote"})     #TODO find a way to delete this message when the next round starts    
     
     # checkItems returns True after everyone places vote for one image
-    if await room.checkItems(Player.PlayerConstants.HAS_VOTED, context.bot, advance=False):
+    if await room.checkItems(PlayerConstants.HAS_VOTED, context.bot, advance=False):
         #reveal
         message = await votingImage.showPlayersTricked()
 
@@ -371,7 +373,7 @@ async def handle_arcade_prompt(update: Update, context: ContextTypes.DEFAULT_TYP
     context.user_data["arcade_image"] = image
     await RoomHandler.takeImage(context.user_data['roomCode'], update.callback_query.from_user.username, image)
     
-    check_items_task = asyncio.create_task(RoomHandler.checkItems(context.user_data['roomCode'], Player.PlayerConstants.ARCADE_IMAGE, context.bot))
+    check_items_task = asyncio.create_task(RoomHandler.checkItems(context.user_data['roomCode'], PlayerConstants.ARCADE_IMAGE, context.bot))
     await check_items_task
     
     return BotInitiator.CAPTION_PHASE
@@ -391,7 +393,7 @@ async def take_caption(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.delete()
             if not await RoomHandler.sendNextImage(context.bot, context.user_data["roomCode"], update.message.from_user.username):
                 context.user_data["waiting_msg"] = await DialogueReader.sendMessageByID(context.bot, update.message.from_user.id, "WaitingForItems", **{'item': "caption"})     #TODO find a way to delete this message when the next round starts
-                await RoomHandler.checkItems(context.user_data['roomCode'], Player.PlayerConstants.CAPTION, context.bot)
+                await RoomHandler.checkItems(context.user_data['roomCode'], PlayerConstants.CAPTION, context.bot)
                 return BotInitiator.PICKING_PHASE
             return BotInitiator.CAPTION_PHASE
     except KeyError:
@@ -422,7 +424,7 @@ async def handle_pick(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     #check if everyone has picked
     context.user_data['has_picked'] = True
-    await RoomHandler.checkItems(context.user_data['roomCode'], Player.PlayerConstants.HAS_PICKED, context.bot)
+    await RoomHandler.checkItems(context.user_data['roomCode'], PlayerConstants.HAS_PICKED, context.bot)
 
     return BotInitiator.BATTLE_PHASE
 
@@ -456,7 +458,7 @@ async def battle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYP
     # context.user_data["waiting_msg"] = await DialogueReader.sendMessageByID(context.bot, update.callback_query.from_user.id, "WaitingForItems", **{'item': "vote"})     #TODO find a way to delete this message when the next round starts
     
     # checkItems returns True after everyone places vote for one image
-    if await room.checkItems(Player.PlayerConstants.HAS_VOTED, context.bot, advance=False):
+    if await room.checkItems(PlayerConstants.HAS_VOTED, context.bot, advance=False):
         #reveal
         if await room.advanceBattle(context.bot, finals=finals):
             await RoomHandler.endGame(context.user_data['roomCode'], context.bot)
