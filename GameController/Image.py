@@ -179,6 +179,8 @@ class Image:
         sortedLies = sorted(self.imageLies.items(), key=lambda x:len(x[1][1]), reverse=True)
         mostPopularPrompt = "BEST PROMPT: " + sortedLies[0][1][0]
         
+        del self.imageLies[self.author] # remove original prompt from dictionary of image lies
+
         # check if there is already a bgFrame.png
         
         if not os.path.isfile(f"{IMAGE_ASSETS_PATH}bgFrame.png"):
