@@ -234,13 +234,29 @@ class Image:
 
     async def captionImage(self):
         imagePng = MyImage.open(self.imageURL)
-        # TODO: edit the caption onto the image
-        self.captionImage = imagePng
+        font = ImageFont.load_default()
+        caption = self.getPrompt()
+
+        # calc position of text
+        draw = ImageDraw.Draw(imagePng)
+        text_width, text_height = draw.textsize(caption, font)
+        x = (imagePng.width - text_width) // 2
+        y = imagePng.height - text_height - 10
+
+        # draw black background textbox
+        draw.rectangle([x - 5, y - 5, x + text_width + 5, y + text_height + 5],
+                       fill="black"
+        )
+
+        # draw white text for caption
+        draw.text((x, y), caption, font=font, fill="white")
+
+        self.captionedImage = imagePng
 
     async def getCaptionedImage(self):
         # TODO: return the captioned image, this should be a BytesIO object
         bio = BytesIO() # got to import BytesIO from io
-        framedFinalImage = await self.captionedImage
+        framedFinalImage = self.captionedImage
         framedFinalImage.save(bio, 'PNG')
 
         return bio
