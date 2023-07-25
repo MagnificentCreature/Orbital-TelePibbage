@@ -118,12 +118,10 @@ def get_random_elements_dict(data, num_elements=6, banned=None):
         random_element = get_random_element(data, banned)
         if random_element[0] is None or random_element[1] is None:
             print(random_element)
-            print("HMMMMMMMMMMMMMMMMMMMM")
         random_elements[random_element[1]] = random_element[0]
     if len(random_elements) < num_elements:
         print(random_elements)
         print(random_element)
-        print("WTF IS GOING ON HERE")
     return random_elements
 
 wordnik_service = Wordnik(api_key=WORDNIK_API_KEY)
@@ -133,8 +131,9 @@ def get_random_word():
 
 #Should I make it more common for nouns to show up (ie change ratio of nouns to verbs?)
 def get_random_word_list(length=6):
+    word_list = []
     word_list = wordnik_service.get_random_words(hasDictionaryDef="true", includePartOfSpeech="noun,verb", minCorpusCount=MIN_CORPUS_COUNT, minDictionaryCount=20, limit=length)
-    while len(word_list) < length:
+    while word_list is None or len(word_list) < length:
         word_list.append(get_random_word())
     return word_list
 

@@ -236,32 +236,32 @@ class Image:
 
     def captionImage(self):
 
+        caption = self.choosenCaption[0]
+
         response = requests.get(self.imageURL)    
         response.raise_for_status()
 
         imagePng = MyImage.open(BytesIO(response.content))
         
-        font = ImageFont.truetype(f"{FONT_ASSETS_PATH}arial.ttf", 35)
-        caption = self.choosenCaption[0]
-
+        font = ImageFont.truetype(f"{FONT_ASSETS_PATH}arial.ttf", 30)
         # calc position of text
         draw = ImageDraw.Draw(imagePng)
-        left, top, right, bottom = draw.textbbox(caption, font)
+
+        left, top, right, bottom = draw.textbbox((0,0), caption, font=font)
         text_width = right - left
         text_height = top - bottom
-        # text_width, text_height = draw.textbbox(caption, font)
 
-        x = (imagePng.width - text_width) // 2
-        y = imagePng.height - text_height - 10
-        # draw.text((x, y), caption, font=font, fill=(0, 0, 0))
+        y_text = 40
 
-        # draw black background textbox
-        draw.rectangle([x - 5, y - 5, x + text_width + 5, y + text_height + 5],
-                       fill="black"
-        )
+        lines = textwrap.wrap(caption, width=26, max_lines=3)
 
-        # draw white text for caption
-        draw.text((x, y), caption, font=font, fill="white")
+        for i, line in enumerate(lines):
+            left, top, right, bottom = draw.textbbox((0,0), line, font=font)
+            text_width = right - left
+            text_height = top - bottom
+            x = (imagePng.width - text_width) // 2
+            y = (imagePng.height - text_height) // 2 + 100
+            draw.text((x, y + i*y_text), line, font=font, fill="black", stroke_width=2, stroke_fill="white")
 
         self.captionedImage = imagePng
 

@@ -332,8 +332,8 @@ class Room:
     async def broadcastLeaderboardArcade(self, bot, winner):
         # show the final leaderboard sequence
         await self.broadcast(bot, "ArcadePhase5p1", parse_mode=DialogueReader.MARKDOWN, **{'AIrtist':f"{winner.getAuthor()}", 'captioner':f"{winner.getCaptionAuthor()}"})
-        winner.saveFramedImage()
-        await self.broadcastImage(InputMediaPhoto(winner.getFramedImage()))
+        winner.saveFrameImage()
+        await self.broadcastImage(bot, InputMediaPhoto(winner.getFramedImage()))
     
     #Calculates the battle winner and sends the victory message to the players
     async def broadcastBattleWinner(self, bot):
@@ -377,7 +377,7 @@ class Room:
             ]
         ])
 
-        mediaGroup = [await image.getCaptionedImage() for image in self._current_battle_images] #TODO: Change this to the proper image canvas thing
+        mediaGroup = [image.getCaptionedImage() for image in self._current_battle_images]
         # delete the old leaderboard (and possibly the old media group, if editting is not possible) (player.deleteMessage should handle errors if it doesn't exist yet)
         for eachPlayer in self._players:
             await eachPlayer.deleteMessageList("battle_images")
