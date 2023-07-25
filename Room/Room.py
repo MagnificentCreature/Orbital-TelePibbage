@@ -75,7 +75,7 @@ class Room:
                 image.seek(0)
                 await eachPlayer.sendImageURL(bot, image, messageKey=messageKey, reply_markup=reply_markup, caption=caption, raw=raw, parse_mode=parse_mode, **kwargs)
             return
-        for player in self._players:
+        for eachPlayer in self._players:
             await eachPlayer.sendImageURL(bot, image, messageKey=messageKey, reply_markup=reply_markup, caption=caption, raw=raw, parse_mode=parse_mode, **kwargs)
 
     async def broadCall(self, bot, func):
@@ -333,7 +333,7 @@ class Room:
         # show the final leaderboard sequence
         await self.broadcast(bot, "ArcadePhase5p1", parse_mode=DialogueReader.MARKDOWN, **{'AIrtist':f"{winner.getAuthor()}", 'captioner':f"{winner.getCaptionAuthor()}"})
         winner.saveFrameImage()
-        await self.broadcastImage(bot, InputMediaPhoto(winner.getFramedImage()))
+        await self.broadcastImage(bot, winner.getFramedImage())
     
     #Calculates the battle winner and sends the victory message to the players
     async def broadcastBattleWinner(self, bot):

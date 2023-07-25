@@ -161,9 +161,15 @@ def randomise_strings(*strings):
     strings = list(strings)
     random.shuffle(strings)
     result = ""
-    for i in range(len(strings) - 1):
-        # result += strings[i] + " " +  random.choice(_prepositions) + " "
-        result += strings[i] + ", "
+    if random.randint(0, 1) == 0:
+        result += strings[0] + " " +  random.choice(_prepositions) + " "
+        result += strings[1] + ", "
+    else:
+        result += strings[0] + ", "
+        result += strings[1] + " " +  random.choice(_prepositions) + " "
+    # for i in range(len(strings) - 1):
+    #     result += strings[i] + " " +  random.choice(_prepositions) + " "
+    #     result += strings[i] + ", "
     result += strings[-1]
     return result
 

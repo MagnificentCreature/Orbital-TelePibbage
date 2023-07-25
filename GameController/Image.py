@@ -253,7 +253,7 @@ class Image:
 
         y_text = 40
 
-        lines = textwrap.wrap(caption, width=26, max_lines=3)
+        lines = textwrap.wrap(caption, width=27, max_lines=3)
 
         for i, line in enumerate(lines):
             left, top, right, bottom = draw.textbbox((0,0), line, font=font)
