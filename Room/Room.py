@@ -8,7 +8,7 @@ import random
 from BotController.BotInitiatorConstants import BotInitiatorConstants
 from Chat.DialogueReader import DialogueReader
 from GameController import ArcadeGen, Battle, Caption, CaptionSelection, Prompting, Lying, Voting, Reveal
-from telegram import InlineKeyboardMarkup, InlineKeyboardButton, Update
+from telegram import InlineKeyboardMarkup, InlineKeyboardButton, InputMediaPhoto, Update
 from io import BytesIO
 import PIL.Image as MyImage
 import urllib.request
@@ -332,7 +332,8 @@ class Room:
     async def broadcastLeaderboardArcade(self, bot, winner):
         # show the final leaderboard sequence
         await self.broadcast(bot, "ArcadePhase5p1", parse_mode=DialogueReader.MARKDOWN, **{'AIrtist':f"{winner.getAuthor()}", 'captioner':f"{winner.getCaptionAuthor()}"})
-        return
+        winner.saveFramedImage()
+        await self.broadcastImage(InputMediaPhoto(winner.getFramedImage()))
     
     #Calculates the battle winner and sends the victory message to the players
     async def broadcastBattleWinner(self, bot):
@@ -375,7 +376,7 @@ class Room:
                 finals_right_button
             ]
         ])
-        
+
         mediaGroup = [await image.getCaptionedImage() for image in self._current_battle_images] #TODO: Change this to the proper image canvas thing
         # delete the old leaderboard (and possibly the old media group, if editting is not possible) (player.deleteMessage should handle errors if it doesn't exist yet)
         for eachPlayer in self._players:

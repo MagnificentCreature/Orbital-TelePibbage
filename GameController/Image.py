@@ -241,12 +241,12 @@ class Image:
 
         imagePng = MyImage.open(BytesIO(response.content))
         
-        font = ImageFont.load_default()
+        font = ImageFont.truetype(f"{FONT_ASSETS_PATH}arial.ttf", 35)
         caption = self.choosenCaption[0]
 
         # calc position of text
         draw = ImageDraw.Draw(imagePng)
-        text_width, text_height = draw.textsize(caption, font, 32)
+        text_width, text_height = draw.textsize(caption, font)
         x = (imagePng.width - text_width) // 2
         y = imagePng.height - text_height - 10
 
