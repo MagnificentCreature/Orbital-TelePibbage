@@ -200,10 +200,10 @@ class Image:
         # check if there is already a bgFrame.png
         if not os.path.isfile(f"{IMAGE_ASSETS_PATH}bgFrame.png"):
             urllib.request.urlretrieve("https://i.imgur.com/UN0tpJR.png", f"{IMAGE_ASSETS_PATH}bgFrame.png")
-            response = requests.get(self.imageURL)    
-            response.raise_for_status()
-
         background = MyImage.open(f"{IMAGE_ASSETS_PATH}.png")
+
+        response = requests.get(self.imageURL)    
+        response.raise_for_status()
         sample = MyImage.open(BytesIO(response.content))
 
         background.paste(sample, (245, 206))
