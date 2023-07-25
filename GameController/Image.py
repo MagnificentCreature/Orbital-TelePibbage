@@ -234,7 +234,7 @@ class Image:
 
         return bio
 
-    async def captionImage(self):
+    def captionImage(self):
 
         response = requests.get(self.imageURL)    
         response.raise_for_status()
@@ -242,11 +242,12 @@ class Image:
         imagePng = MyImage.open(BytesIO(response.content))
         
         font = ImageFont.load_default()
-        caption = self.choosenCaption
+        caption = self.choosenCaption[0]
+        print(f"caption {caption}")
 
         # calc position of text
         draw = ImageDraw.Draw(imagePng)
-        text_width, text_height = draw.textsize(caption, font)
+        text_width, text_height = draw.textsize(caption, font, 32)
         x = (imagePng.width - text_width) // 2
         y = imagePng.height - text_height - 10
 
