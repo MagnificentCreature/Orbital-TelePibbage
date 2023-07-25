@@ -375,6 +375,7 @@ class Room:
                 finals_right_button
             ]
         ])
+        
         mediaGroup = [await image.getCaptionedImage() for image in self._current_battle_images] #TODO: Change this to the proper image canvas thing
         # delete the old leaderboard (and possibly the old media group, if editting is not possible) (player.deleteMessage should handle errors if it doesn't exist yet)
         for eachPlayer in self._players:

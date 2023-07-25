@@ -103,6 +103,7 @@ class Image:
         return InlineKeyboardMarkup(caption_buttons)
     
     def selectCaption(self, captionNum, author):
+        self.captionImage()
         self.choosenCaption = (self.imageCaptions[captionNum][0], author)
 
     def getCaption(self):
