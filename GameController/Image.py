@@ -246,9 +246,14 @@ class Image:
 
         # calc position of text
         draw = ImageDraw.Draw(imagePng)
-        text_width, text_height = draw.textsize(caption, font)
+        left, top, right, bottom = draw.textbbox(caption, font)
+        text_width = right - left
+        text_height = top - bottom
+        # text_width, text_height = draw.textbbox(caption, font)
+
         x = (imagePng.width - text_width) // 2
         y = imagePng.height - text_height - 10
+        # draw.text((x, y), caption, font=font, fill=(0, 0, 0))
 
         # draw black background textbox
         draw.rectangle([x - 5, y - 5, x + text_width + 5, y + text_height + 5],
