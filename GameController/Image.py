@@ -103,8 +103,9 @@ class Image:
         return InlineKeyboardMarkup(caption_buttons)
     
     def selectCaption(self, captionNum, author):
-        self.captionImage()
+        print('image captioned')
         self.choosenCaption = (self.imageCaptions[captionNum][0], author)
+        self.captionImage()
 
     def getCaption(self):
         return self.choosenCaption[0]
@@ -236,7 +237,7 @@ class Image:
     async def captionImage(self):
         imagePng = MyImage.open(self.imageURL)
         font = ImageFont.load_default()
-        caption = self.getPrompt()
+        caption = self.choosenCaption
 
         # calc position of text
         draw = ImageDraw.Draw(imagePng)
