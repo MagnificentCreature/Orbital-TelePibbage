@@ -39,7 +39,7 @@ ArcadePhase1p2, Have some sympathy ya, moi beautiful art pieces do not come chea
 ArcadePhase1p3, Bellow you will see some magic words I pulled out of my magic hat, find one that fancies your imagination and send it to me, I will convert it into a beautiful piece of art for you to hang in my museum!\n\nNote: If the buttons are unresponsive, wait a few seconds and try again, it could be processing other requests
 ArcadePhase1p4, Perfect, now pick another enchanted word...
 ArcadePhase1p5, Last word, something that will elevate your work into a masterpiece.
-ArcadePhase1p6, Now some finishing touches, to tie the cryptic spell all together,
+ArcadePhase1p6, Now some finishing touches, to tie the cryptic spell all together.
 ArcadePhase1p7, *{prompt}\!\?\!*\nOOOoo YES\! I can feel the potential in this one, now let me throw those words into my magic hat and see what I can pull out\.\.\. this might take a while\.\.\. let me go prepare the canvas\.\.\.
 ArcadePhase2p1, *Your masterpiece is almost ready\!* But before that, I appear to have lost the labels on some of my other images in the museum\. Rather than going through the trouble of finding them, I'll just ask you to *make up new labels for me\!*
 ArcadePhase2p2, I'm sure a connoisseur such as yourself can perfectly capture its creators intent and can "cook" something that will "knock the shoes out of" the wider audience and blow its creators mind? hmm?
