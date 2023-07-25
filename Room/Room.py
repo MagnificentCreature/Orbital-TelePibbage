@@ -67,7 +67,7 @@ class Room:
     
     async def broadcast(self, bot, message, messageKey=None, reply_markup=None, raw=False, parse_mode=None, **kwargs):
         for player in self._players:
-            await player.sendMessage(bot, message, messageKey, reply_markup, raw=raw, parse_mode=parse_mode,**kwargs)
+            await player.sendMessage(bot, message, messageKey=messageKey, reply_markup=reply_markup, raw=raw, parse_mode=parse_mode,**kwargs)
 
     async def broadcastImage(self, bot, image, caption=None, messageKey=None, reply_markup=None, raw=False, parse_mode=None, **kwargs):
         if isinstance(image, BytesIO):
