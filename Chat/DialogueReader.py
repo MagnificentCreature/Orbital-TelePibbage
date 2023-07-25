@@ -5,6 +5,7 @@ Calls to this class can be made from the public function sendMessage(bot, chat, 
 """
 
 import asyncio
+from io import BytesIO
 from os import path
 import random
 import logging
@@ -160,7 +161,7 @@ class DialogueReader:
     @classmethod
     async def sendMediaGroupByID(cls, bot, chat_id, mediaGroup, caption=None, exponential_backoff=1, raw=False, parse_mode=None, **kwargs):
         #TODO: Decide to keep or remove this
-        if isinstance(mediaGroup[0], str):
+        if isinstance(mediaGroup[0], str) or isinstance(mediaGroup[0], BytesIO):
             mediaGroup = [InputMediaPhoto(media) for media in mediaGroup]
         try:
             try:

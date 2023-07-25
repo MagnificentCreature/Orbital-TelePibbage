@@ -4,11 +4,15 @@ Class that holds data about rooms
 from enum import Enum
 import asyncio
 import random
+
 from BotController.BotInitiatorConstants import BotInitiatorConstants
 from Chat.DialogueReader import DialogueReader
 from GameController import ArcadeGen, Battle, Caption, CaptionSelection, Prompting, Lying, Voting, Reveal
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton, Update
 from io import BytesIO
+import PIL.Image as MyImage
+import urllib.request
+
 
 from Player.PlayerConstants import PlayerConstants
 
@@ -64,6 +68,16 @@ class Room:
     async def broadcast(self, bot, message, messageKey=None, reply_markup=None, raw=False, parse_mode=None, **kwargs):
         for player in self._players:
             await player.sendMessage(bot, message, messageKey, reply_markup, raw=raw, parse_mode=parse_mode,**kwargs)
+
+    async def broadcastImage(self, bot, image, messageKey=None, reply_markup=None, raw=False, parse_mode=None, **kwargs):
+        #NOTE: finalImage is a GameController.Image object
+        if isinstance(image, BytesIO):
+            for eachPlayer in self._players:
+                image.seek(0)
+                await eachPlayer.sendImageURL(bot, image, messageKey, reply_markup, raw=raw, parse_mode=parse_mode, **kwargs)
+            return
+        for player in self._players:
+            await player.sendImageURL(bot, image, messageKey, reply_markup, raw=raw, parse_mode=parse_mode, **kwargs)
 
     async def broadCall(self, bot, func):
         for player in self._players:
@@ -164,10 +178,8 @@ class Room:
                     self._state = Room.State.PROMPTING_STATE
                 case Room.State.PROMPTING_STATE:
                     await Lying.beginPhase2(bot, self)
-                    # TODO: Maybe delete the players usercontext['prompt']?
                     self._state = Room.State.LYING_STATE
                 case Room.State.LYING_STATE:
-                    # TODO: Maybe delete the players usercontext['lies']?
                     self._list_copy = self._list_of_images.copy() # TODO: Move this into VotingPhase3
                     await Voting.beginPhase3(bot, self)
                     self._state = Room.State.VOTING_STATE
@@ -282,16 +294,6 @@ class Room:
     async def getVotingImage(self):
         return self._current_voting_image
     
-    async def broadcastFramedImage(self, bot, finalImage):
-        #NOTE: finalImage is a GameController.Image object
-        bio = BytesIO() # got to import BytesIO from io
-        framedFinalImage = await finalImage.getFramedImage()
-        framedFinalImage.save(bio, 'PNG')
-                              
-        for eachPlayer in self._players:
-            bio.seek(0)
-            await eachPlayer.sendImageURL(bot, bio)
-    
     def getLeaderboard(self):
         leaderboard = sorted(self._players, key=lambda player: player.getScore(), reverse=True)
         message = f"*☆☆☆☆☆{leaderboard[0]}☆☆☆☆☆*\n"
@@ -313,15 +315,6 @@ class Room:
         # Randomly pop two to add into the current_battle_images
         image1 = self._list_copy.pop(random.randint(0, len(self._list_copy) - 1))
         image2 = self._list_copy.pop(random.randint(0, len(self._list_copy) - 1))
-        
-        image1_url = self._list_copy.pop(random.randint(0, len(self._list_copy) - 1)).getImageURL()
-        image2_url = self._list_copy.pop(random.randint(0, len(self._list_copy) - 1)).getImageURL()
-
-        # Get the images using urllib.request
-        image1 = Image.open(urllib.request.urlopen(image1_url))
-        image2 = Image.open(urllib.request.urlopen(image2_url))
-
-        self._current_battle_images = (image1, image2)
         
         self._current_battle_images = (image1, image2)
 
@@ -353,7 +346,7 @@ class Room:
         # handle case where there is a tie
         if self._current_battle_images[0].getVoteCount() == self._current_battle_images[1].getVoteCount():
             winner = random.choice(self._current_battle_images)
-            message += f"\n*Seems like we have a tie\!*\nBut I prefer this one\!\n"
+            message += f"\n*Seems like we have a tie\!*\nBut I prefer this ^^^ one\!\n"
         else:
             winner = max(self._current_battle_images, key=lambda image: image.getVoteCount())
 
@@ -383,7 +376,7 @@ class Room:
                 finals_right_button
             ]
         ])
-        mediaGroup = [image.getImageURL() for image in self._current_battle_images] #TODO: Change this to the proper image canvas thing
+        mediaGroup = [image.getCaptionedImage() for image in self._current_battle_images] #TODO: Change this to the proper image canvas thing
         # delete the old leaderboard (and possibly the old media group, if editting is not possible) (player.deleteMessage should handle errors if it doesn't exist yet)
         for eachPlayer in self._players:
             await eachPlayer.deleteMessageList("battle_images")
@@ -399,7 +392,7 @@ class Room:
                     continue
                 await eachPlayer.sendMessage(bot, "ArcadePhase4pChallenger", messageKey="battle_winner", reply_markup=finals_keyboard, parse_mode=DialogueReader.MARKDOWN)
                 continue
-            await eachPlayer.sendMessage(bot, "ArcadePhase4p3", messageKey="battle_winner", reply_markup=voting_keyboard) #todo set reply_markup 
+            await eachPlayer.sendMessage(bot, "ArcadePhase4p3", messageKey="battle_winner", reply_markup=voting_keyboard)
         return
     
     async def advanceBattle(self, bot, finals=False):
