@@ -114,14 +114,11 @@ def get_random_elements(data, num_elements=6, banned=None):
 # Returns a dict of elements from get_random_element by (random_element, header)
 def get_random_elements_dict(data, num_elements=6, banned=None):
     random_elements = {}
-    for _ in range(num_elements):
+    for i in range(num_elements):
         random_element = get_random_element(data, banned)
-        if random_element[0] is None or random_element[1] is None:
-            print(random_element)
+        while random_element[1] in random_elements:
+            random_element = get_random_element(data, banned)
         random_elements[random_element[1]] = random_element[0]
-    if len(random_elements) < num_elements:
-        print(random_elements)
-        print(random_element)
     return random_elements
 
 wordnik_service = Wordnik(api_key=WORDNIK_API_KEY)

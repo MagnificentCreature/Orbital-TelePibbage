@@ -285,7 +285,7 @@ async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYP
         await asyncio.sleep(2)
 
         # Broadcast the framed image if its popular
-        if await votingImage.saveFrameImage():
+        if votingImage.saveFrameImage():
             await room.broadcastImage(context.bot, votingImage.getFramedImage(), caption="Phase3BONUS")
             await asyncio.sleep(3)
 
