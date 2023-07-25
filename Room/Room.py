@@ -332,7 +332,7 @@ class Room:
     async def broadcastLeaderboardArcade(self, bot, winner):
         # show the final leaderboard sequence
         await self.broadcast(bot, "ArcadePhase5p1", parse_mode=DialogueReader.MARKDOWN, **{'AIrtist':f"{winner.getAuthor()}", 'captioner':f"{winner.getCaptionAuthor()}"})
-        winner.saveFrameImage()
+        winner.saveFrameImage(custom_caption=winner.getCaption())
         await self.broadcastImage(bot, winner.getFramedImage())
     
     #Calculates the battle winner and sends the victory message to the players
