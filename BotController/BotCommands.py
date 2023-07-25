@@ -281,9 +281,14 @@ async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYP
     if await room.checkItems(PlayerConstants.HAS_VOTED, context.bot, advance=False):
         #reveal
         message = await votingImage.showPlayersTricked()
-
         await room.broadcast(context.bot, message=message, raw=True, parse_mode=DialogueReader.MARKDOWN)
         await asyncio.sleep(2)
+
+        # Broadcast the framed image if its popular
+        if await votingImage.saveFrameImage():
+            await room.broadcastImage(context.bot, votingImage.getFramedImage(), caption="Phase3BONUS")
+            await asyncio.sleep(3)
+
         hasNext = await room.broadcast_voting_image(context.bot)
         if not hasNext:
             await room.advanceState(context.bot)

@@ -69,15 +69,14 @@ class Room:
         for player in self._players:
             await player.sendMessage(bot, message, messageKey, reply_markup, raw=raw, parse_mode=parse_mode,**kwargs)
 
-    async def broadcastImage(self, bot, image, messageKey=None, reply_markup=None, raw=False, parse_mode=None, **kwargs):
-        #NOTE: finalImage is a GameController.Image object
+    async def broadcastImage(self, bot, image, caption=None, messageKey=None, reply_markup=None, raw=False, parse_mode=None, **kwargs):
         if isinstance(image, BytesIO):
             for eachPlayer in self._players:
                 image.seek(0)
-                await eachPlayer.sendImageURL(bot, image, messageKey, reply_markup, raw=raw, parse_mode=parse_mode, **kwargs)
+                await eachPlayer.sendImageURL(bot, image, messageKey=messageKey, reply_markup=reply_markup, caption=caption, raw=raw, parse_mode=parse_mode, **kwargs)
             return
         for player in self._players:
-            await player.sendImageURL(bot, image, messageKey, reply_markup, raw=raw, parse_mode=parse_mode, **kwargs)
+            await eachPlayer.sendImageURL(bot, image, messageKey=messageKey, reply_markup=reply_markup, caption=caption, raw=raw, parse_mode=parse_mode, **kwargs)
 
     async def broadCall(self, bot, func):
         for player in self._players:
