@@ -243,7 +243,6 @@ class Image:
         
         font = ImageFont.load_default()
         caption = self.choosenCaption[0]
-        print(f"caption {caption}")
 
         # calc position of text
         draw = ImageDraw.Draw(imagePng)
@@ -259,13 +258,13 @@ class Image:
         # draw white text for caption
         draw.text((x, y), caption, font=font, fill="white")
 
-        print('i am run')
         self.captionedImage = imagePng
 
-    async def getCaptionedImage(self):
+    def getCaptionedImage(self):
         # TODO: return the captioned image, this should be a BytesIO object
         bio = BytesIO() # got to import BytesIO from io
         framedFinalImage = self.captionedImage
         framedFinalImage.save(bio, 'PNG')
+        bio.seek(0)
 
         return bio
