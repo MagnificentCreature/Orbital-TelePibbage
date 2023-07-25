@@ -235,7 +235,12 @@ class Image:
         return bio
 
     async def captionImage(self):
-        imagePng = MyImage.open(self.imageURL)
+
+        response = requests.get(self.imageURL)    
+        response.raise_for_status()
+
+        imagePng = MyImage.open(BytesIO(response.content))
+        
         font = ImageFont.load_default()
         caption = self.choosenCaption
 
@@ -253,6 +258,7 @@ class Image:
         # draw white text for caption
         draw.text((x, y), caption, font=font, fill="white")
 
+        print('i am run')
         self.captionedImage = imagePng
 
     async def getCaptionedImage(self):
