@@ -157,7 +157,7 @@ class Room:
             self._host = self._players[1]
             # Send new host the host message
             keyboard = BotInitiatorConstants.StartGameButtons.copy()
-            keyboard[0][1].text = f"Change to {self._mode.value} Game Mode"
+            keyboard[1][0] = InlineKeyboardButton(text=f"Change to {self.get_other_member(self._mode).value} Game Mode", callback_data=str(BotInitiatorConstants.CHANGE_MODE))
             await self._host.editMessage("waiting_to_start", "StartGameOption", newMessageKey="start_game_option", reply_markup=InlineKeyboardMarkup(keyboard), parse_mode=DialogueReader.MARKDOWN, **{'gameMode':self._mode.value})
         self._players.remove(player)
         await self.__leaveRoomMessages()

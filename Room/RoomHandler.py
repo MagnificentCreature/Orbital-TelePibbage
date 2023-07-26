@@ -6,7 +6,7 @@ So keeping track of who is in which room is important, and each player can only 
 
 import random
 
-from telegram import InlineKeyboardMarkup
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from BotController.BotInitiatorConstants import BotInitiatorConstants
 from Chat.DialogueReader import DialogueReader
 from GameController import Caption, Lying
@@ -88,8 +88,10 @@ class RoomHandler:
             await host.sendMessage(bot, "RoomCreationFailed")
             return False
         
-        # send start game message to host
-        await host.sendMessage(bot, "StartGameOption", messageKey="start_game_option", reply_markup=InlineKeyboardMarkup(BotInitiatorConstants.StartGameButtons), parse_mode=DialogueReader.MARKDOWN, **{'gameMode':room.getMode().value})
+        # send start game message to 
+        keyboard = BotInitiatorConstants.StartGameButtons.copy()
+        keyboard[1][0] = InlineKeyboardButton(text=f"Change to Arcade Game Mode", callback_data=str(BotInitiatorConstants.CHANGE_MODE))
+        await host.sendMessage(bot, "StartGameOption", messageKey="start_game_option", reply_markup=InlineKeyboardMarkup(keyboard), parse_mode=DialogueReader.MARKDOWN, **{'gameMode':room.getMode().value})
         
         return True
     
