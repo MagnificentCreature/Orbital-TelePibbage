@@ -281,9 +281,14 @@ async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYP
     if await room.checkItems(PlayerConstants.HAS_VOTED, context.bot, advance=False):
         #reveal
         message = await votingImage.showPlayersTricked()
-
         await room.broadcast(context.bot, message=message, raw=True, parse_mode=DialogueReader.MARKDOWN)
         await asyncio.sleep(2)
+
+        # Broadcast the framed image if its popular
+        if votingImage.saveFrameImage():
+            await room.broadcastImage(context.bot, votingImage.getFramedImage(), caption="Phase3BONUS")
+            await asyncio.sleep(3)
+
         hasNext = await room.broadcast_voting_image(context.bot)
         if not hasNext:
             await room.advanceState(context.bot)
@@ -424,8 +429,8 @@ async def handle_pick(update: Update, context: ContextTypes.DEFAULT_TYPE):
     #produce the image
 
     #send the new image to the player
-    await update.callback_query.edit_message_media(InputMediaPhoto(context.user_data['arcade_image'].getImageURL())) #TODO: Replace with new Canvas'd image
-    await DialogueReader.sendMessageByID(context.bot, update.callback_query.from_user.id, context.user_data['arcade_image'].getCaption(), raw=True)
+    await update.callback_query.edit_message_media(InputMediaPhoto(context.user_data['arcade_image'].getCaptionedImage())) 
+    # await DialogueReader.sendMessageByID(context.bot, update.callback_query.from_user.id, context.user_data['arcade_image'].getCaption(), raw=True)
 
     #check if everyone has picked
     context.user_data['has_picked'] = True

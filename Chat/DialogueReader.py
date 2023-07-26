@@ -5,6 +5,7 @@ Calls to this class can be made from the public function sendMessage(bot, chat, 
 """
 
 import asyncio
+from io import BytesIO
 from os import path
 import random
 import logging
@@ -162,11 +163,15 @@ class DialogueReader:
         #TODO: Decide to keep or remove this
         if isinstance(mediaGroup[0], str):
             mediaGroup = [InputMediaPhoto(media) for media in mediaGroup]
+        elif isinstance(mediaGroup[0], BytesIO):
+            for i, media in enumerate(mediaGroup):
+                media.seek(0)
+                mediaGroup[i] = InputMediaPhoto(media)
         try:
             try:
                 try:
                     if raw or caption is None:
-                        return await bot.send_media_group(chat_id=chat_id, media=mediaGroup, caption=caption, parse_mode=parse_mode)
+                        return await bot.send_media_group(chat_id, mediaGroup, caption=caption, parse_mode=parse_mode)
                     if (caption not in cls._dialogues):
                         print("Message " + caption + " not found in dialogues.txt")
                     if len(kwargs) != 0:
@@ -177,7 +182,7 @@ class DialogueReader:
                 except error.BadRequest as badReqError:
                     print("BadReqError " + str(badReqError))
                     try:
-                        asyncio.sleep(1)
+                        await asyncio.sleep(1)
                         if raw or caption is None:
                             return await bot.send_media_group(chat_id=chat_id, media=mediaGroup, caption=caption, parse_mode=parse_mode)
                         return await bot.send_media_group(chat_id=chat_id, media=mediaGroup, caption=formattedText, parse_mode=parse_mode)
