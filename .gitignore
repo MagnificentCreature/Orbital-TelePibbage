@@ -1,6 +1,6 @@
 #Testing files
 Testing*.py
-PromptReadingTest.py
+*PromptReadingTest.py
 
 #Bot API tokens
 conf.py
