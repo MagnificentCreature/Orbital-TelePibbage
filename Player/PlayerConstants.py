@@ -1,6 +1,7 @@
 from enum import Enum
 
 class PlayerConstants(Enum):
+    IN_GAME = "in_game"
     PRESSING_BUTTON = "pressing_button"
     WAITING_MSG = "waiting_msg"
     PROMPT = "prompt"

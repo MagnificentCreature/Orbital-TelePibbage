@@ -22,7 +22,7 @@ class Room:
     _players = [] #contains list of player objects
     _shuffled_players = [] #contains list of player objects but shuffled for arcade mode
     MAX_PLAYERS = 8
-    MIN_PLAYERS = 2
+    MIN_PLAYERS = 3
     _mode = None #game mode
     _state = 0 # 0 = join state, 1 = game state
     _list_of_images = []

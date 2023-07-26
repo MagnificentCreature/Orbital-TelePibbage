@@ -130,6 +130,8 @@ async def join_room(update: Update, context: ContextTypes.DEFAULT_TYPE, roomCode
     return BotInitiatorConstants.INROOM
 
 async def return_to_fresh(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if context.user_data['in_game']:
+        return
     if context.user_data['roomCode'] == "":
         await update.callback_query.edit_message_text(text=DialogueReader.queryDialogue("ReturningToStart"))
     else:
