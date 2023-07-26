@@ -39,13 +39,13 @@ ArcadePhase1p2, Have some sympathy ya, moi beautiful art pieces do not come chea
 ArcadePhase1p3, Bellow you will see some magic words I pulled out of my magic hat, find one that fancies your imagination and send it to me, I will convert it into a beautiful piece of art for you to hang in my museum!\n\nNote: If the buttons are unresponsive, wait a few seconds and try again, it could be processing other requests
 ArcadePhase1p4, Perfect, now pick another enchanted word...
 ArcadePhase1p5, Last word, something that will elevate your work into a masterpiece.
-ArcadePhase1p6, Now some finishing touches, to tie the cryptic spell all together.
+ArcadePhase1p6, Now some finishing touches, to tie the cryptic spell together.
 ArcadePhase1p7, *{prompt}\!\?\!*\nOOOoo YES\! I can feel the potential in this one, now let me throw those words into my magic hat and see what I can pull out\.\.\. this might take a while\.\.\. let me go prepare the canvas\.\.\.
 ArcadePhase2p1, *Your masterpiece is almost ready\!* But before that, I appear to have lost the labels on some of my other images in the museum\. Rather than going through the trouble of finding them, I'll just ask you to *make up new labels for me\!*
-ArcadePhase2p2, I'm sure a connoisseur such as yourself can perfectly capture its creators intent and can "cook" something that will "knock the shoes out of" the wider audience and blow its creators mind? hmm?
+ArcadePhase2p2, I'm sure a connoisseur such as yourself can perfectly capture its creator's intent and can "cook" something that will "knock the shoes out of" the wider audience and blow its creator's mind? hmm?
 ArcadePhase3p1, *Look at what a beauty you made\!* Now, your fellow brilliant articAIns have conjured some SPLENDID labels\! *Pick the one you think best fits our image on the wall\.* 
 ArcadePhase4p1, Your masterpiece is now finally complete and on canvas\!\nIt seems there is only one thing left to do, a *BATTLE OF FIRE AND FLAMES UNTIL ONLY ONE REMAINS\!\!\!*
-ArcadePhase4p2, You will be presented with two images\. Your task is to decide which will be hung in the museum and the other that will be burned to the ground\!\n\n*Let the battle begin\!*
+ArcadePhase4p2, Each round, you will be presented with two images\. Your task is to decide which will be hung in the museum and the other that will be burned to the ground\!\n\n*Let the battle begin\!*
 ArcadePhase4p3, Pick the display you find superior
 ArcadePhase4pRematch, FINAL BATTLE *REMATCH\!*:\nPick the display that will *WIN IT ALL\!\!\!*
 ArcadePhase4pChallenger, FINAL BATTLE :\nOne last fight that will decide the *FINAL VICTOR\!\!\!*
@@ -64,7 +64,7 @@ NotEnoughPlayers, Not enough players to start the game. Need at least 3 players.
 InvalidPrompt, Image was censored for various reasons, try sending the same prompt or another prompt again
 PromptFewWords, Prompt too short!\nYour prompt must be at least {limit} words long, try again!
 PromptManyChars, Prompt too long!\nYour prompt must be at most {limit} characters long, try again!
-PromptTakingAwhile, Your prompt is taking a while to generate, please hold...\nEstimate time is {eta} more seconds
+PromptTakingAwhile, Your prompt is taking a while to generate, please hold...\nEstimated time is {eta} more seconds
 MaxRetries, Image generation took to long, automatically generating simpler image.\nNote: If this does not produce an image, you are free to try again with a simpler prompt, however, it could be that Stable Diffusion is experiencing heavy load.
 WaitingAgain, Image generation is taking a while, waiting for another {time} seconds, {retries} retries left.
 PromptFailed, Previous prompt failed to generate, try making another!
