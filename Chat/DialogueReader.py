@@ -56,7 +56,7 @@ class DialogueReader:
     
     @staticmethod
     def parseFormatting(inputString):
-        SPECIAL_CHARACTERS = ["[", "]", "(", ")", "~", "`", ">", "#", "+", "-", "=", "|", "{", "}", ".", "!"]
+        SPECIAL_CHARACTERS = ["[", "]", "(", ")", "~", "`", ">", "#", "+", "-", "=", "|", "{", "}", ".", "!", "_"]
         # Replace special characters with \<character> for telegram compliance
         for eachItem in SPECIAL_CHARACTERS:
             inputString = inputString.replace(eachItem, f"\{eachItem}")

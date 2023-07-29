@@ -301,7 +301,7 @@ class Room:
         message += "TelePibbage Leaderboard:\n"
 
         for i, player in enumerate(leaderboard, start=1):
-            username = player.getUsername()
+            username = player.getUsername().replace("_", "\_") # Abit of a hardcode fix for markdown
             score = player.getScore()
             message += f"{i}\. {username}: {score} points\n"
 
@@ -331,7 +331,9 @@ class Room:
 
     async def broadcastLeaderboardArcade(self, bot, winner):
         # show the final leaderboard sequence
-        await self.broadcast(bot, "ArcadePhase5p1", parse_mode=DialogueReader.MARKDOWN, **{'AIrtist':f"{winner.getAuthor()}", 'captioner':f"{winner.getCaptionAuthor()}"})
+        formattedAuthor = winner.getAuthor().replace("_", "\_") # Abit of a hardcode fix for markdown
+        formattedCaptionAuthor = winner.getCaptionAuthor().replace("_", "\_")
+        await self.broadcast(bot, "ArcadePhase5p1", parse_mode=DialogueReader.MARKDOWN, **{'AIrtist':f"{formattedAuthor}", 'captioner':f"{formattedCaptionAuthor}"})
         winner.saveFrameImage(custom_caption=winner.getCaption())
         await self.broadcastImage(bot, winner.getFramedImage())
     

@@ -68,9 +68,17 @@ class Image:
         self.imageLies[lieAuthor] = (str(lie), [])
 
     async def insertCaption(self, caption, captionAuthor):
+        # SPECIAL_CHARACTERS = ["[", "]", "(", ")", "~", "`", ">", "#", "+", "-", "=", "|", "{", "}", ".", "!", "*", "_"]         
+        # for char in SPECIAL_CHARACTERS:
+        #     captionAuthor = captionAuthor.replace(char, f"\{char}")
+
         self.imageCaptions.append((caption, captionAuthor))
 
     async def addPlayersTricked(self, lieAuthor, playerTricked):
+        # SPECIAL_CHARACTERS = ["[", "]", "(", ")", "~", "`", ">", "#", "+", "-", "=", "|", "{", "}", ".", "!", "*", "_"]         
+        # for char in SPECIAL_CHARACTERS:
+        #     playerTricked = playerTricked.replace(char, f"\{char}")
+
         if lieAuthor == self.author:
             # if the prompt picked was by the original author means its the truth
             self.correct_players.append(playerTricked)
@@ -126,7 +134,9 @@ class Image:
 
     def showBattleVoters(self):
         message = ""
-        message += f"Votes for {self.author}'s image with {self.choosenCaption[1]} caption:\n"
+        formattedAuthor = self.author.replace("_", "\_")
+        formattedCaptionAuthor = self.getCaptionAuthor().replace("_", "\_")
+        message += f"Votes for {formattedAuthor}'s image with {formattedCaptionAuthor} caption:\n"
         for voter in self.battle_voters:
             message += f"@{voter}\n"
         return message
@@ -138,15 +148,15 @@ class Image:
         return otherImage in self.winstreak
     
     async def showPlayersTricked(self):
-        SPECIAL_CHARACTERS = ["[", "]", "(", ")", "~", "`", ">", "#", "+", "-", "=", "|", "{", "}", ".", "!", "*"] # [".",">","!"]        
+        # SPECIAL_CHARACTERS = ["[", "]", "(", ")", "~", "`", ">", "#", "+", "-", "=", "|", "{", "}", ".", "!", "*", "_"] # [".",">","!"]        
         message = ""
 
         # iterate through all lies
         for lieAuthor, (lie, playersTricked) in self.imageLies.items():
-            for char in SPECIAL_CHARACTERS:
-                lie = lie.replace(char, f"\{char}")
 
-            message += f"\*@{lieAuthor}'s LIE: {lie}\*\n"
+            # message += f"\*@{lieAuthor}'s LIE: {lie}\*\n"
+            message += f"*@{lieAuthor}'s LIE: {lie}*\n"
+            
             lieAuthorObj = PlayersManager.queryPlayer(lieAuthor)
 
             playersTrickedString = ", @".join(playersTricked)
@@ -157,18 +167,21 @@ class Image:
                 message += f"Players who picked this prompt: @{playersTrickedString}\n"
                 # message += f"This was a LIE by {lieAuthor}\n"
             
-            message += f"{lieAuthor} gains {len(playersTricked) * 500} points\!\n\n"
+            # message += f"{lieAuthor} gains {len(playersTricked) * 500} points\!\n\n"
+            message += f"{lieAuthor} gains {len(playersTricked) * 500} points!\n\n"
             lieAuthorObj.addScore(len(playersTricked) * 500)
 
         formatted_prompt = self.prompt
-        for char in SPECIAL_CHARACTERS:
-            formatted_prompt = formatted_prompt.replace(char, f"\{char}")
+        # for char in SPECIAL_CHARACTERS:
+        #     formatted_prompt = formatted_prompt.replace(char, f"\{char}")
 
-        message += f"\n\*@{self.author}'s PROMPT: {formatted_prompt}\*\n"
+        # message += f"\n\*@{self.author}'s PROMPT: {formatted_prompt}\*\n"
+        message += f"\n*@{self.author}'s PROMPT: {formatted_prompt}*\n"
         # iterate through all players who got the right answer
         for correct_player in self.correct_players:
             message += f"Player who picked this prompt: @{correct_player}\n"
-            message += f"{correct_player} gains 1000 points\!\n"
+            # message += f"{correct_player} gains 1000 points\!\n"
+            message += f"{correct_player} gains 1000 points!\n"
             playerObj = PlayersManager.queryPlayer(correct_player)
             playerObj.addScore(1000)
 

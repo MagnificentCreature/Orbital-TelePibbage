@@ -12,6 +12,7 @@ async def sendPhase4Messages(bot, room):
     await asyncio.sleep(2)
     await room.broadcast(bot, "Phase4p2")
 
+# Method Unused
 async def revealNextImage(bot, room, player):
     # TODO: Send the player the next image he should come up with a lie for
     imageList = await room.getImageListCopy() #This function should return a COPY of the image list
@@ -22,7 +23,7 @@ async def revealNextImage(bot, room, player):
 
       message = imageObj.showPlayersTricked()
 
-      await player.send_message(bot, message, raw=True, parse_mode=DialogueReader.MARKDOWN) #unsafe method?
+      await player.send_message(bot, message, raw=True) #unsafe method? , parse_mode=DialogueReader.MARKDOWN
     # message = await image.getMessage(PlayerConstants.NEXT_LIE)
 
 async def revealLeaderboard(bot, room):
