@@ -138,6 +138,7 @@ class Image:
         formattedCaptionAuthor = self.getCaptionAuthor().replace("_", "\_")
         message += f"Votes for {formattedAuthor}'s image with {formattedCaptionAuthor} caption:\n"
         for voter in self.battle_voters:
+            voter = voter.replace("_", "\_")
             message += f"@{voter}\n"
         return message
     
@@ -155,7 +156,7 @@ class Image:
         for lieAuthor, (lie, playersTricked) in self.imageLies.items():
 
             # message += f"\*@{lieAuthor}'s LIE: {lie}\*\n"
-            message += f"*@{lieAuthor}'s LIE: {lie}*\n"
+            message += f"@{lieAuthor}'s LIE: {lie}\n"
             
             lieAuthorObj = PlayersManager.queryPlayer(lieAuthor)
 
