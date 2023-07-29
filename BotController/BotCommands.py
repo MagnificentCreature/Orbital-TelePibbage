@@ -283,7 +283,7 @@ async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYP
     if await room.checkItems(PlayerConstants.HAS_VOTED, context.bot, advance=False):
         #reveal
         message = await votingImage.showPlayersTricked()
-        await room.broadcast(context.bot, message=message, raw=True, parse_mode=DialogueReader.MARKDOWN)
+        await room.broadcast(context.bot, message=message, raw=True) # , parse_mode=DialogueReader.MARKDOWN
         await asyncio.sleep(2)
 
         # Broadcast the framed image if its popular
