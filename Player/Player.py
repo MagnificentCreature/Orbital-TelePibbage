@@ -174,7 +174,11 @@ class Player:
             except TypeError:
                 pass
             return
-        await self._user_data[messageKey].delete()
+        try:
+            await self._user_data[messageKey].delete()
+        except telegram.error.BadRequest as badReqError:
+            print(badReqError)
+            pass
         del self._user_data[messageKey]
 
     @timeOutRetryDecorator
