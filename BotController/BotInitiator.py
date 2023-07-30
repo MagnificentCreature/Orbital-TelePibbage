@@ -28,6 +28,7 @@ def main() -> None:
     # In game conversation handler
     game_conv_handler = ConversationHandler(
         entry_points=[
+                CommandHandler("help", BotCommands.help),
                 CallbackQueryHandler(BotCommands.start_game, pattern="^" + str(BotInitiatorConstants.START_GAME) + "$"),
                 MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.take_prompt, block=False),
                 CallbackQueryHandler(BotCommands.handle_arcade_gen, pattern=BotInitiatorConstants.SEND_ARCADE_WORD_REGEX),
@@ -44,6 +45,7 @@ def main() -> None:
                 CallbackQueryHandler(BotCommands.create_room, pattern="^" + str(BotInitiatorConstants.CREATE_ROOM) + "$"),
                 CallbackQueryHandler(BotCommands.join_room_start, pattern="^" + str(BotInitiatorConstants.JOIN_ROOM) + "$"),
                 CallbackQueryHandler(BotCommands.play_again, pattern=BotInitiatorConstants.PLAY_AGAIN_REGEX),
+                CommandHandler("help", BotCommands.help),
             ],
             BotInitiatorConstants.REVEAL_PHASE: [
                 # MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.reveal_lies),
@@ -78,10 +80,12 @@ def main() -> None:
     main_conv_handler = ConversationHandler(
         entry_points=[CommandHandler("start", BotCommands.start)],
         states={
-            BotInitiatorConstants.FRESH: [CommandHandler("start", BotCommands.start),
+            BotInitiatorConstants.FRESH: [
+                    CommandHandler("start", BotCommands.start),
                     CallbackQueryHandler(BotCommands.create_room, pattern="^" + str(BotInitiatorConstants.CREATE_ROOM) + "$"),
                     CallbackQueryHandler(BotCommands.join_room_start, pattern="^" + str(BotInitiatorConstants.JOIN_ROOM) + "$"),
                     CallbackQueryHandler(BotCommands.play_again, pattern=BotInitiatorConstants.PLAY_AGAIN_REGEX),
+                    CommandHandler("help", BotCommands.help),
             ],
             BotInitiatorConstants.ENTERCODE: [MessageHandler(filters.TEXT & ~filters.COMMAND, BotCommands.join_room_code),
                         FRESH_CALLBACK
