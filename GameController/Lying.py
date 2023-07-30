@@ -29,7 +29,7 @@ async def sendNextImage(bot, room, player):
         return False
     image = imageList.pop(random.randint(0, len(imageList) - 1))
     if image is None:
-        print("NO IMAGE WTF LOL")
+        print("No Image to Lie")
     player.setItem(PlayerConstants.NEXT_LIE, image) # fill second param with image
     if not await player.queryMessagekey("LyingImage"):
         await player.sendImageURL(bot, image.getImageURL(), messageKey="LyingImage", caption="Phase2caption", **{"item": "lie"}) # , reply_markup=lie_keyboard

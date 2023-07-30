@@ -232,20 +232,6 @@ async def recievePickedWord(username, wordList, banned=None):
 
 async def beginPhase1(bot, room):
     asyncio.create_task(sendPhase1Messages(bot, room))
-    # df = pd.read_csv(PROMPT_POOL)
-    # data = process_generation_poll(df)
-
-    # curated_word_dict = get_random_elements_dict(_generation_data)
-    # choosen_word1 = prompt_user(list(curated_word_dict.keys()))
-
-    # word_list = get_random_word_list()
-    # choosen_word2 = prompt_user(word_list)
-
-    # curated_word_list2 = get_random_elements(_generation_data, num_elements=5, banned=curated_word_dict[choosen_word1])
-    # choosen_word3 = prompt_user(curated_word_list2)
-
-    # print("Comma seperated prompt is: " + choosen_word1 + ", " + choosen_word2 + ", " + choosen_word3)
-    # print("Randomized prompt is: " + randomise_strings(choosen_word1, choosen_word2, choosen_word3))
 
 if __name__ == "__main__":
     df = pd.read_csv(PROMPT_POOL)

@@ -62,10 +62,6 @@ class DialogueReader:
             inputString = inputString.replace(eachItem, f"\{eachItem}")
         return inputString
     
-    # @classmethod
-    # def queryDialogue(cls, key):
-    #     return cls.additionalProcessing(cls._dialogues[key])
-    
     @classmethod
     def queryDialogue(cls, key, **kwargs):
         if key is None:
@@ -73,29 +69,7 @@ class DialogueReader:
         if len(kwargs) == 0:
             return cls.additionalProcessing(cls._dialogues[key])
         return cls.additionalProcessing(cls._dialogues[key].format(**kwargs))
-
-    # @classmethod
-    # async def sendMessageByID(cls, bot, chat_id, message, reply_markup=None, raw=False, exponential_backoff=1, parse_mode=None):
-    #     try:
-    #         #Use telegram api to send a message
-    #         try:
-    #             if raw:
-    #                 return await bot.send_message(chat_id=chat_id, text=message, reply_markup=reply_markup, parse_mode=parse_mode) 
-    #             if (message not in cls._dialogues):
-    #                 print("Message " + message + " not found in dialogues.txt")
-    #             formattedText = cls.additionalProcessing(cls._dialogues[message])
-    #             return await bot.send_message(chat_id=chat_id, text=formattedText, reply_markup=reply_markup, parse_mode=parse_mode)
-    #         except error.Forbidden as e:
-    #             logging.error("Error sending message to chat_id " + str(chat_id) + ": " + str(e))
-    #     except error.TimedOut as e:
-    #         if exponential_backoff > cls.MAX_RETRIES:
-    #             print("FAILURE TO SEND, ABORTING")
-    #             return
-    #         logging.error("Timeout error sending message to chat_id " + str(chat_id) + ": " + str(e))
-    #         await asyncio.sleep(2**random.randint(1, exponential_backoff))
-    #         return await cls.sendMessageByID(bot, chat_id, message, reply_markup=reply_markup, raw=raw, exponential_backoff=exponential_backoff+1, parse_mode=parse_mode)
-
-
+    
     @classmethod
     async def sendMessageByID(cls, bot, chat_id, message, reply_markup=None, raw=False, exponential_backoff=1, parse_mode=None, **kwargs):
         try:

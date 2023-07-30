@@ -239,7 +239,6 @@ class Image:
             y += y_text
 
         self.framedImage = background
-        print('image framed' + str(self.framedImage))
         return True
     
     def getFramedImage(self):
