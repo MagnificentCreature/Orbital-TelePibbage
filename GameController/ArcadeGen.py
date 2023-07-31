@@ -128,9 +128,10 @@ def get_random_word():
 
 #Should I make it more common for nouns to show up (ie change ratio of nouns to verbs?)
 def get_random_word_list(length=6):
-    word_list = []
     word_list = wordnik_service.get_random_words(hasDictionaryDef="true", includePartOfSpeech="noun,verb", minCorpusCount=MIN_CORPUS_COUNT, minDictionaryCount=20, limit=length)
-    while word_list is None or len(word_list) < length:
+    if word_list is None:
+        word_list = []
+    while len(word_list) < length:
         word_list.append(get_random_word())
     return word_list
 
