@@ -1,5 +1,5 @@
 # Each line is an entry stored in the form of key, text 
-Welcome1, Welcome to Pibbage! If you're new here, check <Insert youtube video/website> for the rules!
+Welcome1, Welcome to Pibbage! If you're new here, check https://youtu.be/6jW4kYFT3h8 for the rules!
 Welcome2, When you're ready, press "Create Room" to create a game lobby or "Join Room" then enter your Room Code to join a game!
 Welcome3, Hope you had a great game! You can press play again to play again with the same players or create/join another room!
 ReturningToStart, Returning to start
@@ -23,7 +23,7 @@ StartingGame, Host @{host} has started the game! Get Ready!
 HostStartingGame, You are starting the game! Get Ready!
 # Game related dialogues
 Phase1p1, Ladies and gentlemen, boys and girls, welcome to the most exhilarating game show in town, TelePibbage! I am honored to be your host for today's thrilling competition of witty imagery and trickery.
-Phase1p2, This is the *PROMPTING PHASE*\! With the help of my backstage magic monkeys with paintbrushes, I can convert your words into whacky images, so let your imaginations run wild and *send me your most hilarious prompts\!*\n\nPS This process is expected to take a while, especially if another player is generating before you, please hold
+Phase1p2, This is the *PROMPTING PHASE*\! With the help of my backstage magic monkeys with paintbrushes, I can convert your words into whacky images, so let your imaginations run wild and send me your most hilarious prompts\!\n\n*Type your prompt below\!*\n\(For example\: Giraffe at a circus with dolphins\)\nPS This process is expected to take a while, especially if another player is generating before you, please hold
 PromptRecieved, Prompt Recieved! Generating Image...
 WaitingForItems, Waiting for other players to send in their {item}s...
 Phase2p1, I see some of you have sent some REALLY creative images, now we will move on to the next phase\. The *LYING PHASE*
@@ -34,16 +34,16 @@ Phase3p2, Your task is to examine all prompts and vote for the prompt you believ
 Phase3BONUS, Gee huge props to this lie! You really got alot of people to believe it\! I'll give you a bonus point for that\!
 Phase4p1, Now that the liars have been exposed and the real prompts have been revealed, let's see who has triumphed in this thrilling journey!
 Phase4p2, Annnnd the WINNER is......
-ArcadePhase1p1, *Bonjour, mes amis\!* Welcome to the worlds finest museum of the AI arts, my name is Pierre, I am the curator\.\nI am in a little predicament, you see, my art got pirated\(copy\-pasted\) by some bored looking apes and now my museum is in peril\.\.\.
+ArcadePhase1p1, *Bonjour, mes amis\!* Welcome to the worlds finest museum of the AI arts, my name is Pierre, I am the curator\.\nI am in a little predicament, you see, moi art got pirated\(copy\-pasted\) by some bored looking apes and now my museum is in peril\.\.\.
 ArcadePhase1p2, Have some sympathy ya, moi beautiful art pieces do not come cheap. So, I'll need talented AIrtists such as yourselves to help to fill my museum with the finest art. But worry not my friend, it will be a fun and easy process, I will even reward the best AIrtists with an imaginary prize!
-ArcadePhase1p3, Bellow you will see some magic words I pulled out of my magic hat, find one that fancies your imagination and send it to me, I will convert it into a beautiful piece of art for you to hang in my museum!\n\nNote: If the buttons are unresponsive, wait a few seconds and try again, it could be processing other requests
-ArcadePhase1p4, Perfect, now pick another enchanted word...
-ArcadePhase1p5, Last word, something that will elevate your work into a masterpiece.
-ArcadePhase1p6, Now some finishing touches, to tie the cryptic spell together.
+ArcadePhase1p3, Bellow you will see some magic words I pulled out of my magic hat, find one that fancies your imagination and send it to me, I will convert it into a beautiful piece of art for you to hang in my museum\!\n\n*PRESS A BUTTON BELLLOW TO CRAFT YOUR PROMPT\!*\n\nNote\: If the buttons are unresponsive, wait a few seconds and try again, it could be processing other requests
+ArcadePhase1p4, Perfect, now pick another enchanted word\.\.\.\n\n*PRESS A BUTTON BELLLOW TO CRAFT YOUR PROMPT\!*
+ArcadePhase1p5, Last word, something that will elevate your work into a masterpiece\.\n\n*PRESS A BUTTON BELLLOW TO CRAFT YOUR PROMPT\!*
+ArcadePhase1p6, Now some finishing touches, to tie the cryptic spell together\.\n\n*SELECT THE FINAL PROMPT\!*
 ArcadePhase1p7, *{prompt}\!\?\!*\nOOOoo YES\! I can feel the potential in this one, now let me throw those words into my magic hat and see what I can pull out\.\.\. this might take a while\.\.\. let me go prepare the canvas\.\.\.
 ArcadePhase2p1, *Your masterpiece is almost ready\!* But before that, I appear to have lost the labels on some of my other images in the museum\. Rather than going through the trouble of finding them, I'll just ask you to *make up new labels for me\!*
-ArcadePhase2p2, I'm sure a connoisseur such as yourself can perfectly capture its creator's intent and can "cook" something that will "knock the shoes out of" the wider audience and blow its creator's mind? hmm?
-ArcadePhase3p1, *Look at what a beauty you made\!* Now, your fellow brilliant articAIns have conjured some SPLENDID labels\! *Pick the one you think best fits our image on the wall\.* 
+ArcadePhase2p2, I'm sure a connoisseur such as yourself can perfectly capture its creator's intent and can "cook" something that will "knock the shoes out of" the wider audience and blow its creator's mind? hmm?\n\nSEND YOUR CAPTION BELLOW!\n(eg: Masterpiece of Pablo Picasso)
+ArcadePhase3p1, *Look at what a beauty you made\!* Now, your fellow brilliant articAIns have conjured some SPLENDID labels\!\n\n*PICK YOUR FAVOURITE CAPTION\!* 
 ArcadePhase4p1, Your masterpiece is now finally complete and on canvas\!\nIt seems there is only one thing left to do, a *BATTLE OF FIRE AND FLAMES UNTIL ONLY ONE REMAINS\!\!\!*
 ArcadePhase4p2, Each round, you will be presented with two images\. Your task is to decide which will be hung in the museum and the other that will be burned to the ground\!\n\n*Let the battle begin\!*
 ArcadePhase4p3, Pick the display you find superior

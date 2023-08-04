@@ -202,12 +202,12 @@ def make_keyboard(word_list, number=1, row_size=ROW_SIZE, final_keyboard=False):
 # This function is used in the send phase 1 messages
 async def sendRandomElements(bot, room, player):
     curated_word_dict = get_random_elements_dict(_generation_data)
-    await player.sendMessage(bot, "ArcadePhase1p3", messageKey="arcade_prompting", reply_markup=make_keyboard(curated_word_dict, 1))
+    await player.sendMessage(bot, "ArcadePhase1p3", messageKey="arcade_prompting", reply_markup=make_keyboard(curated_word_dict, 1), parse_mode=DialogueReader.MARKDOWN)
 
 # Function to be used to under room broadCall to send a specified list to the player
 # This function is not actually being used
 async def sendRandomWords(bot, room, player):
-    await player.sendMessage(bot, "ArcadePhase1p3", messageKey="arcade_prompting", reply_markup=make_keyboard(get_random_word_list(), 1))
+    await player.sendMessage(bot, "ArcadePhase1p3", messageKey="arcade_prompting", reply_markup=make_keyboard(get_random_word_list(), 1), parse_mode=DialogueReader.MARKDOWN)
 
 # Returns false when there are still more words to be picked
 # Returns true when all the words are picked
@@ -215,18 +215,18 @@ async def recievePickedWord(username, wordList, banned=None):
     player = PlayersManager.queryPlayer(username)
     match len(wordList):
         case 1:
-            await player.editMessage("arcade_prompting", "ArcadePhase1p4", reply_markup=make_keyboard(get_random_word_list(), len(wordList) + 1)) #TODO change wordlist out
+            await player.editMessage("arcade_prompting", "ArcadePhase1p4", reply_markup=make_keyboard(get_random_word_list(), len(wordList) + 1), parse_mode=DialogueReader.MARKDOWN) #TODO change wordlist out
         case 2:
             curated_word_list2 = get_random_elements(_generation_data, num_elements=3, banned=banned)
             curated_word_list2.extend(get_random_word_list(length=3))
-            await player.editMessage("arcade_prompting", "ArcadePhase1p5", reply_markup=make_keyboard(curated_word_list2, len(wordList) + 1))
+            await player.editMessage("arcade_prompting", "ArcadePhase1p5", reply_markup=make_keyboard(curated_word_list2, len(wordList) + 1), parse_mode=DialogueReader.MARKDOWN)
         case 3:
             # sets the player arcade_gen_string to the comma seperated output
             final_list = [f"{wordList[0]}, {wordList[1]}, {wordList[2]}", 
                           randomise_strings(*wordList), 
                           randomise_strings(*wordList)]
             player.setItem(PlayerConstants.ARCADE_PROMPT_LIST, final_list)
-            await player.editMessage("arcade_prompting", "ArcadePhase1p6", reply_markup=make_keyboard(final_list, row_size=1, final_keyboard=True))
+            await player.editMessage("arcade_prompting", "ArcadePhase1p6", reply_markup=make_keyboard(final_list, row_size=1, final_keyboard=True), parse_mode=DialogueReader.MARKDOWN)
         case _:
             print(wordList)
             print("Error: Invalid number of words recieved in recievePickedWord")
