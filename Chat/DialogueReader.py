@@ -9,6 +9,7 @@ from io import BytesIO
 from os import path
 import random
 import logging
+import re
 
 from telegram import InputMediaPhoto, error
 from telegram import constants
@@ -57,10 +58,14 @@ class DialogueReader:
     @staticmethod
     def parseFormatting(inputString):
         SPECIAL_CHARACTERS = ["[", "]", "(", ")", "~", "`", ">", "#", "+", "-", "=", "|", "{", "}", ".", "!", "_"]
-        # Replace special characters with \<character> for telegram compliance
-        for eachItem in SPECIAL_CHARACTERS:
-            inputString = inputString.replace(eachItem, f"\{eachItem}")
-        return inputString
+        pattern = '|'.join(map(re.escape, SPECIAL_CHARACTERS)) # Creates a pattern using the "or" operator with each special operator
+        return re.sub(pattern, lambda m: '\\' + m.group(), inputString) # Replaces each special character with a backslash and the character
+    
+        # SPECIAL_CHARACTERS = ["[", "]", "(", ")", "~", "`", ">", "#", "+", "-", "=", "|", "{", "}", ".", "!", "_"]
+        # # Replace special characters with \<character> for telegram compliance
+        # for eachItem in SPECIAL_CHARACTERS:
+        #     inputString = inputString.replace(eachItem, f"\{eachItem}")
+        # return inputString
     
     @classmethod
     def queryDialogue(cls, key, **kwargs):

@@ -6,6 +6,7 @@ import os
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 import random
 from BotController.BotInitiatorConstants import BotInitiatorConstants
+from Chat.DialogueReader import DialogueReader
 from Player.PlayersManager import PlayersManager
 import urllib.request
 import requests
@@ -68,17 +69,9 @@ class Image:
         self.imageLies[lieAuthor] = (str(lie), [])
 
     async def insertCaption(self, caption, captionAuthor):
-        # SPECIAL_CHARACTERS = ["[", "]", "(", ")", "~", "`", ">", "#", "+", "-", "=", "|", "{", "}", ".", "!", "*", "_"]         
-        # for char in SPECIAL_CHARACTERS:
-        #     captionAuthor = captionAuthor.replace(char, f"\{char}")
-
         self.imageCaptions.append((caption, captionAuthor))
 
     async def addPlayersTricked(self, lieAuthor, playerTricked):
-        # SPECIAL_CHARACTERS = ["[", "]", "(", ")", "~", "`", ">", "#", "+", "-", "=", "|", "{", "}", ".", "!", "*", "_"]         
-        # for char in SPECIAL_CHARACTERS:
-        #     playerTricked = playerTricked.replace(char, f"\{char}")
-
         if lieAuthor == self.author:
             # if the prompt picked was by the original author means its the truth
             self.correct_players.append(playerTricked)
@@ -149,18 +142,19 @@ class Image:
         return otherImage in self.winstreak
     
     async def showPlayersTricked(self):
-        # SPECIAL_CHARACTERS = ["[", "]", "(", ")", "~", "`", ">", "#", "+", "-", "=", "|", "{", "}", ".", "!", "*", "_"] # [".",">","!"]        
         message = ""
 
         # iterate through all lies
         for lieAuthor, (lie, playersTricked) in self.imageLies.items():
 
-            # message += f"\*@{lieAuthor}'s LIE: {lie}\*\n"
-            message += f"@{lieAuthor}'s LIE: {lie}\n"
+            formattedLieAuthor = lieAuthor.replace("_", "\_")
+            message += f"*@{formattedLieAuthor}'s LIE: {lie}*\n"
+            # message += f"@{lieAuthor}'s LIE: {lie}\n"
             
             lieAuthorObj = PlayersManager.queryPlayer(lieAuthor)
 
-            playersTrickedString = ", @".join(playersTricked)
+            playersTrickedFormatted = [name.replace('_', '\_') for name in playersTricked]
+            playersTrickedString = ", @".join(playersTrickedFormatted)
 
             if playersTrickedString == "":
                 message += "Nobody picked this lie\n"    
@@ -168,21 +162,20 @@ class Image:
                 message += f"Players who picked this prompt: @{playersTrickedString}\n"
                 # message += f"This was a LIE by {lieAuthor}\n"
             
-            # message += f"{lieAuthor} gains {len(playersTricked) * 500} points\!\n\n"
-            message += f"{lieAuthor} gains {len(playersTricked) * 500} points!\n\n"
+            message += f"{formattedLieAuthor} gains {len(playersTricked) * 500} points\!\n\n"
+            # message += f"{formattedLieAuthor} gains {len(playersTricked) * 500} points!\n\n"
             lieAuthorObj.addScore(len(playersTricked) * 500)
 
-        formatted_prompt = self.prompt
-        # for char in SPECIAL_CHARACTERS:
-        #     formatted_prompt = formatted_prompt.replace(char, f"\{char}")
+        formatted_prompt = DialogueReader.parseFormatting(self.prompt)
 
-        # message += f"\n\*@{self.author}'s PROMPT: {formatted_prompt}\*\n"
-        message += f"\n*@{self.author}'s PROMPT: {formatted_prompt}*\n"
+        message += f"\n*@{self.author}'s REAL PROMPT: {formatted_prompt}*\n"
+        # message += f"\n*@{self.author}'s PROMPT: {formatted_prompt}*\n"
         # iterate through all players who got the right answer
         for correct_player in self.correct_players:
-            message += f"Player who picked this prompt: @{correct_player}\n"
-            # message += f"{correct_player} gains 1000 points\!\n"
-            message += f"{correct_player} gains 1000 points!\n"
+            formattedCorrectPlayer = correct_player.replace("_", "\_")
+            message += f"Player who picked this prompt: @{formattedCorrectPlayer}\n"
+            message += f"{correct_player} gains 1000 points\!\n"
+            # message += f"{formattedCorrectPlayer} gains 1000 points!\n"
             playerObj = PlayersManager.queryPlayer(correct_player)
             playerObj.addScore(1000)
 
@@ -281,7 +274,6 @@ class Image:
         self.captionedImage = imagePng
 
     def getCaptionedImage(self):
-        # TODO: return the captioned image, this should be a BytesIO object
         bio = BytesIO() # got to import BytesIO from io
         captionedFinalImage = self.captionedImage
         captionedFinalImage.save(bio, 'PNG')

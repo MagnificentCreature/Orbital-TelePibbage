@@ -168,14 +168,10 @@ async def take_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # check if the room is in the prompting state
     if not await RoomHandler.checkState(context.user_data['roomCode'], Room.State.PROMPTING_STATE):
-        # TODO Handle the phase error
         print("Error: Not in prompting phase")
         return BotInitiatorConstants.PROMPTING_PHASE
 
     prompt = update.message.text
-    # SPECIAL_CHARACTERS = ["[", "]", "(", ")", "~", "`", ">", "#", "+", "-", "=", "|", "{", "}", ".", "*", "!"] # [".",">","!"]
-    # for eachItem in SPECIAL_CHARACTERS:
-    #     prompt =  prompt.replace(eachItem, f"\{eachItem}")
 
     # check if prompt is less than 3 words
     if len(prompt.split(" ")) < MIN_PROMPT_LENGTH:
@@ -283,7 +279,7 @@ async def handle_vote_callback(update: Update, context: ContextTypes.DEFAULT_TYP
     if await room.checkItems(PlayerConstants.HAS_VOTED, context.bot, advance=False):
         #reveal
         message = await votingImage.showPlayersTricked()
-        await room.broadcast(context.bot, message=message, raw=True) # , parse_mode=DialogueReader.MARKDOWN
+        await room.broadcast(context.bot, message=message, raw=True, parse_mode=DialogueReader.MARKDOWN) # 
         await asyncio.sleep(2)
 
         # Broadcast the framed image if its popular

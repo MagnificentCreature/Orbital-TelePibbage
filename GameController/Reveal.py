@@ -23,7 +23,7 @@ async def revealNextImage(bot, room, player):
 
       message = imageObj.showPlayersTricked()
 
-      await player.send_message(bot, message, raw=True) #unsafe method? , parse_mode=DialogueReader.MARKDOWN
+      await player.send_message(bot, message, raw=True, parse_mode=DialogueReader.MARKDOWN) #unsafe method? , parse_mode=DialogueReader.MARKDOWN
     # message = await image.getMessage(PlayerConstants.NEXT_LIE)
 
 async def revealLeaderboard(bot, room):
