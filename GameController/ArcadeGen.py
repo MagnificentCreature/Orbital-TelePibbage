@@ -12,7 +12,7 @@ import conf
 
 PROMPT_POOL = 'Assets\PromptsGenerationPool.csv'
 PREPOSITIONS = 'Assets\Preposition.csv'
-MIN_CORPUS_COUNT = 10000
+MIN_CORPUS_COUNT = 15000
 WORDNIK_API_KEY = conf.WORDNIK_API_TOKEN
 ROW_SIZE = 2
 

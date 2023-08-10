@@ -260,11 +260,12 @@ class Room:
                     continue
                 self._playerToRemainingImages[eachPlayer].append(image)
         elif self._mode == Room.Mode.ARCADE:
-            max_range = min(len(self._players), 3)
+            max_range = min(len(self._players), 4)
             player_index = self._shuffled_players.index(player)
             for i in range(1, max_range):
-                next_player = self._shuffled_players[(player_index + i) % max_range]
+                next_player = self._shuffled_players[(player_index + i) % len(self._players)]
                 self._playerToRemainingImages[next_player].append(image)
+            print(self._playerToRemainingImages)
 
     async def getRemainingImages(self, player):
         return self._playerToRemainingImages[player]                      

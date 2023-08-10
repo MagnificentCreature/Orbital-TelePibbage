@@ -129,9 +129,12 @@ class Player:
 
     def deleteContext(self, key):
         try:
-            del self._user_data[key]
-        except KeyError:
-            del self._user_data[key.value]
+            if key in self._user_data:
+                del self._user_data[key]
+            else:
+                del self._user_data[key.value]
+        except (KeyError, AttributeError) as error:
+            pass
 
     async def queryMessagekey(self, messageKey):
         try:
@@ -179,7 +182,10 @@ class Player:
         except telegram.error.BadRequest as badReqError:
             print(badReqError)
             pass
-        del self._user_data[messageKey]
+        try:
+            del self._user_data[messageKey]
+        except KeyError:
+            pass
 
     @timeOutRetryDecorator
     async def deleteMessageList(self, messageKeyList):

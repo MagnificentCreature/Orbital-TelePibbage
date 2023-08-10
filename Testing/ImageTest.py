@@ -5,8 +5,6 @@ import sys
 sys.path.append('.')
 from GameController.Image import Image
 from Player.Player import Player
-
-
 class TestImage(unittest.TestCase):
     
     def setUp(self):
