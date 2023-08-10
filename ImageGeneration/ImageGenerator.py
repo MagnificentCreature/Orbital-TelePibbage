@@ -2,14 +2,13 @@ import asyncio
 import requests
 import hashlib
 import json
-# import conf
+import conf
 import math
 
 from GameController.Image import Image
 from Player.PlayersManager import PlayersManager
 
-# AI_API_TOKEN = conf.SD_API_TOKEN
-AI_API_TOKEN = "7vFwuHHVpUoOW5his0TrwewJP40w1WDeydVQTMMllgzHBzjvLl6kcrqHGfTR"
+AI_API_TOKEN = conf.SD_API_TOKEN
 
 URL_V3 = "https://stablediffusionapi.com/api/v3/text2img"
 URL = "https://stablediffusionapi.com/api/v4/dreambooth"
