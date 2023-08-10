@@ -22,7 +22,7 @@ class Room:
     _players = [] #contains list of player objects
     _shuffled_players = [] #contains list of player objects but shuffled for arcade mode
     MAX_PLAYERS = 8
-    MIN_PLAYERS = 2
+    MIN_PLAYERS = 3
     _mode = None #game mode
     _state = 0 # 0 = join state, 1 = game state
     _list_of_images = []
@@ -265,7 +265,6 @@ class Room:
             for i in range(1, max_range):
                 next_player = self._shuffled_players[(player_index + i) % len(self._players)]
                 self._playerToRemainingImages[next_player].append(image)
-            print(self._playerToRemainingImages)
 
     async def getRemainingImages(self, player):
         return self._playerToRemainingImages[player]                      
